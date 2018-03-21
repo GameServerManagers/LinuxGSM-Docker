@@ -56,7 +56,7 @@ RUN dpkg --add-architecture i386 && \
 		libnm-glib-dev:i386
 
 ## lgsm.sh
-RUN wget https://gameservermanagers.com/dl/linuxgsm.sh
+RUN wget https://linuxgsm.com/dl/linuxgsm.sh
 
 ## user config
 RUN adduser --disabled-password --gecos "" lgsm && \
