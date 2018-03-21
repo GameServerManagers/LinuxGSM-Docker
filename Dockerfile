@@ -62,7 +62,7 @@ RUN wget https://gameservermanagers.com/dl/linuxgsm.sh
 RUN adduser --disabled-password --gecos "" lgsm && \
 	chown lgsm:lgsm /linuxgsm.sh && \
 	chmod +x /linuxgsm.sh && \
-	cp /linuxgsm.sh /home/lgsm/linuxgsm.sh \
+	cp /linuxgsm.sh /home/lgsm/linuxgsm.sh && \
 	usermod -G tty lgsm
 
 USER lgsm
