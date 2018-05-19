@@ -65,7 +65,7 @@ RUN adduser --disabled-password --gecos "" lgsm && \
 	cp /linuxgsm.sh /home/lgsm/linuxgsm.sh && \
 	usermod -G tty lgsm
 
-RUN passwd root \ pcmasterrace
+RUN echo "root:pcmasterrace" | chpasswd
 
 USER lgsm
 WORKDIR /home/lgsm
