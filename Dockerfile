@@ -5,7 +5,7 @@
 #
 
 FROM ubuntu:16.04
-LABEL maintainer="LinuxGSM <me@Danielgibbs.co.uk>"
+LABEL maintainer="LinuxGSM <andrew.martin1995@hotmail.com>"
 
 ENV DEBIAN_FRONTEND noninteractive
 
@@ -64,6 +64,8 @@ RUN adduser --disabled-password --gecos "" lgsm && \
 	chmod +x /linuxgsm.sh && \
 	cp /linuxgsm.sh /home/lgsm/linuxgsm.sh && \
 	usermod -G tty lgsm
+
+RUN passwd root \ pcmasterrace
 
 USER lgsm
 WORKDIR /home/lgsm
