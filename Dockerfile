@@ -17,6 +17,7 @@ RUN dpkg --add-architecture i386 && \
 		mailutils \
 		postfix \
 		bc \
+		jq \
 		curl \
 		wget \
 		file \
