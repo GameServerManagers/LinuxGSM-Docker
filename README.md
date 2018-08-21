@@ -16,3 +16,10 @@ Dockerhub https://hub.docker.com/r/gameservermanagers/linuxgsm-docker/
 
 Run Game Servers in Docker, multiplex multiple LinuxGSM deployments easily by taking advantage of Dockers port mapping.
 
+## Installation
+This will work both on linux and Docker for Windows. With Docker for Windows, skip the first command and make a folder the normal way. When running the container, Docker for Windows may ask for permission to access the folder. Simply allow this action.
+
+```bash
+$ mkdir -p /path/to/lgsm && sudo chown -R 750:750 /path/to/lgsm
+$ docker run --name lgsm-docker --restart always --net=host --hostname LGSM -it -v "/path/to/lgsm:/home/lgsm/" lgsm-docker
+```
