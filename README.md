@@ -9,8 +9,6 @@
 [![Discord](https://discordapp.com/api/guilds/127498813903601664/widget.png?style=shield)](https://linuxgsm.com/discord)
 [![MIT Licence](https://badges.frapsoft.com/os/mit/mit.svg?v=103)](https://github.com/GameServerManagers/LinuxGSM/blob/master/LICENSE)
 
-# LinuxGSM Docker
-
 This docker image is under development and not officialy supported.
 
 The best functioning docker image can be found here
