@@ -26,5 +26,5 @@ This will work both on linux and Docker for Windows. With Docker for Windows, sk
 
 ```bash
 $ mkdir -p /path/to/lgsm && sudo chown -R 750:750 /path/to/lgsm
-$ docker run --name lgsm-docker --restart always --net=host --hostname LGSM -it -v "/path/to/lgsm:/home/lgsm/" lgsm-docker
+$ docker run --name lgsm-docker --restart always --net=host --hostname LGSM -it -v "/path/to/lgsm:/home/lgsm/" gameservermanagers/linuxgsm-docker
 ```
