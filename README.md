@@ -11,9 +11,7 @@
 
 This docker image is under development and not officialy supported.
 
-The best functioning docker image can be found here
-
-The developers of LinuxGSM are not currently docker experts. So if there is some interested in becoming a LinuxGSM docker developer please contact us.
+The developers of LinuxGSM are not currently docker experts. So if there is someone interested in becoming a LinuxGSM docker developer please contact us.
 
 A docker container distribution of https://github.com/GameServerManagers/LinuxGSM
 
