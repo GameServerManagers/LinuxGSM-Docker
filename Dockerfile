@@ -54,7 +54,9 @@ RUN dpkg --add-architecture i386 && \
 		libssl1.0.0:i386 \
 		libgtk2.0-0:i386 \
 		libdbus-glib-1-2:i386 \
-		libnm-glib-dev:i386
+		libnm-glib-dev:i386 \
+		&& apt-get clean \
+	  && rm -rf /var/lib/apt/lists/*
 
 ## lgsm.sh
 RUN wget https://linuxgsm.com/dl/linuxgsm.sh
