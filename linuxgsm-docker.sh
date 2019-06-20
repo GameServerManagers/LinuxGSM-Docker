@@ -55,7 +55,7 @@ fn_command_support(){
 		    	# Get List of game server name for install
 		    	sudo docker exec ${InstanceName} bash /home/lgsm/linuxgsm.sh install
 			echo "enter the server name; ctrl+c to cancel"
-			read -a type
+			read -ra type
 			fn_exec_cmd_sender exec install "${type}"
 		    fi
 		    ;;
@@ -153,7 +153,7 @@ then
 	fn_command_support "${cmd}" "${2}"
 else
 	echo $"Usage: $0 {start|stop|restart|console|monitor|update|backup|details|alerts|cronjob|attach|command|install}"
-	read -a cmd
+	read -ra cmd
 	fn_command_support "${cmd}" "${2}"
 fi
 
