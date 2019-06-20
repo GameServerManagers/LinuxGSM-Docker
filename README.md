@@ -11,9 +11,7 @@
 
 This docker image is under development and not officialy supported.
 
-The best functioning docker image can be found here
-
-The developers of LinuxGSM are not currently docker experts. So if there is some interested in becoming a LinuxGSM docker developer please contact us.
+The developers of LinuxGSM are not currently docker experts. So if there is someone interested in becoming a LinuxGSM docker developer please contact us.
 
 A docker container distribution of https://github.com/GameServerManagers/LinuxGSM
 
@@ -26,5 +24,5 @@ This will work both on linux and Docker for Windows. With Docker for Windows, sk
 
 ```bash
 $ mkdir -p /path/to/lgsm && sudo chown -R 750:750 /path/to/lgsm
-$ docker run --name lgsm-docker --restart always --net=host --hostname LGSM -it -v "/path/to/lgsm:/home/lgsm/" lgsm-docker
+$ docker run --name lgsm-docker --restart always --net=host --hostname LGSM -it -v "/path/to/lgsm:/home/lgsm/" gameservermanagers/linuxgsm-docker
 ```

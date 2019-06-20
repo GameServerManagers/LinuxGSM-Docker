@@ -61,7 +61,10 @@ RUN dpkg --add-architecture i386 && \
 		zlib1g \
 		libssl1.0.0:i386 \
 		libtcmalloc-minimal4:i386 \
-		libsdl1.2debian
+		libsdl1.2debian \
+		libnm-glib-dev:i386 \
+		&& apt-get clean \
+	  && rm -rf /var/lib/apt/lists/*
 
 ## lgsm.sh
 RUN wget https://linuxgsm.com/dl/linuxgsm.sh
