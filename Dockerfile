@@ -66,6 +66,9 @@ RUN dpkg --add-architecture i386 && \
 		&& apt-get clean \
 	  && rm -rf /var/lib/apt/lists/*
 
+## linuxgsm.sh
+RUN wget https://linuxgsm.com/dl/linuxgsm.sh
+
 # Add the linuxgsm user
 RUN adduser \
       --disabled-login \
@@ -78,10 +81,6 @@ RUN adduser \
 
 # Switch to the user linuxgsm
 USER linuxgsm
-
-
-## linuxgsm.sh
-RUN wget https://linuxgsm.com/dl/linuxgsm.sh
 
 ## user config
 RUN groupadd -g 750 -o linuxgsm && \
