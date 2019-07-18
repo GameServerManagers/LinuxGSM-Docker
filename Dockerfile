@@ -5,7 +5,7 @@
 #
 
 FROM ubuntu:18.04
-LABEL maintainer="LinuxGSM <me@Danielgibbs.co.uk>"
+LABEL maintainer="LinuxGSM <me@danielgibbs.co.uk>"
 
 ENV DEBIAN_FRONTEND noninteractive
 
@@ -66,28 +66,42 @@ RUN dpkg --add-architecture i386 && \
 		&& apt-get clean \
 	  && rm -rf /var/lib/apt/lists/*
 
-## lgsm.sh
+# Add the linuxgsm user
+RUN adduser \
+      --disabled-login \
+      --disabled-password \
+      --shell /bin/bash \
+      --gecos "" \
+      linuxgsm \
+    && usermod -G tty linuxgsm \
+    && chown -R linuxgsm:linuxgsm /home/linuxgsm
+
+# Switch to the user linuxgsm
+USER linuxgsm
+
+
+## linuxgsm.sh
 RUN wget https://linuxgsm.com/dl/linuxgsm.sh
 
 ## user config
-RUN groupadd -g 750 -o lgsm && \
-	adduser --uid 750 --disabled-password --gecos "" --ingroup lgsm lgsm && \
-	chown lgsm:lgsm /linuxgsm.sh && \
+RUN groupadd -g 750 -o linuxgsm && \
+	adduser --uid 750 --disabled-password --gecos "" --ingroup linuxgsm linuxgsm && \
+	chown linuxgsm:linuxgsm /linuxgsm.sh && \
 	chmod +x /linuxgsm.sh && \
-	cp /linuxgsm.sh /home/lgsm/linuxgsm.sh && \
-	usermod -G tty lgsm && \
-	chown -R lgsm:lgsm /home/lgsm/ && \
-	chmod 755 /home/lgsm
+	cp /linuxgsm.sh /home/linuxgsm/linuxgsm.sh && \
+	usermod -G tty linuxgsm && \
+	chown -R linuxgsm:linuxgsm /home/linuxgsm/ && \
+	chmod 755 /home/linuxgsm
 
-USER lgsm
-WORKDIR /home/lgsm
-VOLUME [ "/home/lgsm" ]
+USER linuxgsm
+WORKDIR /home/linuxgsm
+VOLUME [ "/home/linuxgsm" ]
 
 # need use xterm for LinuxGSM
 ENV TERM=xterm
 
 ## Docker Details
-ENV PATH=$PATH:/home/lgsm
+ENV PATH=$PATH:/home/linuxgsm
 
 COPY entrypoint.sh /entrypoint.sh
 ENTRYPOINT ["bash","/entrypoint.sh" ]
