@@ -22,6 +22,7 @@ RUN dpkg --add-architecture i386 && \
 		curl \
 		wget \
 		file \
+		tar \
 		bzip2 \
 		gzip \
 		unzip \
