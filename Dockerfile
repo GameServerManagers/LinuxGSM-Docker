@@ -15,8 +15,9 @@ ENV LANG en_US.utf8
 
 ## Base System
 RUN dpkg --add-architecture i386 && \
-	apt update -y && \
-	apt install -y \
+	apt-get update -y && \
+	apt-get install -y \
+                iproute2\
 		mailutils \
 		postfix \
 		curl \
@@ -66,36 +67,21 @@ RUN dpkg --add-architecture i386 && \
 		&& apt-get clean \
 	  && rm -rf /var/lib/apt/lists/*
 
-# Add the linuxgsm user
-RUN adduser \
-      --disabled-login \
-      --disabled-password \
-      --shell /bin/bash \
-      --gecos "" \
-      linuxgsm \
-    && usermod -G tty linuxgsm \
-    && chown -R linuxgsm:linuxgsm /home/linuxgsm
-
-# Switch to the user linuxgsm
-USER linuxgsm
-
-
-## linuxgsm.sh
-RUN wget https://linuxgsm.com/dl/linuxgsm.sh
 
 ## user config
 RUN groupadd -g 750 -o linuxgsm && \
 	adduser --uid 750 --disabled-password --gecos "" --ingroup linuxgsm linuxgsm && \
-	chown linuxgsm:linuxgsm /linuxgsm.sh && \
-	chmod +x /linuxgsm.sh && \
-	cp /linuxgsm.sh /home/linuxgsm/linuxgsm.sh && \
 	usermod -G tty linuxgsm && \
 	chown -R linuxgsm:linuxgsm /home/linuxgsm/ && \
 	chmod 755 /home/linuxgsm
 
+# Switch to the user linuxgsm
 USER linuxgsm
 WORKDIR /home/linuxgsm
-VOLUME [ "/home/linuxgsm" ]
+
+## linuxgsm.sh
+RUN wget https://linuxgsm.com/dl/linuxgsm.sh -O ~/linuxgsm.sh && chmod +x ~/linuxgsm.sh
+VOLUME [ "/home/linuxgsm" ] # define volume _after_ download.
 
 # need use xterm for LinuxGSM
 ENV TERM=xterm
