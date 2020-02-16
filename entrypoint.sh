@@ -18,10 +18,10 @@ fi
 if [ $# = 0 ]; then
     if [ ! -e "$GAMESERVER" ]; then
         echo "Installing $GAMESERVER"
-        ./linuxgsm.sh $GAMESERVER && ./$GAMESERVER auto-install
+        ./linuxgsm.sh "$GAMESERVER" && "./$GAMESERVER" auto-install
     fi
     echo "Launching $GAMESERVER (IN DEBUG MODE)"
-    echo Y | ./$GAMESERVER debug
+    echo Y | "./$GAMESERVER" debug
 else
     # execute the command passed through docker
     "$@"
