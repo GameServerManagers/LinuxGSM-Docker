@@ -11,24 +11,18 @@
 ## then we must keep a backup copy of the script on local drive
 if [ ! -e ~/linuxgsm.sh ]; then
     echo "Initializing Linuxgsm User Script in New Volume"
-    cp /linuxgsm.sh ./linuxgsm.sh
+    wget https://linuxgsm.com/dl/linuxgsm.sh -O ~/linuxgsm.sh && chmod +x ~/linuxgsm.sh
 fi
 
-# with no command, just spawn a running container suitable for exec's
+# with no command, just run the game (or try)
 if [ $# = 0 ]; then
-    tail -f /dev/null
+    if [ ! -e "$GAMESERVER" ]; then
+        echo "Installing $GAMESERVER"
+        ./linuxgsm.sh "$GAMESERVER" && "./$GAMESERVER" auto-install
+    fi
+    echo "Launching $GAMESERVER (IN DEBUG MODE)"
+    echo Y | "./$GAMESERVER" debug
 else
     # execute the command passed through docker
     "$@"
-
-    # if this command was a server start cmd
-    # to get around LinuxGSM running everything in
-    # tmux;
-    # we attempt to attach to tmux to track the server
-    # this keeps the container running
-    # when invoked via docker run
-    # but requires -it or at least -t
-    tmux set -g status off && tmux attach 2> /dev/null
 fi
-
-exit 0

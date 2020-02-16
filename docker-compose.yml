@@ -1,0 +1,6 @@
+version: '3.3'
+services:
+  quake2:
+    build: .
+    environment:
+      - GAMESERVER=q2server
