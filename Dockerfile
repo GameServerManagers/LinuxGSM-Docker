@@ -17,6 +17,7 @@ ENV LANG en_US.utf8
 RUN dpkg --add-architecture i386 && \
 	apt update -y && \
 	apt install -y \
+                iproute2 \
 		mailutils \
 		postfix \
 		curl \
