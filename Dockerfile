@@ -43,6 +43,8 @@ RUN dpkg --add-architecture i386 && \
 		libncurses5:i386 \
 		libcurl4-gnutls-dev:i386 \
 		libstdc++5:i386 \
+		netcat \
+		lib32stdc++6 \		
 		lib32tinfo5 \
 		xz-utils \
 		zlib1g:i386 \
