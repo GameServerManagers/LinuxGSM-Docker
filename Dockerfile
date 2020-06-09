@@ -69,20 +69,6 @@ RUN dpkg --add-architecture i386 && \
 		&& apt-get clean \
 	  && rm -rf /var/lib/apt/lists/*
 
-# Add the linuxgsm user
-RUN adduser \
-      --disabled-login \
-      --disabled-password \
-      --shell /bin/bash \
-      --gecos "" \
-      linuxgsm \
-    && usermod -G tty linuxgsm \
-    && chown -R linuxgsm:linuxgsm /home/linuxgsm
-
-# Switch to the user linuxgsm
-USER linuxgsm
-
-
 ## linuxgsm.sh
 RUN wget https://linuxgsm.com/dl/linuxgsm.sh
 
