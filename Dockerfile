@@ -14,11 +14,7 @@ RUN apt-get update && apt-get install -y locales && rm -rf /var/lib/apt/lists/* 
 ENV LANG en_US.utf8
 
 ## Base System
-RUN apt-get update && apt-get install -y software-properties-common && \
-    add-apt-repository multiverse && \
-    apt-get update && \
-    apt-get upgrade && \
-    apt-get install -y \
+RUN apt-get update && apt-get install -y \
     mailutils \
     postfix \
     curl \
@@ -38,21 +34,20 @@ RUN apt-get update && apt-get install -y software-properties-common && \
     tmux \
     lib32gcc1 \
     libstdc++6 \
-    lib32stdc++6 \
-    steamcmd \
- && rm -rf /var/lib/apt/lists/*
+    lib32stdc++6
 
 ## linuxgsm.sh
-RUN wget https://linuxgsm.com/dl/linuxgsm.sh
+RUN wget -O linuxgsm.sh https://linuxgsm.sh
 
-## Add User
-RUN groupadd -r linuxgsm && useradd --no-log-init -r -g linuxgsm linuxgsm
-RUN	chown linuxgsm:linuxgsm /linuxgsm.sh && \
-RUN	chmod +x /linuxgsm.sh && \
-    cp /linuxgsm.sh /home/linuxgsm/linuxgsm.sh && \
-    usermod -G tty linuxgsm && \
-    chown -R linuxgsm:linuxgsm /home/linuxgsm/ && \
-    chmod 755 /home/linuxgsm
+## user config
+RUN groupadd -g 750 -o linuxgsm && \
+	adduser --uid 750 --disabled-password --gecos "" --ingroup linuxgsm linuxgsm && \
+	chown linuxgsm:linuxgsm /linuxgsm.sh && \
+	chmod +x /linuxgsm.sh && \
+	cp /linuxgsm.sh /home/linuxgsm/linuxgsm.sh && \
+	usermod -G tty linuxgsm && \
+	chown -R linuxgsm:linuxgsm /home/linuxgsm/ && \
+	chmod 755 /home/linuxgsm
 
 USER linuxgsm
 WORKDIR /home/linuxgsm

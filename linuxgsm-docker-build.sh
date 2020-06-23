@@ -1,4 +1,4 @@
 #!/bin/bash
 
 ## simple building script to create the image/container
-sudo docker build -t lgsm-docker .
+sudo docker build -t linuxgsm .
