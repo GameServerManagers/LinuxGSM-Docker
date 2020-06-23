@@ -14,73 +14,41 @@ RUN apt-get update && apt-get install -y locales && rm -rf /var/lib/apt/lists/* 
 ENV LANG en_US.utf8
 
 ## Base System
-RUN dpkg --add-architecture i386 && \
-	apt update -y && \
-	apt install -y \
-		iproute2 \
-		mailutils \
-		postfix \
-		curl \
-		wget \
-		file \
-		bzip2 \
-		gzip \
-		unzip \
-		bsdmainutils \
-		python \
-		util-linux \
-		binutils \
-		bc \
-		jq \
-		tmux \
-		lib32gcc1 \
-		libstdc++6 \
-		libstdc++6:i386 \
-		apt-transport-https \
-		ca-certificates \
-		telnet \
-		expect \
-		libncurses5:i386 \
-		libcurl4-gnutls-dev:i386 \
-		libstdc++5:i386 \
-		netcat \
-		lib32stdc++6 \		
-		lib32tinfo5 \
-		xz-utils \
-		zlib1g:i386 \
-		libldap-2.4-2:i386 \
-		lib32z1 \
-		default-jre \
-		speex:i386 \
-		libtbb2 \
-		libxrandr2:i386 \
-		libglu1-mesa:i386 \
-		libxtst6:i386 \
-		libusb-1.0-0:i386 \
-		libopenal1:i386 \
-		libpulse0:i386 \
-		libdbus-glib-1-2:i386 \
-		libnm-glib4:i386 \
-		zlib1g \
-		libssl1.0.0:i386 \
-		libtcmalloc-minimal4:i386 \
-		libsdl1.2debian \
-		libnm-glib-dev:i386 \
-		&& apt-get clean \
-	  && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y \
+    mailutils \
+    postfix \
+    curl \
+    wget \
+    file \
+    tar \
+    bzip2 \
+    gzip \
+    unzip \
+    bsdmainutils \
+    python \
+    util-linux \
+    ca-certificates \
+    binutils \
+    bc \
+    jq \
+    tmux \
+    lib32gcc1 \
+    libstdc++6 \
+    lib32stdc++6 \
+    steamcmd \
+ && rm -rf /var/lib/apt/lists/*
 
 ## linuxgsm.sh
 RUN wget https://linuxgsm.com/dl/linuxgsm.sh
 
-## user config
-RUN groupadd -g 750 -o linuxgsm && \
-	adduser --uid 750 --disabled-password --gecos "" --ingroup linuxgsm linuxgsm && \
-	chown linuxgsm:linuxgsm /linuxgsm.sh && \
-	chmod +x /linuxgsm.sh && \
-	cp /linuxgsm.sh /home/linuxgsm/linuxgsm.sh && \
-	usermod -G tty linuxgsm && \
-	chown -R linuxgsm:linuxgsm /home/linuxgsm/ && \
-	chmod 755 /home/linuxgsm
+## Add User
+RUN groupadd -r linuxgsm && useradd --no-log-init -r -g linuxgsm linuxgsm
+RUN	chown linuxgsm:linuxgsm /linuxgsm.sh && \
+RUN	chmod +x /linuxgsm.sh && \
+    cp /linuxgsm.sh /home/linuxgsm/linuxgsm.sh && \
+    usermod -G tty linuxgsm && \
+    chown -R linuxgsm:linuxgsm /home/linuxgsm/ && \
+    chmod 755 /home/linuxgsm
 
 USER linuxgsm
 WORKDIR /home/linuxgsm
