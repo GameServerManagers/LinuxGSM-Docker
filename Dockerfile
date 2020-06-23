@@ -14,6 +14,9 @@ RUN apt-get update && apt-get install -y locales && rm -rf /var/lib/apt/lists/* 
 ENV LANG en_US.utf8
 
 ## Base System
+RUN apt-get update && \
+    apt-get install -y software-properties-common && \
+
 RUN add-apt-repository multiverse
 RUN apt-get update && apt-get install -y \
     mailutils \
