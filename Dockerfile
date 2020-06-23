@@ -15,6 +15,7 @@ ENV LANG en_US.utf8
 
 ## Base System
 RUN apt-get update && apt-get install -y \
+    iproute2 \
     mailutils \
     postfix \
     curl \
@@ -39,17 +40,21 @@ RUN apt-get update && apt-get install -y \
 ## linuxgsm.sh
 RUN wget -O linuxgsm.sh https://linuxgsm.sh
 
-## user config
-RUN groupadd -g 750 -o linuxgsm && \
-	adduser --uid 750 --disabled-password --gecos "" --ingroup linuxgsm linuxgsm && \
-	chown linuxgsm:linuxgsm /linuxgsm.sh && \
-	chmod +x /linuxgsm.sh && \
-	cp /linuxgsm.sh /home/linuxgsm/linuxgsm.sh && \
-	usermod -G tty linuxgsm && \
-	chown -R linuxgsm:linuxgsm /home/linuxgsm/ && \
-	chmod 755 /home/linuxgsm
+# Add the linuxgsm user
+RUN adduser \
+      --disabled-login \
+      --disabled-password \
+      --shell /bin/bash \
+      --gecos "" \
+      linuxgsm \
+    && usermod -G tty linuxgsm \
+    && chown -R linuxgsm:linuxgsm /home/linuxgsm \
+    && chmod +x linuxgsm.sh
 
+# Switch to the user linuxgsm
 USER linuxgsm
+
+
 WORKDIR /home/linuxgsm
 VOLUME [ "/home/linuxgsm" ]
 
@@ -60,4 +65,4 @@ ENV TERM=xterm
 ENV PATH=$PATH:/home/linuxgsm
 
 COPY entrypoint.sh /entrypoint.sh
-ENTRYPOINT ["bash","/entrypoint.sh" ]
+ENTRYPOINT ["/entrypoint.sh" ]
