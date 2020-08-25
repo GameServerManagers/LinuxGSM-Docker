@@ -3,14 +3,10 @@
 ## execute LinuxGSM or arbitrary server commands at will
 ## by passing command
 
-
-## Because of a limitation in LinuxGSM script it must be run from the directory
-## It is installed in.
-##
-## If one wants to use a volume for the data directory, which is the home directory
+## If you want to use a volume for the data directory, which is the home directory
 ## then we must keep a backup copy of the script on local drive
 if [ ! -e ~/linuxgsm.sh ]; then
-    echo "Initializing Linuxgsm User Script in New Volume"
+    echo "Initializing LinuxGSM in New Volume"
     cp /linuxgsm.sh ./linuxgsm.sh
 fi
 
@@ -21,7 +17,7 @@ else
     # execute the command passed through docker
     "$@"
 
-    # if this command was a server start cmd
+    # if the command is start
     # to get around LinuxGSM running everything in
     # tmux;
     # we attempt to attach to tmux to track the server
