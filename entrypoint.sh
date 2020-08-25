@@ -10,6 +10,7 @@ if [ ! -e ~/linuxgsm.sh ]; then
     cp /linuxgsm.sh ./linuxgsm.sh
     ./linuxgsm.sh ${GAMESERVERNAME}
     ./${GAMESERVERNAME} auto-install
+    ./${GAMESERVERNAME} start
 fi
 
 # with no command, just spawn a running container suitable for exec's
