@@ -8,6 +8,8 @@
 if [ ! -e ~/linuxgsm.sh ]; then
     echo "Initializing LinuxGSM in New Volume"
     cp /linuxgsm.sh ./linuxgsm.sh
+    ./linuxgsm.sh ${GAMESERVERNAME}
+    ./${GAMESERVERNAME} auto-install
 fi
 
 # with no command, just spawn a running container suitable for exec's
