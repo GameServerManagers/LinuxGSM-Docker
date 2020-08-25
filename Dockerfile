@@ -4,7 +4,7 @@
 # https://github.com/GameServerManagers/LinuxGSM-Docker
 #
 
-FROM ubuntu:18.04
+FROM ubuntu:20.04
 LABEL maintainer="LinuxGSM <me@danielgibbs.co.uk>"
 
 ENV DEBIAN_FRONTEND noninteractive
@@ -15,7 +15,6 @@ ENV LANG en_US.utf8
 
 ## Base System
 RUN apt-get update && apt-get install -y \
-    iproute2 \
     mailutils \
     postfix \
     curl \
@@ -32,10 +31,11 @@ RUN apt-get update && apt-get install -y \
     binutils \
     bc \
     jq \
-    tmux \
+    tmux \ 
+    netcat \
     lib32gcc1 \
-    libstdc++6 \
-    lib32stdc++6
+    lib32stdc++6 \
+    steamcmd
 
 ## linuxgsm.sh
 RUN wget -O linuxgsm.sh https://linuxgsm.sh
