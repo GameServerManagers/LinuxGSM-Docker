@@ -1,0 +1,9 @@
+version: '3.8'
+services:
+  game:
+    image: gameservermanaers/linuxgsm-docker:latest
+    ports:
+      - 27015:27015/tcp
+      - 27015:27015/udp
+    environment:
+      GAMESERVERNAME="csgoserver"
