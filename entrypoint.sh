@@ -10,9 +10,13 @@ if [ ! -e ~/linuxgsm.sh ]; then
     cp /linuxgsm.sh ./linuxgsm.sh
     ./linuxgsm.sh ${GAMESERVERNAME}
     ./${GAMESERVERNAME} auto-install
+    fn_container_run
     ./${GAMESERVERNAME} start
+else
+    fn_container_run  
 fi
 
+fn_container_run(){
 # with no command, just spawn a running container suitable for exec's
 if [ $# = 0 ]; then
     tail -f /dev/null
@@ -29,5 +33,5 @@ else
     # but requires -it or at least -t
     tmux set -g status off && tmux attach 2> /dev/null
 fi
-
+}
 exit 0
