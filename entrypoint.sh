@@ -5,16 +5,6 @@
 
 ## If you want to use a volume for the data directory, which is the home directory
 ## then we must keep a backup copy of the script on local drive
-if [ ! -e ~/linuxgsm.sh ]; then
-    echo "Initializing LinuxGSM in New Volume"
-    cp /linuxgsm.sh ./linuxgsm.sh
-    ./linuxgsm.sh ${GAMESERVERNAME}
-    ./${GAMESERVERNAME} auto-install
-    fn_container_run
-    ./${GAMESERVERNAME} start
-else
-    fn_container_run  
-fi
 
 fn_container_run(){
 # with no command, just spawn a running container suitable for exec's
@@ -34,4 +24,17 @@ else
     tmux set -g status off && tmux attach 2> /dev/null
 fi
 }
+
+if [ ! -e ~/linuxgsm.sh ]; then
+    echo "Initializing LinuxGSM in New Volume"
+    cp /linuxgsm.sh ./linuxgsm.sh
+    ./linuxgsm.sh ${GAMESERVERNAME}
+    ./${GAMESERVERNAME} auto-install
+    fn_container_run
+    ./${GAMESERVERNAME} start
+else
+    fn_container_run  
+fi
+
+
 exit 0
