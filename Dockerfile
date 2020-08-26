@@ -53,7 +53,7 @@ RUN echo steam steam/question select "I AGREE" | debconf-set-selections \
     && ln -s /usr/games/steamcmd /usr/local/bin/steamcmd
 
 ## linuxgsm.sh
-RUN wget -O linuxgsm.sh https://linuxgsm.sh
+RUN wget -O linuxgsm.sh https://raw.githubusercontent.com/GameServerManagers/LinuxGSM/feature/docker/linuxgsm.sh
 
 # Add the linuxgsm user
 RUN adduser \
