@@ -4,7 +4,7 @@
 # https://github.com/GameServerManagers/LinuxGSM-Docker
 #
 
-FROM ubuntu:20.04
+FROM ubuntu:18.04
 LABEL maintainer="LinuxGSM <me@danielgibbs.co.uk>"
 
 ENV DEBIAN_FRONTEND noninteractive
