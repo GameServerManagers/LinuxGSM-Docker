@@ -16,7 +16,7 @@ RUN apt-get update \
     ENV LANG en_US.utf8
 
     ## Base System
-    && apt-get update \
+RUN apt-get update \
     && apt-get install -y software-properties-common \
     && add-apt-repository multiverse \
     && apt-get update \
