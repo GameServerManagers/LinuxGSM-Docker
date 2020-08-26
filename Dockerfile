@@ -91,7 +91,7 @@ VOLUME [ "/home/linuxgsm" ]
 ENV TERM=xterm
 
 # Run SteamCMD
-RUN steamcmd +quit
+RUN CMD ["su", "-", "linuxgsm", "-c", "steamcmd +quit"] 
 
 # Symlink common.cfg
 RUN ln -s /hone/linuxgsm/lgsm/config-lgsm/cssserver/common.cfg common.cfg
