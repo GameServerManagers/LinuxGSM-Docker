@@ -51,7 +51,8 @@ RUN echo steam steam/question select "I AGREE" | debconf-set-selections \
     && mkdir -p "/home/linuxgsm/.steam" \
     && ln -s "/home/linuxgsm/.local/share/Steam" "/home/linuxgsm/.steam/root" \
     && ln -s "/home/linuxgsm/.local/share/Steam" "/home/linuxgsm/.steam/steam" \
-    && ln -s /usr/games/steamcmd /usr/local/bin/steamcmd
+    && ln -s /usr/games/steamcmd /usr/local/bin/steamcmd \
+    && steamcmd +quit
 
 ## linuxgsm.sh
 RUN wget -O linuxgsm.sh https://raw.githubusercontent.com/GameServerManagers/LinuxGSM/feature/docker/linuxgsm.sh
