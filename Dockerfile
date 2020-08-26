@@ -10,12 +10,12 @@ LABEL maintainer="LinuxGSM <me@danielgibbs.co.uk>"
 ENV DEBIAN_FRONTEND noninteractive
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
-RUN apt-get update
-RUN apt-get install -y locales apt-utils debconf-utils
+RUN apt-get update \
+    && apt-get install -y locales apt-utils debconf-utils
 RUN localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
 ENV LANG en_US.utf8
 
-    ## Base System
+## Base System
 RUN apt-get update \
     && apt-get install -y software-properties-common \
     && add-apt-repository multiverse \
@@ -54,7 +54,6 @@ RUN apt-get update \
     && ln -s "/home/linuxgsm/.local/share/Steam" "/home/linuxgsm/.steam/root" \
     && ln -s "/home/linuxgsm/.local/share/Steam" "/home/linuxgsm/.steam/steam" \
     && ln -s /usr/games/steamcmd /usr/local/bin/steamcmd \
-    && steamcmd +quit \
 
 # Install Gamedig https://docs.linuxgsm.com/requirements/gamedig
     && curl -sL https://deb.nodesource.com/setup_12.x | bash - \
@@ -90,6 +89,9 @@ VOLUME [ "/home/linuxgsm" ]
 
 # need use xterm for LinuxGSM
 ENV TERM=xterm
+
+# Run SteamCMD
+RUN steamcmd +quit
 
 COPY entrypoint.sh /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh" ]
