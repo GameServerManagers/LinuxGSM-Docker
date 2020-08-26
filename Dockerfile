@@ -8,18 +8,19 @@ FROM ubuntu:18.04
 LABEL maintainer="LinuxGSM <me@danielgibbs.co.uk>"
 
 ENV DEBIAN_FRONTEND noninteractive
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
-RUN apt-get update
-RUN apt-get install -y locales apt-utils debconf-utils
-RUN localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
-ENV LANG en_US.utf8
+RUN apt-get update \
+    && apt-get install -y locales apt-utils debconf-utils \
+    && localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8 \
+    && LANG en_US.utf8 \
 
-## Base System
-RUN apt-get update && \
-    apt-get install -y software-properties-common && \
-    add-apt-repository multiverse && \
-    apt-get update && \
-    apt-get install -y \
+    ## Base System
+    && apt-get update \
+    && apt-get install -y software-properties-common \
+    && add-apt-repository multiverse \
+    && apt-get update \
+    && apt-get install -y \
     curl \
     wget \
     file \
@@ -40,10 +41,10 @@ RUN apt-get update && \
     lib32stdc++6 \
     iproute2 \
     nano \
-    iputils-ping
+    iputils-ping \
 
-SHELL ["/bin/bash", "-o", "pipefail", "-c"]
-RUN echo steam steam/question select "I AGREE" | debconf-set-selections \
+    # Install SteamCMD
+    && echo steam steam/question select "I AGREE" | debconf-set-selections \
     && echo steam steam/license note '' | debconf-set-selections \
     && dpkg --add-architecture i386 \
     && apt-get update -y \
@@ -53,7 +54,19 @@ RUN echo steam steam/question select "I AGREE" | debconf-set-selections \
     && ln -s "/home/linuxgsm/.local/share/Steam" "/home/linuxgsm/.steam/root" \
     && ln -s "/home/linuxgsm/.local/share/Steam" "/home/linuxgsm/.steam/steam" \
     && ln -s /usr/games/steamcmd /usr/local/bin/steamcmd \
-    && steamcmd +quit
+    && steamcmd +quit \
+
+# Install Gamedig https://docs.linuxgsm.com/requirements/gamedig
+    && curl -sL https://deb.nodesource.com/setup_12.x | bash - \
+    && apt-get update && apt-get install -y nodejs \
+    && npm install -g gamedig \
+    
+    # Cleanup
+    && apt-get -y autoremove \
+    && apt-get -y clean \
+    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /tmp/* \
+    && rm -rf /var/tmp/*
 
 ## linuxgsm.sh
 RUN wget -O linuxgsm.sh https://raw.githubusercontent.com/GameServerManagers/LinuxGSM/feature/docker/linuxgsm.sh
