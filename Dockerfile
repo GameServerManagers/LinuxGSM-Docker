@@ -93,5 +93,8 @@ ENV TERM=xterm
 # Run SteamCMD
 RUN steamcmd +quit
 
+# Symlink common.cfg
+RUN ln -s lgsm/config-lgsm/cssserver/common.cfg common.cfg
+
 COPY entrypoint.sh /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh" ]
