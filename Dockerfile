@@ -39,7 +39,8 @@ RUN apt-get update && \
     lib32gcc1 \
     lib32stdc++6 \
     iproute2 \
-    nano
+    nano \
+    iputils-ping
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN echo steam steam/question select "I AGREE" | debconf-set-selections \
