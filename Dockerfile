@@ -38,7 +38,8 @@ RUN apt-get update && \
     netcat \
     lib32gcc1 \
     lib32stdc++6 \
-    iproute2
+    iproute2 \
+    nano
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN echo steam steam/question select "I AGREE" | debconf-set-selections \
