@@ -30,7 +30,7 @@ if [ ! -e ~/linuxgsm.sh ]; then
     cp /linuxgsm.sh ./linuxgsm.sh
     ./linuxgsm.sh ${GAMESERVERNAME}
     ./${GAMESERVERNAME} auto-install
-    fn_container_run
+    clear
     ./${GAMESERVERNAME} start
 else
     fn_container_run  
