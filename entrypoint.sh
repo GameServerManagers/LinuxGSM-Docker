@@ -32,8 +32,10 @@ if [ ! -e ~/linuxgsm.sh ]; then
     ./${GAMESERVERNAME} auto-install
     clear
     ./${GAMESERVERNAME} start
+    tail -f /dev/null
 else
-    fn_container_run  
+    ./${GAMESERVERNAME} start
+    tail -f /dev/null 
 fi
 
 
