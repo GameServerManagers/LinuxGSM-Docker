@@ -6,37 +6,29 @@
 ## If you want to use a volume for the data directory, which is the home directory
 ## then we must keep a backup copy of the script on local drive
 
-fn_container_run(){
-# with no command, just spawn a running container suitable for exec's
-if [ $# = 0 ]; then
-    tail -f /dev/null
-else
-    # execute the command passed through docker
-    "$@"
-
-    # if the command is start
-    # to get around LinuxGSM running everything in
-    # tmux;
-    # we attempt to attach to tmux to track the server
-    # this keeps the container running
-    # when invoked via docker run
-    # but requires -it or at least -t
-    tmux set -g status off && tmux attach 2> /dev/null
-fi
-}
-
-if [ ! -e ~/linuxgsm.sh ]; then
+if [ -z "${GAMESERVERNAME}" ]; then
+    # fail if GAMESERVERNAME env is not specified.
+    echo "No game server specificed"
+    echo "example: --env GAMESERVERNAME=csgoserver"
+elif [ ! -e ~/linuxgsm.sh ]; then
     echo "Initializing LinuxGSM in New Volume"
     cp /linuxgsm.sh ./linuxgsm.sh
     ./linuxgsm.sh ${GAMESERVERNAME}
     ./${GAMESERVERNAME} auto-install
     clear
     ./${GAMESERVERNAME} start
-    tail -f /dev/null
-else
+    # to get around LinuxGSM running everything in tmux
+    # we attempt to attach to tmux to track the server
+    # this keeps the container running
+    # when invoked via docker run
+    # but requires -it or at least -t
+    tmux set -g status off && tmux attach 2> /dev/null
+elif [ $# = 0 ]; then 
     ./${GAMESERVERNAME} start
-    tail -f /dev/null 
+    tmux set -g status off && tmux attach 2> /dev/null
+else
+    # execute the command passed through docker
+    "$@"    
 fi
-
 
 exit 0
