@@ -26,7 +26,7 @@ Commands can be run just like standard LinuxGSM using teh docker exec command.
 docker exec -it csgoserver ./csgoserver details
 ```
 # Edit LinuxGSM config
-To edit the LinuxGSM config files use teh following
+To edit the LinuxGSM config files use the following
 
 View the default settings 
 ```
