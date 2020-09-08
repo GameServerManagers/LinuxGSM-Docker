@@ -11,8 +11,6 @@
 A dockerised version of LinuxGSM https://linuxgsm.com
 Dockerhub https://hub.docker.com/r/gameservermanagers/linuxgsm-docker/
 
-Run Game Servers in Docker, multiplex multiple LinuxGSM deployments easily by taking advantage of Dockers port mapping.
-
 # Create Persistant Storage
 ```
 docker volume create csgoserver
