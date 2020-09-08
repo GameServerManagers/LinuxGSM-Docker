@@ -4,10 +4,11 @@
   LinuxGSM Docker Container
   </h1>
   
+  LinuxGSM is the command-line tool for quick, simple deployment and management of Linux dedicated game servers.
+  
   > This docker image is under development and not officialy supported.
 
-A docker container distribution of https://github.com/GameServerManagers/LinuxGSM
-
+A dockerised version of LinuxGSM https://linuxgsm.com
 Dockerhub https://hub.docker.com/r/gameservermanagers/linuxgsm-docker/
 
 Run Game Servers in Docker, multiplex multiple LinuxGSM deployments easily by taking advantage of Dockers port mapping.
