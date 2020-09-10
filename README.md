@@ -11,7 +11,11 @@
 A dockerised version of LinuxGSM https://linuxgsm.com
 Dockerhub https://hub.docker.com/r/gameservermanagers/linuxgsm-docker/
 
-# Create Persistant Storage
+# How to Use
+
+## Create Persistant Storage
+Game servers require persistant storage to store the server files and configs. The docker reccomended way is to use Persistant storage
+
 ```
 docker volume create csgoserver
 ```
