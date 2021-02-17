@@ -23,6 +23,7 @@ RUN set -ex; \
 dpkg --add-architecture i386; \
 apt update -y; \
 apt install -y \
+    vi \
     apt-transport-https \
     bc \
     binutils \
