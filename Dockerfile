@@ -18,12 +18,14 @@ localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
 
 ENV LANG en_US.utf8
 
+
+
 ## Base System
 RUN set -ex; \
 dpkg --add-architecture i386; \
 apt update -y; \
 apt install -y \
-    vi \
+    vim \
     apt-transport-https \
     bc \
     binutils \
@@ -51,6 +53,7 @@ apt install -y \
     libopenal1:i386 \
     libpulse0:i386 \
     libsdl1.2debian \
+    libsdl2-2.0-0:i386 \
     libssl1.0.0:i386 \
     libstdc++5:i386 \
     libstdc++6 \
