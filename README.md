@@ -24,5 +24,6 @@ This will work both on linux and Docker for Windows. With Docker for Windows, sk
 
 ```bash
 $ mkdir -p /path/to/lgsm && sudo chown -R 750:750 /path/to/lgsm
-$ docker run --name lgsm-docker --restart always --net=host --hostname LGSM -it -v "/path/to/lgsm:/home/lgsm/" gameservermanagers/linuxgsm-docker
+$ docker run -d --name lgsm-docker -p <server-ports>:<server-ports>  --restart always --net=host --hostname LGSM -it -v "/path/to/lgsm:/home/lgsm/" gameservermanagers/linuxgsm-docker
 ```
+To expose multiple game ports for your server use the format `-p <start-stop>:<start-stop>`. For example `docker run -d --name <server name> -p 12203-12204:12203-12204 --restart-always --net=host gameservermanagers/linuxgsm-docker `
