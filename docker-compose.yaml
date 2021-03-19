@@ -1,0 +1,15 @@
+version: '3.9'
+
+services:
+  lgsm_test:
+   image: dockclair/lgsm-dev
+   environment:
+     - GAMESERVER=vhserver
+   ports:
+     - 2456:2456
+   volumes:
+     - type: volume
+       target: /home/linuxgsm
+
+volumes:
+   lgsm: 

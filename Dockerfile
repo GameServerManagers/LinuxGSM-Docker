@@ -70,6 +70,7 @@ apt install -y \
     tmux \
     unzip \
     util-linux \
+    vim \
     wget \
     xz-utils \
     zlib1g \
@@ -90,7 +91,7 @@ chmod +x /linuxgsm.sh; \
 cp /linuxgsm.sh /home/linuxgsm/linuxgsm.sh; \
 usermod -G tty linuxgsm; \
 chown -R linuxgsm:linuxgsm /home/linuxgsm/; \
-chmod 755 /home/linuxgsm
+chmod 777 /home/linuxgsm
 
 USER linuxgsm
 
@@ -104,6 +105,10 @@ ENV TERM=xterm
 ## Docker Details
 ENV PATH=$PATH:/home/linuxgsm
 
-COPY entrypoint.sh /entrypoint.sh
+COPY --chown=linuxgsm:linuxgsm entrypoint.sh installserver.sh /home/linuxgsm
 
-ENTRYPOINT ["bash","/entrypoint.sh" ]
+RUN chmod +x *.sh
+
+ENTRYPOINT ["bash","./entrypoint.sh" ]
+
+CMD ["./installserver.sh"]
