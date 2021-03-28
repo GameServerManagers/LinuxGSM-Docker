@@ -2,7 +2,6 @@
 ## linuxgsm-docker base image entrypoint script
 ## execute LinuxGSM or arbitrary server commands at will
 ## by passing command
-set -x
 PUID=${PUID:-750}
 PGID=${PGID:-750}
 
