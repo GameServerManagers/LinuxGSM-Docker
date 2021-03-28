@@ -2,7 +2,25 @@
 ## linuxgsm-docker base image entrypoint script
 ## execute LinuxGSM or arbitrary server commands at will
 ## by passing command
+set -x
+PUID=${PUID:-750}
+PGID=${PGID:-750}
 
+groupmod -o -g ${PGID} linuxgsm
+usermod -o -u ${PUID} linuxgsm
+
+echo '
+-------------------------------------
+GID/UID
+-------------------------------------'
+echo "
+User uid:    $(id -u linuxgsm)
+User gid:    $(id -g linuxgsm)
+-------------------------------------
+"
+chown -R ${PUID}:${PGID} /home/linuxgsm/
+
+gosu linuxgsm bash
 
 ## Because of a limitation in LinuxGSM script it must be run from the directory
 ## It is installed in.

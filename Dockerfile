@@ -6,9 +6,14 @@
 
 FROM ubuntu:18.04
 
+RUN ln -s -f /bin/true /usr/bin/chfn
+
 LABEL maintainer="LinuxGSM <me@danielgibbs.co.uk>"
 
 ENV DEBIAN_FRONTEND noninteractive
+
+ENV PUID=750
+ENV PGID=750
 
 RUN set -ex; \
 apt-get update; \
@@ -73,18 +78,19 @@ apt install -y \
     wget \
     xz-utils \
     zlib1g \
+    gosu \
     zlib1g:i386; \
 apt-get clean; \
 rm -rf /var/lib/apt/lists/*
 
 ## linuxgsm.sh
 RUN set -ex; \
-wget https://linuxgsm.com/dl/linuxgsm.sh
+wget -O linuxgsm.sh https://linuxgsm.sh
 
 ## user config
 RUN set -ex; \
-groupadd -g 750 -o linuxgsm; \
-adduser --uid 750 --disabled-password --gecos "" --ingroup linuxgsm linuxgsm; \
+groupadd -g "${PGID}" -o linuxgsm; \
+adduser --uid "${PUID}" --disabled-password --gecos "" --ingroup linuxgsm linuxgsm; \
 chown linuxgsm:linuxgsm /linuxgsm.sh; \
 chmod +x /linuxgsm.sh; \
 cp /linuxgsm.sh /home/linuxgsm/linuxgsm.sh; \
@@ -105,5 +111,7 @@ ENV TERM=xterm
 ENV PATH=$PATH:/home/linuxgsm
 
 COPY entrypoint.sh /entrypoint.sh
+
+USER root
 
 ENTRYPOINT ["bash","/entrypoint.sh" ]

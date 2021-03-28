@@ -4,6 +4,9 @@ services:
         container_name: lgsm-docker
         hostname: 'LGSM'
         network_mode: host
+        environment:
+          - PUID=750
+          - PGID=750
         volumes:
           - '/path/to/lgsm:/home/linuxgsm'
         restart: always
