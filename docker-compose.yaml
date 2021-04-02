@@ -3,6 +3,7 @@ services:
         image: gameservermanagers/linuxgsm-docker
         container_name: lgsm-docker
         hostname: 'LGSM'
+        user: '750:750'
         network_mode: host
         volumes:
           - '/path/to/lgsm:/home/linuxgsm'
