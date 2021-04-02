@@ -20,61 +20,32 @@ localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
 ENV LANG en_US.utf8
 
 ## Base System
-RUN set -ex; \
-dpkg --add-architecture i386; \
-apt update -y; \
-apt install -y \
-    vim \
-    apt-transport-https \
-    bc \
-    binutils \
-    bsdmainutils \
-    bzip2 \
-    ca-certificates \
+RUN apt-get update \
+    && apt-get install -y software-properties-common \
+    && add-apt-repository multiverse \
+    && apt-get update \
+    && apt-get install -y \
     curl \
-    default-jre \
-    expect \
+    wget \
     file \
+    tar \
+    bzip2 \
     gzip \
-    iproute2 \
+    unzip \
+    bsdmainutils \
+    python \
+    util-linux \
+    ca-certificates \
+    binutils \
+    bc \
     jq \
+    tmux \
+    netcat \
     lib32gcc1 \
     lib32stdc++6 \
-    lib32tinfo5 \
-    lib32z1 \
-    libcurl4-gnutls-dev:i386 \
-    libdbus-glib-1-2:i386 \
-    libglu1-mesa:i386 \
-    libldap-2.4-2:i386 \
-    libncurses5:i386 \
-    libnm-glib-dev:i386 \
-    libnm-glib4:i386 \
-    libopenal1:i386 \
-    libpulse0:i386 \
-    libsdl1.2debian \
-    libsdl2-2.0-0:i386 \
-    libssl1.0.0:i386 \
-    libstdc++5:i386 \
-    libstdc++6 \
-    libstdc++6:i386 \
-    libtbb2 \
-    libtcmalloc-minimal4:i386 \
-    libusb-1.0-0:i386 \
-    libxrandr2:i386 \
-    libxtst6:i386 \
-    mailutils \
-    netcat \
-    postfix \
-    python \
-    speex:i386 \
-    telnet \
-    tmux \
-    unzip \
-    util-linux \
-    wget \
-    xz-utils \
-    zlib1g \
-    zlib1g:i386; \
+    iproute2 \
+    nano \
+    iputils-ping \
 
     # Install SteamCMD
     && echo steam steam/question select "I AGREE" | debconf-set-selections \
