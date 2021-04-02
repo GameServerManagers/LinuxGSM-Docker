@@ -9,6 +9,7 @@ FROM ubuntu:20.04
 LABEL maintainer="LinuxGSM <me@danielgibbs.co.uk>"
 
 ENV DEBIAN_FRONTEND noninteractive
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 RUN set -ex; \
 apt-get update; \
