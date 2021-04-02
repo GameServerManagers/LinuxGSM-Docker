@@ -75,8 +75,30 @@ apt install -y \
     xz-utils \
     zlib1g \
     zlib1g:i386; \
-apt-get clean; \
-rm -rf /var/lib/apt/lists/*
+
+    # Install SteamCMD
+    && echo steam steam/question select "I AGREE" | debconf-set-selections \
+    && echo steam steam/license note '' | debconf-set-selections \
+    && dpkg --add-architecture i386 \
+    && apt-get update -y \
+    && apt-get install -y --no-install-recommends ca-certificates locales steamcmd \
+    && mkdir -p "/home/linuxgsm/.local/share/Steam" \
+    && mkdir -p "/home/linuxgsm/.steam" \
+    && ln -s "/home/linuxgsm/.local/share/Steam" "/home/linuxgsm/.steam/root" \
+    && ln -s "/home/linuxgsm/.local/share/Steam" "/home/linuxgsm/.steam/steam" \
+    && ln -s /usr/games/steamcmd /usr/local/bin/steamcmd \
+
+    # Install Gamedig https://docs.linuxgsm.com/requirements/gamedig
+    && curl -sL https://deb.nodesource.com/setup_15.x | bash - \
+    && apt-get update && apt-get install -y nodejs \
+    && npm install -g gamedig \
+
+    # Cleanup
+    && apt-get -y autoremove \
+    && apt-get -y clean \
+    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /tmp/* \
+    && rm -rf /var/tmp/*
 
 ## linuxgsm.sh
 RUN set -ex; \
