@@ -22,11 +22,15 @@ RUN apt-get update \
 RUN localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
 
 ## Base System
+RUN apt-get update; \
+    apt-get upgrade -y
+
 RUN apt-get update \
     && apt-get install -y software-properties-common \
     && add-apt-repository multiverse \
     && apt-get update \
     && apt-get install -y \
+    sudo \
     curl \
     wget \
     file \
@@ -34,6 +38,7 @@ RUN apt-get update \
     bzip2 \
     gzip \
     unzip \
+    cpio \
     bsdmainutils \
     python \
     util-linux \
@@ -49,38 +54,34 @@ RUN apt-get update \
     nano \
     iputils-ping \
 
-    # Install SteamCMD
-    && echo steam steam/question select "I AGREE" | debconf-set-selections \
-    && echo steam steam/license note '' | debconf-set-selections \
-    && dpkg --add-architecture i386 \
-    && apt-get update -y \
-    && apt-get install -y --no-install-recommends ca-certificates locales steamcmd \
-    && mkdir -p "/home/linuxgsm/.local/share/Steam" \
-    && mkdir -p "/home/linuxgsm/.steam" \
-    && ln -s "/home/linuxgsm/.local/share/Steam" "/home/linuxgsm/.steam/root" \
-    && ln -s "/home/linuxgsm/.local/share/Steam" "/home/linuxgsm/.steam/steam" \
-    && ln -s /usr/games/steamcmd /usr/local/bin/steamcmd \
+# Install SteamCMD
+&& echo steam steam/question select "I AGREE" | debconf-set-selections \
+&& echo steam steam/license note '' | debconf-set-selections \
+&& dpkg --add-architecture i386 \
+&& apt-get update -y \
+&& apt-get install -y --no-install-recommends ca-certificates locales steamcmd \
 
-    # Install Gamedig https://docs.linuxgsm.com/requirements/gamedig
-    && curl -sL https://deb.nodesource.com/setup_16.x | bash - \
-    && apt-get update && apt-get install -y nodejs \
-    && npm install -g gamedig \
+# Install Gamedig https://docs.linuxgsm.com/requirements/gamedig
+&& curl -sL https://deb.nodesource.com/setup_16.x | bash - \
+&& apt-get update && apt-get install -y nodejs \
+&& npm install -g gamedig \
 
-    # Cleanup
-    && apt-get -y autoremove \
-    && apt-get -y clean \
-    && rm -rf /var/lib/apt/lists/* \
-    && rm -rf /tmp/* \
-    && rm -rf /var/tmp/*
+# Cleanup
+&& apt-get -y autoremove \
+&& apt-get -y clean \
+&& rm -rf /var/lib/apt/lists/* \
+&& rm -rf /tmp/* \
+&& rm -rf /var/tmp/*
 
 ## linuxgsm.sh
 RUN set -ex; \
-wget https://linuxgsm.sh
+wget -O linuxgsm.sh https://linuxgsm.sh
 
 ## user config
 RUN set -ex; \
 groupadd -g 750 -o linuxgsm; \
 adduser --uid 750 --disabled-password --gecos "" --ingroup linuxgsm linuxgsm; \
+echo "linuxgsm ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers ; \
 chown linuxgsm:linuxgsm /linuxgsm.sh; \
 chmod +x /linuxgsm.sh; \
 cp /linuxgsm.sh /home/linuxgsm/linuxgsm.sh; \
@@ -91,8 +92,6 @@ chmod 755 /home/linuxgsm
 USER linuxgsm
 
 WORKDIR /home/linuxgsm
-
-VOLUME [ "/home/linuxgsm" ]
 
 # need use xterm for LinuxGSM
 ENV TERM=xterm
