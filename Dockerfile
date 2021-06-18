@@ -1,5 +1,5 @@
 #
-# LinuxGSM Dockerfile
+# LinuxGSM Base Dockerfile
 #
 # https://github.com/GameServerManagers/LinuxGSM-Docker
 #
@@ -78,27 +78,25 @@ RUN set -ex; \
 wget -O linuxgsm.sh https://linuxgsm.sh
 
 ## user config
-RUN set -ex; \
-groupadd -g 750 -o linuxgsm; \
-adduser --uid 750 --disabled-password --gecos "" --ingroup linuxgsm linuxgsm; \
-echo "linuxgsm ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers ; \
-chown linuxgsm:linuxgsm /linuxgsm.sh; \
-chmod +x /linuxgsm.sh; \
-cp /linuxgsm.sh /home/linuxgsm/linuxgsm.sh; \
-usermod -G tty linuxgsm; \
-chown -R linuxgsm:linuxgsm /home/linuxgsm/; \
-chmod 755 /home/linuxgsm
+RUN adduser \
+--disabled-login \
+--disabled-password \
+--shell /bin/bash \
+--gecos "" \
+linuxgsm \
+&& usermod -G tty linuxgsm \
+&& echo "linuxgsm ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers \
+&& chown -R linuxgsm:linuxgsm /home/linuxgsm \
+&& chmod +x linuxgsm.sh
 
 USER linuxgsm
 
 WORKDIR /home/linuxgsm
+
+VOLUME [ "/home/linuxgsm" ]
 
 # need use xterm for LinuxGSM
 ENV TERM=xterm
 
 ## Docker Details
 ENV PATH=$PATH:/home/linuxgsm
-
-COPY entrypoint.sh /entrypoint.sh
-
-ENTRYPOINT ["bash","/entrypoint.sh" ]
