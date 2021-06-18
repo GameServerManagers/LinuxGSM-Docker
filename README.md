@@ -25,12 +25,12 @@ docker volume create csgoserver
 docker run -d --name csgoserver -v csgoserver --net-host -it -env GAMESERVERNAME=csgoserver gameservermanagers/linuxgsm-docker
 ```
 # Run LinuxGSM commands
-Commands can be run just like standard LinuxGSM using teh docker exec command.
+Commands can be run just like standard LinuxGSM using the docker exec command.
 ```
 docker exec -it csgoserver ./csgoserver details
 ```
 # Edit LinuxGSM config
-To edit the LinuxGSM config files use the following
+To edit the LinuxGSM config files use the following.
 
 View the default settings
 ```
