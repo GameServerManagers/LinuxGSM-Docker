@@ -75,7 +75,7 @@ RUN apt-get update \
 
 ## linuxgsm.sh
 RUN set -ex; \
-wget https://linuxgsm.com/dl/linuxgsm.sh
+wget https://linuxgsm.sh
 
 ## user config
 RUN set -ex; \
