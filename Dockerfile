@@ -62,7 +62,7 @@ RUN apt-get update \
     && ln -s /usr/games/steamcmd /usr/local/bin/steamcmd \
 
     # Install Gamedig https://docs.linuxgsm.com/requirements/gamedig
-    && curl -sL https://deb.nodesource.com/setup_15.x | bash - \
+    && curl -sL https://deb.nodesource.com/setup_16.x | bash - \
     && apt-get update && apt-get install -y nodejs \
     && npm install -g gamedig \
 
