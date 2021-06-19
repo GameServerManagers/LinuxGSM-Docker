@@ -93,8 +93,6 @@ USER linuxgsm
 
 WORKDIR /home/linuxgsm
 
-VOLUME [ "/home/linuxgsm" ]
-
 # need use xterm for LinuxGSM
 ENV TERM=xterm
 
