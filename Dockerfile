@@ -73,10 +73,6 @@ RUN apt-get update \
 && rm -rf /tmp/* \
 && rm -rf /var/tmp/*
 
-## linuxgsm.sh
-RUN set -ex; \
-wget -O linuxgsm.sh https://linuxgsm.sh
-
 ## user config
 RUN adduser \
 --disabled-login \
@@ -87,7 +83,13 @@ linuxgsm \
 && usermod -G tty linuxgsm \
 && echo "linuxgsm ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers \
 && chown -R linuxgsm:linuxgsm /home/linuxgsm \
-&& chmod +x linuxgsm.sh
+
+## linuxgsm.sh
+RUN set -ex; \
+mkdir /opt/linuxgsm; \
+chown linuxgsm:linuxgsm /opt/linuxgsm; \
+wget -O /opt/linuxgsm/linuxgsm.sh https://linuxgsm.sh; \
+chmod +x /opt/linuxgsm/linuxgsm.sh
 
 USER linuxgsm
 
