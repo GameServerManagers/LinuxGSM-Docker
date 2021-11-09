@@ -14,7 +14,6 @@ COPY scripts/cleanImage.sh \
      scripts/installLGSM.sh \
      scripts/installMinimalDependencies.sh \
      scripts/setupUser.sh \
-     scripts/workaroundsLGSM.sh \
      /home/
 COPY --from=dependencyStage /usr/local/bin/gosu /usr/local/bin/gosu
 
