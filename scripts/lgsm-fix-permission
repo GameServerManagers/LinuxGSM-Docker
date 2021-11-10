@@ -1,0 +1,4 @@
+#!/bin/bash
+
+chown -R "$USER_NAME:$GROUP_NAME" "$LGSM_PATH"
+chmod 755 "$LGSM_PATH"

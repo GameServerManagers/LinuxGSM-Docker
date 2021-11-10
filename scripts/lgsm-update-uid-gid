@@ -1,0 +1,12 @@
+#!/bin/bash
+
+GROUP_NAME="$USER_NAME"
+if [ "$(id --user "$USER_ID")" != "$USER_ID" ] || [ "$(id --group "$USER_ID")" != "$GROUP_ID" ]; then
+    echo "[setupUser] changing user id"
+    old_user_id="$(id --user "$USER_ID")"
+    usermod -u "$USER_ID" "$USER_NAME"
+
+    echo "[setupUser] changing group id"
+    old_group_id="$(id --group "$USER_ID")"
+    groupmod -g "$GROUP_ID" "$GROUP_NAME"
+fi

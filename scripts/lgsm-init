@@ -1,0 +1,4 @@
+#!/bin/bash
+
+gosu "$USER_NAME" cp -f "$LGSM_SCRIPTS/linuxgsm.sh" .
+gosu "$USER_NAME" ./linuxgsm.sh "$LGSM_GAMESERVER"
