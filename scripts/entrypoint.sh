@@ -27,8 +27,9 @@ function stopServer() {
 lgsm-start
 trap stopServer SIGTERM SIGINT
 
-echo "Server is running, waiting for SIGTERM / SIGINT"
+echo "Started linuxgsm waiting for tmux"
+
 while "$isRunning"; do
+    lgsm-tmux-attach
 	sleep 1s
 done
-echo "Server closed gracefully"

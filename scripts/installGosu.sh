@@ -3,6 +3,7 @@
 set -o errexit
 set -o pipefail
 set -o nounset
+GOSU_VERSION="$1"
 
 # save list of currently installed packages for later so we can clean up
 savedAptMark="$(apt-mark showmanual)"

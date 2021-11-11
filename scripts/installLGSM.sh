@@ -6,5 +6,5 @@ echo "[installLGSM] installing LGSM"
 
 GROUP_NAME="$USER_NAME"
 
-wget "https://raw.githubusercontent.com/GameServerManagers/LinuxGSM/$LGSM_VERSION/linuxgsm.sh"
-chmod +x linuxgsm.sh
+wget -O "$LGSM_SCRIPTS/linuxgsm.sh" "https://raw.githubusercontent.com/GameServerManagers/LinuxGSM/$LGSM_VERSION/linuxgsm.sh"
+chmod +x "$LGSM_SCRIPTS/linuxgsm.sh"
