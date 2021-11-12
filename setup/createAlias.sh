@@ -20,7 +20,7 @@ function createAlias() {
 		echo "[createAlias.sh] $command $name"
 		cat > "$file" <<- EOM
 		#!/bin/sh
-		gosu "$USER_NAME" "$command" "$name" "\$@"
+		gosu "\$USER_NAME" "$command" "$name" "\$@"
 		EOM
 		chmod a=rx "$file"
 		# create 2nd link for better script readability
@@ -29,6 +29,7 @@ function createAlias() {
 }
 
 #TODO if linuxgsm supports -h / --help to list commands this can be generated
-for cmd in install auto-install start stop restart details postdetails backup update-lgsm monitor test-alert update check-update force-update validate console debug; do
+for cmd in install auto-install start stop restart details postdetails backup update-lgsm monitor test-alert update check-update force-update validate console debug \
+	change-password map-compressor developer detect-deps detect-glibc detect-ldd query-raw clear-functions; do
 	createAlias "$cmd"
 done

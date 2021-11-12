@@ -2,11 +2,12 @@
 # own stage = additional deps needed which are only here used
 FROM ubuntu:21.04 as dependencyStage
 
-COPY scripts/installGosu.sh \
-     scripts/installSupercron.sh \
+COPY setup/installGosu.sh \
+     setup/installSupercronic.sh \
      /
 RUN set -eux; \
-    ./installGosu.sh 1.14
+    ./installGosu.sh 1.14; \
+    ./installSupercronic.sh v0.1.12 8d3a575654a6c93524c410ae06f681a3507ca5913627fa92c7086fd140fa12ce
 
 # create linuxgsm image
 # this stage should be usable by existing developers
@@ -25,24 +26,28 @@ ENV LGSM_VERSION="$LGSM_VERSION" \
     LANG="en_US.UTF-8" \
     LANGUAGE="en_US.UTF-8" \
     LC_ALL="en_US.UTF-8" \
-    TERM="xterm" 
+    TERM="xterm" \
+    SUPERCRONIC_CONFIG="/home/linuxgsm-scripts/cron.config"
 
 COPY --from=dependencyStage \
      /usr/local/bin/gosu \
+     /usr/local/bin/supercronic \
      /usr/local/bin/
-COPY scripts/installMinimalDependencies.sh \
-     scripts/setupUser.sh \
-     scripts/installLGSM.sh \
-     scripts/installGamedig.sh \
-     scripts/cleanImage.sh \
-     scripts/installDependencies.sh \
-     scripts/createAlias.sh \
+COPY setup/installMinimalDependencies.sh \
+     setup/setupUser.sh \
+     setup/installLGSM.sh \
+     setup/installGamedig.sh \
+     setup/cleanImage.sh \
+     setup/installDependencies.sh \
+     setup/createAlias.sh \
+     setup/entrypoint.sh \
      \
-     scripts/entrypoint.sh \
-     scripts/lgsm-update-uid-gid \
-     scripts/lgsm-fix-permission \
-     scripts/lgsm-init \
-     scripts/lgsm-tmux-attach \
+     commands/lgsm-cron-init \
+     commands/lgsm-cron-start \
+     commands/lgsm-init \
+     commands/lgsm-fix-permission \
+     commands/lgsm-tmux-attach \
+     commands/lgsm-update-uid-gid \
      "$LGSM_SCRIPTS"/
 
 RUN set -eux; \
@@ -51,6 +56,9 @@ RUN set -eux; \
     installLGSM.sh; \
     installGamedig.sh; \
     cleanImage.sh
+
+HEALTHCHECK --start-period=3600s --interval=300s --timeout=30s --retries=3 \
+    CMD [ lgsm-monitor || exit 1 ]
 
 VOLUME "$LGSM_PATH"
 WORKDIR "$LGSM_PATH"

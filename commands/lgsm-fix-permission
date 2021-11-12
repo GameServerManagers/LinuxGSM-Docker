@@ -1,4 +1,8 @@
-#!/bin/bash
+#!/bin/sh
 
+set -o errexit
+set -o nounset
+
+GROUP_NAME="$USER_NAME"
 chown -R "$USER_NAME:$GROUP_NAME" "$LGSM_PATH"
 chmod 755 "$LGSM_PATH"

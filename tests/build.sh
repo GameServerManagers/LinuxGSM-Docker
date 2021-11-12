@@ -2,6 +2,7 @@
 
 server=""
 lgsm_version=""
+clear=""
 while [ $# -ge 1 ]; do
     key="$1"
     shift
@@ -13,6 +14,8 @@ while [ $# -ge 1 ]; do
             echo "options:"
             echo "-v        x       use provided lgsm version where x is branch / tag / commit"
             echo "--version x       e.g. --version v21.4.1"
+            echo "-c                disable cache using"
+            echo "--no-cache"
             echo ""
             echo "server:"
             echo "gmodserver        build linuxgsm image and specific gmodserver"
@@ -23,6 +26,8 @@ while [ $# -ge 1 ]; do
             echo "using lgsm version ${lgsm_version:-default}"
             shift
             ;;
+        -c|--no-cache)
+            clear="--no-cache";;
         *)
             echo "$key is server"
             server="$key";;
@@ -32,7 +37,7 @@ done
 source "$(dirname "$0")/config" 
 cd "$(dirname "$0")/.."
 
-cmd=(docker build -t "$IMAGE:lgsm" --target linuxgsm $lgsm_version .)
+cmd=(docker build -t "$IMAGE:lgsm" $clear --target linuxgsm $lgsm_version .)
 echo "${cmd[@]}"
 "${cmd[@]}"
 if [ -n "$server" ]; then
