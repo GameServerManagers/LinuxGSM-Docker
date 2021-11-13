@@ -1,9 +1,14 @@
+volumes:
+  server:
+
 services:
     linuxgsm:
-        image: gameservermanagers/linuxgsm-docker
-        container_name: lgsm-docker
-        hostname: 'LGSM'
-        network_mode: host
+        build:
+          context: .
+          args:
+            LGSM_GAMESERVER: gmodserver
         volumes:
-          - '/path/to/lgsm:/home/linuxgsm'
+          - server:/home/linuxgsm
+          - /etc/localtime:/etc/localtime:ro
         restart: always
+        tty: true

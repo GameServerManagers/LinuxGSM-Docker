@@ -12,25 +12,21 @@ lgsm-cron-init
 
 # check if wished server is provided
 if [ ! -e "$LGSM_GAMESERVER" ]; then
-    echo "installing $LGSM_GAMESERVER"
     lgsm-init
     lgsm-auto-install
 else
     lgsm-update
 fi
 
-isRunning="true"
-function stopServer() {
-    lgsm-stop
-    isRunning="false"
-}
-
 lgsm-start
-trap stopServer SIGTERM SIGINT
-lgsm-cron-start &
+trap lgsm-stop SIGTERM SIGINT
+lgsm-cron-start > /dev/null 2>1 &
 
-echo "Started linuxgsm waiting for tmux"
-while "$isRunning"; do
-    lgsm-tmux-attach 2> /dev/null
-	sleep 1s
-done
+# tmux in background with log usable for docker
+# alternative solution: lgsm-tmux-attach | tee /dev/tty &
+rm tmux.pipe > /dev/null 2>1 || true
+mkfifo tmux.pipe
+lgsm-tmux-attach | tee tmux.pipe & 
+while read line; do
+    echo "$line"
+done < tmux.pipe
