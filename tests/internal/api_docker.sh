@@ -39,7 +39,8 @@ function awaitHealthCheck() {
         sleep 1s
         echo -en "\r[awaitHealthCheck] waiting for health check of \"$container\" currently ${seconds} seconds"
     done
-    echo -e "\r[awaitHealthCheck] \"$container\" health check startup time $seconds"
+    echo ""
+    echo "[awaitHealthCheck] \"$container\" health check startup time $seconds"
 
     isContainerHealthHealthy "$container"
 }

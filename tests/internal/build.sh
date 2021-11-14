@@ -1,5 +1,12 @@
 #!/bin/bash
 
+set -o errexit
+set -o pipefail
+set -o nounset
+
+source "$(dirname "$0")/api_docker.sh"
+source "$(dirname "$0")/api_various.sh"
+
 server=""
 lgsm_version=""
 clear=""
@@ -39,7 +46,6 @@ while [ $# -ge 1 ]; do
     esac
 done
 
-source "$(dirname "$0")/config" 
 cd "$(dirname "$0")/../.."
 
 cmd=(docker build -t "$image:lgsm" $clear --target linuxgsm $lgsm_version .)

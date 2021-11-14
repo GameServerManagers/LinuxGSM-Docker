@@ -58,7 +58,7 @@ RUN set -eux; \
     cleanImage.sh
 
 HEALTHCHECK --start-period=3600s --interval=90s --timeout=75s --retries=3 \
-    CMD [ lgsm-monitor || exit 1 ]
+    CMD lgsm-monitor || exit 1
 
 VOLUME "$LGSM_PATH"
 WORKDIR "$LGSM_PATH"
