@@ -1,2 +1,7 @@
-live/
+tests/
+.gitignore
+docker-compose.yml
+LICENSE
+linuxgsm-docker.sh
 README.md
+
