@@ -57,7 +57,7 @@ RUN set -eux; \
     installGamedig.sh; \
     cleanImage.sh
 
-HEALTHCHECK --start-period=3600s --interval=300s --timeout=30s --retries=3 \
+HEALTHCHECK --start-period=3600s --interval=90s --timeout=75s --retries=3 \
     CMD [ lgsm-monitor || exit 1 ]
 
 VOLUME "$LGSM_PATH"

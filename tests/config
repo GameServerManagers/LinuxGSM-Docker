@@ -1,8 +1,0 @@
-#!/bin/bash
-
-set -o errexit
-set -o pipefail
-set -o nounset
-
-IMAGE="lgsm-test"
-CONTAINER="lgsm-test"

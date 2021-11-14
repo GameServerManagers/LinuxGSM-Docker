@@ -1,12 +1,14 @@
 #!/bin/bash
 
-source "$(dirname "$0")/config" 
-
 args=()
 debug=""
 tag=""
 volume=""
 remove="false"
+docker_run_mode="-it"
+quick=""
+image="lgsm-test"
+container="lgsm-test"
 while [ $# -ge 1 ]; do
     key="$1"
     shift
@@ -18,8 +20,14 @@ while [ $# -ge 1 ]; do
             echo "options:"
             echo "-d            set entrypoint to bash"
             echo "--debug"
-            echo "-v            use volume instead of clean"
-            echo "--volume"
+            echo "--detach      run in background instead of foreground"
+            echo "-v          x    use volume x"
+            echo "--volume    x"
+            echo "--quick       enforce quick monitoring"
+            echo "-i          x   target image, default=lgsm-test"
+            echo "--image     x"
+            echo "-c          x   container name default=lgsm-test"
+            echo "--container x"
             echo ""
             echo "tag:"
             echo "lgsm          run lgsm image"
@@ -30,8 +38,17 @@ while [ $# -ge 1 ]; do
             exit 0;;
         -d|--debug)
             debug="--entrypoint bash";;
+        --detach)
+            docker_run_mode="-dt";;
         -v|--volume)
             volume="-v $1:/home/linuxgsm"
+            shift;;
+        --quick)
+            quick="--health-interval=10s";;
+        -i|--image)
+            image="$key";;
+        -c|--container)
+            container="$1"
             shift;;
         lgsm|specific)
             tag="$key";;
@@ -48,7 +65,7 @@ if [ -z "$tag" ]; then
 fi
 
 
-cmds=(docker run -it --rm --name "$CONTAINER" $volume $debug "$IMAGE:$tag")
+cmds=(docker run $docker_run_mode --rm --name "$container" $volume $debug $quick "$image:$tag")
 for arg in "$@"; do
     if [ "$arg" != "$1" ]; then
         cmds+=("$arg")

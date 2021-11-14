@@ -3,6 +3,7 @@
 server=""
 lgsm_version=""
 clear=""
+image="lgsm-test"
 while [ $# -ge 1 ]; do
     key="$1"
     shift
@@ -16,16 +17,20 @@ while [ $# -ge 1 ]; do
             echo "--version x       e.g. --version v21.4.1"
             echo "-c                disable cache using"
             echo "--no-cache"
+            echo "-i        x       target image, default=lgsm-test"
+            echo "--image   x"
             echo ""
             echo "server:"
             echo "gmodserver        build linuxgsm image and specific gmodserver"
             echo "..."
             exit 0;;
         -v|--version)
-            lgsm_version="--build-arg=\"LGSM_VERSION=$1\" --no-cache "
+            lgsm_version="--build-arg=\"LGSM_VERSION=$1\""
             echo "using lgsm version ${lgsm_version:-default}"
             shift
             ;;
+        -i|--image)
+            image="$key";;
         -c|--no-cache)
             clear="--no-cache";;
         *)
@@ -35,13 +40,13 @@ while [ $# -ge 1 ]; do
 done
 
 source "$(dirname "$0")/config" 
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/../.."
 
-cmd=(docker build -t "$IMAGE:lgsm" $clear --target linuxgsm $lgsm_version .)
+cmd=(docker build -t "$image:lgsm" $clear --target linuxgsm $lgsm_version .)
 echo "${cmd[@]}"
 "${cmd[@]}"
 if [ -n "$server" ]; then
-    cmd=(docker build -t "$IMAGE:specific" --build-arg "LGSM_GAMESERVER=$server" $lgsm_version .)
+    cmd=(docker build -t "$image:specific" --build-arg "LGSM_GAMESERVER=$server" $lgsm_version .)
     echo "${cmd[@]}"
     "${cmd[@]}"
 fi
