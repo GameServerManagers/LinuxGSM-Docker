@@ -5,6 +5,7 @@ set -o nounset
 
 LOG="$LGSM_PATH/log/cron.log"
 gosu "$USER_NAME" mkdir -p "$(dirname "$LOG")"
+gosu "$USER_NAME" touch "$LOG"
 
 echo "0 0 * * * [ \"$(du -s "$LOG" | grep -oE "^[0-9]*")\" -gt 1000 ] && savelog -c 3 '$LOG'" > "$SUPERCRONIC_CONFIG"
 # allow every CRON_ variable as cronjob
