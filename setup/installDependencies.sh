@@ -14,7 +14,7 @@ gosu "$USER_NAME" ./linuxgsm.sh "$server"
 # maybe add a "./linuxgsm.sh installDependencies"
 gosu "$USER_NAME" ./"$server" auto-install 2>&1 | tee auto-install.log || true
 # if not probably dependencies are missing
-IFS=';' cmds=($(grep 'sudo\s*dpkg' auto-install.log | sed -E 's/\s*sudo\s*//g' | sed 's/install/install -y /g'))
+mapfile -d ";" cmds < <( grep 'sudo\s*dpkg' auto-install.log | sed -E 's/\s*sudo\s*//g' | sed 's/install/install -y /g' )
 if [ "${#cmds[@]}" -gt "0" ]; then
     # preselect answers for steam
     echo steam steam/question select "I AGREE" | debconf-set-selections #"# ide fix

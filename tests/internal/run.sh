@@ -1,13 +1,12 @@
 #!/bin/bash
 
 args=()
-debug=""
+debug=()
 tag=""
-volume=""
-remove="false"
+volume=()
 docker_run_mode="-it"
 quick=""
-image="lgsm-test"
+IMAGE="lgsm-test"
 container="lgsm-test"
 while [ $# -ge 1 ]; do
     key="$1"
@@ -37,16 +36,16 @@ while [ $# -ge 1 ]; do
             echo "every other argument is added to docker run ... IMAGE [args] "
             exit 0;;
         -d|--debug)
-            debug="--entrypoint bash";;
+            debug=("--entrypoint" "bash");;
         --detach)
             docker_run_mode="-dt";;
         -v|--volume)
-            volume="-v $1:/home/linuxgsm"
+            volume=("-v" "$1:/home/linuxgsm")
             shift;;
         --quick)
             quick="--health-interval=10s";;
         -i|--image)
-            image="$key";;
+            IMAGE="$key";;
         -c|--container)
             container="$1"
             shift;;
@@ -64,8 +63,8 @@ if [ -z "$tag" ]; then
     exit 1
 fi
 
-
-cmds=(docker run $docker_run_mode --rm --name "$container" $volume $debug $quick "$image:$tag")
+#shellcheck disable=SC2206
+cmds=(docker run $docker_run_mode --rm --name "$container" ${volume[@]} ${debug[@]} $quick "$IMAGE:$tag")
 for arg in "$@"; do
     if [ "$arg" != "$1" ]; then
         cmds+=("$arg")

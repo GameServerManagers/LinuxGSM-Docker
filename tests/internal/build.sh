@@ -4,7 +4,9 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
+# shellcheck source=tests/internal/api_docker.sh
 source "$(dirname "$0")/api_docker.sh"
+# shellcheck source=tests/internal/api_various.sh
 source "$(dirname "$0")/api_various.sh"
 
 server=""
@@ -48,11 +50,12 @@ done
 
 cd "$(dirname "$0")/../.."
 
-cmd=(docker build -t "$image:lgsm" $clear --target linuxgsm $lgsm_version .)
+#shellcheck disable=SC2206
+cmd=(docker build -t "$image:lgsm" $clear --target linuxgsm "$lgsm_version" .)
 echo "${cmd[@]}"
 "${cmd[@]}"
 if [ -n "$server" ]; then
-    cmd=(docker build -t "$image:specific" --build-arg "LGSM_GAMESERVER=$server" $lgsm_version .)
+    cmd=(docker build -t "$image:specific" --build-arg "LGSM_GAMESERVER=$server" "$lgsm_version" .)
     echo "${cmd[@]}"
     "${cmd[@]}"
 fi

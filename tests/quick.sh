@@ -4,14 +4,18 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
+cd "$(dirname "$0")/.."
+
+# shellcheck source=tests/internal/api_docker.sh
 source "$(dirname "$0")/internal/api_docker.sh"
+# shellcheck source=tests/internal/api_various.sh
 source "$(dirname "$0")/internal/api_various.sh"
 
-VERSION=""
+VERSION=()
 GAMESERVER=""
-VOLUME=""
+VOLUME=()
 DEBUG=""
-clear=""
+CLEAR=""
 while [ $# -ge 1 ]; do
     key="$1"
     shift
@@ -32,13 +36,13 @@ while [ $# -ge 1 ]; do
             echo "server         e.g. gmodserver"
             exit 0;;
         --version)
-            VERSION="--version \"$1\""
+            VERSION=("--version" "$1")
             shift;;
         --volume)
-            VOLUME="--volume $1"
+            VOLUME=("--volume" "$1")
             shift;;
         -c|--no-cache)
-            clear="--no-cache";;
+            CLEAR="--no-cache";;
         -d|--debug)
             DEBUG="--debug";;
         *)
@@ -59,8 +63,8 @@ CONTAINER="linuxgsm-$GAMESERVER"
 (
     cd "$(dirname "$0")"
     removeContainer "$CONTAINER"
-    ./internal/build.sh $clear "$VERSION" "$GAMESERVER"
-    ./internal/run.sh --container "$CONTAINER" --detach $VOLUME specific
+    ./internal/build.sh "$CLEAR" "${VERSION[@]}" "$GAMESERVER"
+    ./internal/run.sh --container "$CONTAINER" --detach "${VOLUME[@]}" "$DEBUG" specific
     if awaitHealthCheck "$CONTAINER"; then
         echo "successful"
     else

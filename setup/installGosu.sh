@@ -6,7 +6,6 @@ set -o nounset
 GOSU_VERSION="$1"
 
 # save list of currently installed packages for later so we can clean up
-savedAptMark="$(apt-mark showmanual)"
 apt-get update
 apt-get install -y --no-install-recommends ca-certificates wget
 if ! command -v gpg; then
@@ -22,10 +21,11 @@ wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$G
 wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch.asc"
 
 # verify the signature
-export GNUPGHOME="$(mktemp -d)"
+GNUPGHOME="$(mktemp -d)"
 gpg --batch --keyserver hkps://keys.openpgp.org --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4
 gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu
-command -v gpgconf && gpgconf --kill all || :
+command -v gpgconf
+command -v gpgconf --kill all
 rm -rf "$GNUPGHOME" /usr/local/bin/gosu.asc
 
 chmod +x /usr/local/bin/gosu
