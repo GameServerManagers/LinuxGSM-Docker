@@ -5,10 +5,10 @@ set -o pipefail
 set -o nounset
 
 VERSION=""
-GAMESERVER=""
+GAMESERVER=()
 PARRALEL=""
 PARRALEL="$(lscpu -p | grep -Ev '^#' | sort -u -t, -k 2,4 | wc -l)"
-ROOT_FOLDER="$(realpath "$(dirname "$0")")/.."
+ROOT_FOLDER="$(realpath "$(dirname "$0")/..")"
 while [ $# -ge 1 ]; do
     key="$1"
     shift
@@ -37,14 +37,22 @@ while [ $# -ge 1 ]; do
                 echo "unknown option $key"
                 exit 1
             fi
-            GAMESERVER="$key";;
+            GAMESERVER+=("$key");;
     esac
 done
 
 # create results folder
 RESULTS="$ROOT_FOLDER/tests/results"
-rm -rf "$RESULTS"
+if [ "${#GAMESERVER[@]}" = "0" ]; then
+    rm -rf "$RESULTS"
+else
+    # rerun only remove specific log
+    for servercode in "${GAMESERVER[@]}"; do
+        rm -rf "${RESULTS:?}/"*".$servercode.log"
+    done
+fi
 mkdir -p "$RESULTS"
+
 (
     working_folder="$(mktemp -d)"
     cd "$working_folder"
@@ -57,6 +65,7 @@ mkdir -p "$RESULTS"
         rm -rf "$working_folder" > /dev/null 2>&1
         cd "$ROOT_FOLDER"
 
+        # only start $PARRALEL amount of tests
         while [ "${#subprocesses[@]}" -ge "$PARRALEL" ]; do
             sleep 1s
             temp=()
@@ -69,8 +78,8 @@ mkdir -p "$RESULTS"
         done
         
         server_code="$(grep -oE '^\S*' <<< "$line")"
-        echo "testing: $server_code"
-        if [ -z "$GAMESERVER" ] || [ "$server_code" = "$GAMESERVER" ]; then
+        if [ "${#GAMESERVER[@]}" = "0" ] || grep -qF "$server_code" <<< "${GAMESERVER[@]}"; then
+            echo "testing: $server_code"
             (
                 if ./tests/quick.sh --logs --version "$VERSION" "$server_code" > "$RESULTS/$server_code.log" 2>&1; then
                     mv "$RESULTS/$server_code.log" "$RESULTS/successful.$server_code.log"
@@ -81,6 +90,18 @@ mkdir -p "$RESULTS"
             subprocesses+=("$!")
         fi
     done < <(echo "$server_list")
+
+    # await every job is done
+    while [ "${#subprocesses[@]}" -gt "0" ]; do
+        sleep 1s
+        temp=()
+        for pid in "${subprocesses[@]}"; do
+            if ps -p "$pid" -o pid= > /dev/null 2>&1; then 
+                temp+=("$pid")
+            fi
+        done
+        subprocesses=("${temp[@]}")
+    done
 
     echo "successful: $(find "$RESULTS/" -iname "successful.*" | wc -l)"
     echo "failed: $(find "$RESULTS/" -iname "failed.*" | wc -l)"

@@ -22,6 +22,9 @@ if [ "${#cmds[@]}" -gt "0" ]; then
 
     # install dependencies
     for cmd in "${cmds[@]}"; do
-        eval "DEBIAN_FRONTEND=noninteractive $cmd"
+        eval "DEBIAN_FRONTEND=noninteractive $cmd" || (
+            apt-get update
+            eval "DEBIAN_FRONTEND=noninteractive $cmd"
+        )
     done
 fi
