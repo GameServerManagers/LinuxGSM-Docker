@@ -16,6 +16,7 @@ GAMESERVER=""
 VOLUME=()
 DEBUG=""
 CLEAR=""
+LOGS="false"
 while [ $# -ge 1 ]; do
     key="$1"
     shift
@@ -32,6 +33,8 @@ while [ $# -ge 1 ]; do
             echo "--debug"
             echo "-c             run without docker cache"
             echo "--no-cache"
+            echo "--logs         print last log lines after run"
+            echo "-l"
             echo ""
             echo "server         e.g. gmodserver"
             exit 0;;
@@ -45,6 +48,8 @@ while [ $# -ge 1 ]; do
             CLEAR="--no-cache";;
         -d|--debug)
             DEBUG="--debug";;
+        -l|--logs)
+            LOGS="true";;
         *)
             if grep -qE '^-' <<< "$key"; then
                 echo "unknown option $key"
@@ -65,10 +70,21 @@ CONTAINER="linuxgsm-$GAMESERVER"
     removeContainer "$CONTAINER"
     ./internal/build.sh "$CLEAR" "${VERSION[@]}" "$GAMESERVER"
     ./internal/run.sh --container "$CONTAINER" --detach "${VOLUME[@]}" "$DEBUG" specific
+
+    successful="false"
     if awaitHealthCheck "$CONTAINER"; then
-        echo "successful"
-    else
-        echo "failed"
+        successful="true"
+    fi
+    if "$LOGS"; then
+        docker logs -n 30 "$CONTAINER"
     fi
     removeContainer "$CONTAINER"
+
+    if "$successful"; then
+        echo "successful"
+        exit 0
+    else
+        echo "failed"
+        exit 1
+    fi
 )
