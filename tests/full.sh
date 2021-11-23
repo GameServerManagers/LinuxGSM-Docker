@@ -42,8 +42,9 @@ while [ $# -ge 1 ]; do
 done
 
 # create results folder
-rm -rf "$ROOT_FOLDER/results"
-mkdir -p "$ROOT_FOLDER/results"
+RESULTS="$ROOT_FOLDER/tests/results"
+rm -rf "$RESULTS"
+mkdir -p "$RESULTS"
 (
     working_folder="$(mktemp -d)"
     cd "$working_folder"
@@ -71,16 +72,16 @@ mkdir -p "$ROOT_FOLDER/results"
         echo "testing: $server_code"
         if [ -z "$GAMESERVER" ] || [ "$server_code" = "$GAMESERVER" ]; then
             (
-                if ./tests/quick.sh --logs --version "$VERSION" "$server_code" > "results/$server_code.log" 2>&1; then
-                    mv "results/$server_code.log" "results/successful.$server_code.log"
+                if ./tests/quick.sh --logs --version "$VERSION" "$server_code" > "$RESULTS/$server_code.log" 2>&1; then
+                    mv "$RESULTS/$server_code.log" "$RESULTS/successful.$server_code.log"
                 else
-                    mv "results/$server_code.log" "results/failed.$server_code.log"
+                    mv "$RESULTS/$server_code.log" "$RESULTS/failed.$server_code.log"
                 fi
             ) &
             subprocesses+=("$!")
         fi
     done < <(echo "$server_list")
 
-    echo "successful: $(find "$ROOT_FOLDER/results/" -iname "successful.*" | wc -l)"
-    echo "failed: $(find "$ROOT_FOLDER/results/" -iname "failed.*" | wc -l)"
+    echo "successful: $(find "$RESULTS/" -iname "successful.*" | wc -l)"
+    echo "failed: $(find "$RESULTS/" -iname "failed.*" | wc -l)"
 )
