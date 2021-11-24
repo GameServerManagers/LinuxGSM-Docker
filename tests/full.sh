@@ -41,6 +41,9 @@ while [ $# -ge 1 ]; do
     esac
 done
 
+# shellcheck source=tests/internal/api_various.sh
+source "$(dirname "$0")/internal/api_various.sh"
+
 # create results folder
 RESULTS="$ROOT_FOLDER/tests/results"
 if [ "${#GAMESERVER[@]}" = "0" ]; then
@@ -54,15 +57,9 @@ fi
 mkdir -p "$RESULTS"
 
 (
-    working_folder="$(mktemp -d)"
-    cd "$working_folder"
-    wget -O "linuxgsm.sh" "https://raw.githubusercontent.com/GameServerManagers/LinuxGSM/$VERSION/linuxgsm.sh"
-    chmod +x "linuxgsm.sh"
-    server_list="$(./linuxgsm.sh list)"
-    
     subprocesses=()
-    while IFS=$'\n' read -r line; do
-        rm -rf "$working_folder" > /dev/null 2>&1
+    mapfile -d $'\n' -t servers < <(getServerCodeList "$VERSION")
+    for server_code in "${servers[@]}"; do
         cd "$ROOT_FOLDER"
 
         # only start $PARRALEL amount of tests
@@ -77,19 +74,18 @@ mkdir -p "$RESULTS"
             subprocesses=("${temp[@]}")
         done
         
-        server_code="$(grep -oE '^\S*' <<< "$line")"
         if [ "${#GAMESERVER[@]}" = "0" ] || grep -qF "$server_code" <<< "${GAMESERVER[@]}"; then
             echo "testing: $server_code"
             (
-                if ./tests/quick.sh --logs --version "$VERSION" "$server_code" | tee /dev/tty > "$RESULTS/$server_code.log" 2>&1; then
+                if ./tests/quick.sh --logs --version "$VERSION" "$server_code" > "$RESULTS/$server_code.log" 2>&1; then
                     mv "$RESULTS/$server_code.log" "$RESULTS/successful.$server_code.log"
                 else
                     mv "$RESULTS/$server_code.log" "$RESULTS/failed.$server_code.log"
                 fi
-            ) &
+            ) | tee /dev/tty > /dev/null 2>&1 &
             subprocesses+=("$!")
         fi
-    done < <(echo "$server_list")
+    done
 
     # await every job is done
     while [ "${#subprocesses[@]}" -gt "0" ]; do

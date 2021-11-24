@@ -20,8 +20,12 @@ function isContainerHealthHealthy() {
     getContainerState "$container" | grep -qF '(healthy)'
 }
 
-function removeContainer() {
+function stopContainer() {
     docker stop "$1" > /dev/null 2>&1 || true
+}
+
+function removeContainer() {
+    stopContainer "$1"
     docker rm "$1" > /dev/null 2>&1 || true
 }
 

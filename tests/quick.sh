@@ -77,8 +77,9 @@ CONTAINER="linuxgsm-$GAMESERVER"
     if awaitHealthCheck "$CONTAINER"; then
         successful="true"
     fi
+    stopContainer "$CONTAINER"
     if "$LOGS"; then
-        docker logs -n 30 "$CONTAINER"
+        docker logs "$CONTAINER"
     fi
     removeContainer "$CONTAINER"
 
