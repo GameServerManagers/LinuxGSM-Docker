@@ -49,8 +49,9 @@ while [ $# -ge 1 ]; do
         -c|--container)
             container="$1"
             shift;;
-        lgsm|specific)
-            tag="$key";;
+        -t|--tag)
+            tag="$1"
+            shift;;
         *)
             echo "$key is argument for docker container"
             args+=("$key");;

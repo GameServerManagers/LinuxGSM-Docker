@@ -27,7 +27,8 @@ ENV LGSM_VERSION="$LGSM_VERSION" \
     LANGUAGE="en_US.UTF-8" \
     LC_ALL="en_US.UTF-8" \
     TERM="xterm" \
-    SUPERCRONIC_CONFIG="/home/linuxgsm-scripts/cron.config"
+    SUPERCRONIC_CONFIG="/home/linuxgsm-scripts/cron.config" \
+    LGSM_STARTED="/home/linuxgsm/server.started"
 
 COPY --from=dependencyStage \
      /usr/local/bin/gosu \
@@ -57,8 +58,8 @@ RUN set -eux; \
     installGamedig.sh; \
     cleanImage.sh
 
-HEALTHCHECK --start-period=3600s --interval=90s --timeout=75s --retries=3 \
-    CMD lgsm-monitor || exit 1
+HEALTHCHECK --start-period=3600s --interval=90s --timeout=600s --retries=3 \
+    CMD [ -f "$LGSM_STARTED" ] && lgsm-monitor || exit 1
 
 VOLUME "$LGSM_PATH"
 WORKDIR "$LGSM_PATH"

@@ -13,7 +13,7 @@ server=""
 lgsm_version=""
 clear=""
 image="lgsm-test"
-tag_lgsm="latest"
+tag_lgsm="dev"
 latest="false"
 push="false"
 while [ $# -ge 1 ]; do
@@ -51,6 +51,9 @@ while [ $# -ge 1 ]; do
             latest="true";;
         --push)
             push="true";;
+        --tag)
+            tag="$1"
+            shift;;
         -c|--no-cache)
             clear="--no-cache";;
         *)

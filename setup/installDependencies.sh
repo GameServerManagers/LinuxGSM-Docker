@@ -21,7 +21,9 @@ if [ "${#cmds[@]}" -gt "0" ]; then
     echo steam steam/license note '' | debconf-set-selections
 
     # install dependencies
+    echo "installing dependencies:"
     for cmd in "${cmds[@]}"; do
+        echo "$cmd"
         eval "DEBIAN_FRONTEND=noninteractive $cmd" || (
             apt-get update
             eval "DEBIAN_FRONTEND=noninteractive $cmd"

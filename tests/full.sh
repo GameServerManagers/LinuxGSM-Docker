@@ -57,6 +57,9 @@ fi
 mkdir -p "$RESULTS"
 
 (
+    echo "building linuxgsm base once"
+    ./tests/internal/build.sh --version "$VERSION"
+
     subprocesses=()
     mapfile -d $'\n' -t servers < <(getServerCodeList "$VERSION")
     for server_code in "${servers[@]}"; do
