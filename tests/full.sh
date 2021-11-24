@@ -4,7 +4,7 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
-VERSION=""
+VERSION="master"
 GAMESERVER=()
 PARRALEL=""
 PARRALEL="$(lscpu -p | grep -Ev '^#' | sort -u -t, -k 2,4 | wc -l)"
@@ -81,7 +81,7 @@ mkdir -p "$RESULTS"
         if [ "${#GAMESERVER[@]}" = "0" ] || grep -qF "$server_code" <<< "${GAMESERVER[@]}"; then
             echo "testing: $server_code"
             (
-                if ./tests/quick.sh --logs --version "$VERSION" "$server_code" > "$RESULTS/$server_code.log" 2>&1; then
+                if ./tests/quick.sh --logs --version "$VERSION" "$server_code" | tee /dev/tty > "$RESULTS/$server_code.log" 2>&1; then
                     mv "$RESULTS/$server_code.log" "$RESULTS/successful.$server_code.log"
                 else
                     mv "$RESULTS/$server_code.log" "$RESULTS/failed.$server_code.log"

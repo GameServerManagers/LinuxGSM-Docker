@@ -68,8 +68,10 @@ CONTAINER="linuxgsm-$GAMESERVER"
 (
     cd "$(dirname "$0")"
     removeContainer "$CONTAINER"
-    ./internal/build.sh "$CLEAR" "${VERSION[@]}" "$GAMESERVER"
-    ./internal/run.sh --container "$CONTAINER" --detach "${VOLUME[@]}" "$DEBUG" specific
+    #shellcheck disable=SC2068
+    ./internal/build.sh $CLEAR ${VERSION[@]} "$GAMESERVER"
+    #shellcheck disable=SC2068
+    ./internal/run.sh --container "$CONTAINER" --detach ${VOLUME[@]} "$DEBUG" specific
 
     successful="false"
     if awaitHealthCheck "$CONTAINER"; then
