@@ -68,7 +68,7 @@ WORKDIR "$LGSM_PATH"
 FROM linuxgsm as specific
 ARG LGSM_GAMESERVER=""
 ENV LGSM_GAMESERVER="$LGSM_GAMESERVER"
-RUN set -eux; \
+RUN set -eux; echo "${LGSM_GAMESERVER:?}"; \
     installDependencies.sh "$LGSM_GAMESERVER"; \
     createAlias.sh "$LGSM_GAMESERVER"; \
     cleanImage.sh
