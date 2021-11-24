@@ -13,6 +13,9 @@ server=""
 lgsm_version=""
 clear=""
 image="lgsm-test"
+tag_lgsm="latest"
+latest="false"
+push="false"
 while [ $# -ge 1 ]; do
     key="$1"
     shift
@@ -28,18 +31,26 @@ while [ $# -ge 1 ]; do
             echo "--no-cache"
             echo "-i        x       target image, default=lgsm-test"
             echo "--image   x"
+            echo "--latest          every created image is also tagged as latest"
+            echo "--push            every image is also pushed"
             echo ""
             echo "server:"
             echo "gmodserver        build linuxgsm image and specific gmodserver"
             echo "..."
             exit 0;;
         -v|--version)
+            tag_lgsm="$1"
             lgsm_version="--build-arg=\"LGSM_VERSION=$1\""
             echo "using lgsm version ${lgsm_version:-default}"
             shift
             ;;
         -i|--image)
-            image="$key";;
+            image="$1"
+            shift;;
+        --latest)
+            latest="true";;
+        --push)
+            push="true";;
         -c|--no-cache)
             clear="--no-cache";;
         *)
@@ -51,12 +62,35 @@ done
 cd "$(dirname "$0")/../.."
 
 #shellcheck disable=SC2206
-cmd=(docker build -t "$image:lgsm" $clear --target linuxgsm $lgsm_version .)
+cmd=(docker build -t "$image:$tag_lgsm" $clear --target linuxgsm $lgsm_version .)
 echo "${cmd[@]}"
 "${cmd[@]}"
+
+if "$push"; then
+    docker push "$image:$tag_lgsm"
+fi
+
+if "$latest"; then
+    docker tag "$image:$tag_lgsm" "$image:latest"
+    if "$push"; then
+        docker push "$image:latest"
+    fi
+fi
+
+
 if [ -n "$server" ]; then
     #shellcheck disable=SC2206
-    cmd=(docker build -t "$image:specific" --build-arg "LGSM_GAMESERVER=$server" $lgsm_version .)
+    cmd=(docker build -t "$image:${server}_$tag_lgsm" --build-arg "LGSM_GAMESERVER=$server" $lgsm_version .)
     echo "${cmd[@]}"
     "${cmd[@]}"
+
+    if "$push"; then
+        docker push "$image:${server}_$tag_lgsm"
+    fi
+    if "$latest"; then
+        docker tag "$image:${server}_$tag_lgsm" "$image:${server}"
+        if "$push"; then
+        docker push "$image:${server}"
+    fi
+    fi
 fi
