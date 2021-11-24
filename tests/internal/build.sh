@@ -10,7 +10,7 @@ source "$(dirname "$0")/api_docker.sh"
 source "$(dirname "$0")/api_various.sh"
 
 server=""
-lgsm_version=""
+lgsm_version=()
 clear=""
 image="lgsm-test"
 tag_lgsm="dev"
@@ -40,7 +40,7 @@ while [ $# -ge 1 ]; do
             exit 0;;
         -v|--version)
             tag_lgsm="$1"
-            lgsm_version="--build-arg=\"LGSM_VERSION=$1\""
+            lgsm_version=("--build-arg" "LGSM_VERSION=$1")
             echo "using lgsm version ${lgsm_version:-default}"
             shift
             ;;
@@ -65,7 +65,7 @@ done
 cd "$(dirname "$0")/../.."
 
 #shellcheck disable=SC2206
-cmd=(docker build -t "$image:$tag_lgsm" $clear --target linuxgsm $lgsm_version .)
+cmd=(docker build -t "$image:$tag_lgsm" $clear --target linuxgsm ${lgsm_version[@]} .)
 echo "${cmd[@]}"
 "${cmd[@]}"
 
@@ -83,7 +83,7 @@ fi
 
 if [ -n "$server" ]; then
     #shellcheck disable=SC2206
-    cmd=(docker build -t "$image:${server}_$tag_lgsm" --build-arg "LGSM_GAMESERVER=$server" $lgsm_version .)
+    cmd=(docker build -t "$image:${server}_$tag_lgsm" --build-arg "LGSM_GAMESERVER=$server" ${lgsm_version[@]} .)
     echo "${cmd[@]}"
     "${cmd[@]}"
 
