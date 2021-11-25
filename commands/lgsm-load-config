@@ -23,6 +23,7 @@ function handleEnvironmentVariablePrefix() {
     target_file="$2"
     pattern="$3"
     check_file="$4"
+    #shellcheck disable=SC1087 #prefix is no array
     for config in $( env | grep -Eo "^$prefix[^=]*" ); do
         key="${config:${#prefix}}"
         value="$( eval "\$$config" )"

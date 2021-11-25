@@ -54,7 +54,7 @@ while [ $# -ge 1 ]; do
             shift;;
         *)
             if [ -n "$key" ]; then
-                echo "$key is argument for docker container"
+                echo "$key is additional argument to dockerr"
                 args+=("$key")
             fi
             ;;
@@ -68,12 +68,11 @@ if [ -z "$tag" ]; then
 fi
 
 #shellcheck disable=SC2206
-cmds=(docker run $docker_run_mode --name "$container" ${volume[@]} ${debug[@]} $quick "$IMAGE:$tag")
-for arg in "$@"; do
-    if [ "$arg" != "$1" ]; then
-        cmds+=("$arg")
-    fi
+cmds=(docker run $docker_run_mode --name "$container" ${volume[@]} ${debug[@]} $quick)
+for arg in "${args[@]}"; do
+    cmds+=("$arg")
 done
+cmds+=("$IMAGE:$tag")
 
 echo "${cmds[@]}"
 "${cmds[@]}"
