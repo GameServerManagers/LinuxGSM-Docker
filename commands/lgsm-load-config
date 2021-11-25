@@ -1,0 +1,61 @@
+#!/bin/bash
+
+set -o errexit
+set -o nounset
+set -o pipefail
+
+if [ -z "$LGSM_GAMESERVER" ]; then
+    echo "[error][lgsm-load-config] \$LGSM_GAMESERVER is unset but needed for this script, abort"
+    exit 10
+fi
+
+configfile_default="$LGSM_PATH/lgsm/config-default/config-lgsm/$LGSM_GAMESERVER/_default.cfg"
+configfile_common="$LGSM_PATH/lgsm/config-lgsm/$LGSM_GAMESERVER/common.cfg"
+configfile_game="$( lgsm-details | grep -Eo 'Config file:.*' | grep -o '/.*' || true )"
+
+if [ ! -f "$configfile_default" ]; then
+    echo "[error][lgsm-load-config] expected _default config file doesn't exist at \"$configfile_default\""
+    exit 11
+fi
+
+function handleEnvironmentVariablePrefix() {
+    prefix="$1"
+    target_file="$2"
+    pattern="$3"
+    check_file="$4"
+    for config in $( env | grep -Eo "^$prefix[^=]*" ); do
+        key="${config:${#prefix}}"
+        value="$( eval "\$$config" )"
+        echo "[info][lgsm-load-config] processing $key"
+        if [ -z "$check_file" ]; then
+            if grep -Eo "^$key" "$check_file"; then
+                echo "[info][lgsm-load-config] $key is part of $check_file, adding to $target_file"
+                #shellcheck disable=SC2059
+                printf "$pattern\n" "$key" "$value" >> "$target_file"
+            else
+                echo "[error][lgsm-load-config] provided environment variable $config seems illegal for current gameserver $LGSM_GAMESERVER"
+                exit 12
+            fi
+        else
+            echo "[info][lgsm-load-config] $key is part of $check_file, adding to $target_file"
+            echo "$key=$value" >> "$target_file"
+        fi
+        
+    done
+}
+
+
+rm -f "$configfile_common"
+# CONFIG options should be safe to use => fail if not correct because we can verify they are part of _default.cfg
+handleEnvironmentVariablePrefix "CONFIG_" "$configfile_common" "$LGSM_PATTERN_CONFIG" "$configfile_default"
+# COMMON options will be directly added
+handleEnvironmentVariablePrefix "COMMON_" "$configfile_common" "$LGSM_PATTERN_COMMON"
+
+# GAME_ is added to game specific config file
+# TODO probably there need to be more options for non cfg configs, e.g. json format or so
+if [ -f "$configfile_game" ]; then
+    rm -f "$configfile_game"
+    handleEnvironmentVariablePrefix "GAME_" "$configfile_game" "$LGSM_PATTERN_GAME"
+else
+    echo "[warning][lgsm-load-config] couldn't get config file for $LGSM_GAMESERVER, therefore skipped all environment variables with \$GAME_ "
+fi

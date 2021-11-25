@@ -28,7 +28,10 @@ ENV LGSM_VERSION="$LGSM_VERSION" \
     LC_ALL="en_US.UTF-8" \
     TERM="xterm" \
     SUPERCRONIC_CONFIG="/home/linuxgsm-scripts/cron.config" \
-    LGSM_STARTED="/home/linuxgsm/server.started"
+    LGSM_STARTED="/home/linuxgsm/server.started" \
+    LGSM_PATTERN_CONFIG='%s="%s"' \
+    LGSM_PATTERN_COMMON='%s="%s"' \
+    LGSM_PATTERN_GAME='%s="%s"'
 
 COPY --from=dependencyStage \
      /usr/local/bin/gosu \
