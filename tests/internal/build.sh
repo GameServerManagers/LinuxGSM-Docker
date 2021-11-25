@@ -83,7 +83,7 @@ fi
 
 if [ -n "$server" ]; then
     #shellcheck disable=SC2206
-    cmd=(docker build -t "$image:${server}_$tag_lgsm" --build-arg "LGSM_GAMESERVER=$server" ${lgsm_version[@]} .)
+    cmd=(docker build -t "$image:${server}_$tag_lgsm" --build-arg "ARG_LGSM_GAMESERVER=$server" ${lgsm_version[@]} .)
     echo "${cmd[@]}"
     "${cmd[@]}"
 
