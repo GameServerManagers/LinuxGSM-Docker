@@ -71,6 +71,13 @@ mkdir -p "$RESULTS"
     ./tests/internal/build.sh --version "$VERSION"
 
     subprocesses=()
+    function handleInterrupt() {
+        for pid in "${subprocesses[@]}"; do
+            kill -s SIGINT "$pid" || true
+        done
+    }
+    trap handleInterrupt SIGTERM SIGINT
+
     mapfile -d $'\n' -t servers < <(getServerCodeList "$VERSION")
     for server_code in "${servers[@]}"; do
         cd "$ROOT_FOLDER"

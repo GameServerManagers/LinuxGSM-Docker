@@ -65,6 +65,11 @@ if [ -z "$GAMESERVER" ]; then
 fi
 CONTAINER="linuxgsm-$GAMESERVER"
 
+function handleInterrupt() {
+    removeContainer "$CONTAINER"
+}
+trap handleInterrupt SIGTERM SIGINT
+
 (
     cd "$(dirname "$0")"
     removeContainer "$CONTAINER"
