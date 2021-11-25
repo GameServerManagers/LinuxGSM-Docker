@@ -9,6 +9,7 @@ GAMESERVER=()
 PARRALEL=""
 PARRALEL="$(lscpu -p | grep -Ev '^#' | sort -u -t, -k 2,4 | wc -l)"
 ROOT_FOLDER="$(realpath "$(dirname "$0")/..")"
+RERUN="false"
 while [ $# -ge 1 ]; do
     key="$1"
     shift
@@ -23,6 +24,7 @@ while [ $# -ge 1 ]; do
             echo "--version x    use linuxgsm version x e.g. \"v21.4.1\""
             echo "-c        x    run x servers in parralel, default x = physical cores"
             echo "--cpus    x"
+            echo "--rerun     check results and runs every gameserver which isn't successful"
             echo ""
             echo "server         default empty = all, otherwise e.g. gmodserver"
             exit 0;;
@@ -32,6 +34,9 @@ while [ $# -ge 1 ]; do
         -c|--cpus)
             PARRALEL="$1"
             shift;;
+        --rerun)
+            RERUN="true"
+            ;;
         *)
             if grep -qE '^-' <<< "$key"; then
                 echo "unknown option $key"
@@ -40,14 +45,19 @@ while [ $# -ge 1 ]; do
             GAMESERVER+=("$key");;
     esac
 done
+testAllServer="$([ "${#GAMESERVER[@]}" = "0" ] && echo true || echo false )"
 
 # shellcheck source=tests/internal/api_various.sh
 source "$(dirname "$0")/internal/api_various.sh"
 
-# create results folder
+# prepare results folder
 RESULTS="$ROOT_FOLDER/tests/results"
 if [ "${#GAMESERVER[@]}" = "0" ]; then
-    rm -rf "$RESULTS"
+    if "$RERUN"; then
+        find "$RESULTS" -type f ! -name "successful.*" -exec rm -f "{}" \;
+    else
+        rm -rf "$RESULTS"
+    fi
 else
     # rerun only remove specific log
     for servercode in "${GAMESERVER[@]}"; do
@@ -77,7 +87,12 @@ mkdir -p "$RESULTS"
             subprocesses=("${temp[@]}")
         done
         
-        if [ "${#GAMESERVER[@]}" = "0" ] || grep -qF "$server_code" <<< "${GAMESERVER[@]}"; then
+        
+        isServercodeInServerlist="$(grep -qF "$server_code" <<< "${GAMESERVER[@]}" && echo true || echo false )"
+        serverDidntStartSuccessful="$([ ! -f "$RESULTS/successful.$server_code.log" ] && echo true || echo false )"
+        testThisServercode="$( ("$testAllServer" || "$isServercodeInServerlist") && echo true || echo false )"
+        rerunIsFine="$( ( ! "$RERUN" || "$serverDidntStartSuccessful" ) && echo true || echo false )"
+        if "$testThisServercode" && "$rerunIsFine"; then
             echo "testing: $server_code"
             (
                 if ./tests/quick.sh --logs --version "$VERSION" "$server_code" > "$RESULTS/$server_code.log" 2>&1; then

@@ -53,8 +53,11 @@ while [ $# -ge 1 ]; do
             tag="$1"
             shift;;
         *)
-            echo "$key is argument for docker container"
-            args+=("$key");;
+            if [ -n "$key" ]; then
+                echo "$key is argument for docker container"
+                args+=("$key")
+            fi
+            ;;
     esac
 done
 
