@@ -10,32 +10,38 @@ VOLUME="$3"
 CONTAINER="linuxgsm-$GAMESERVER-testCron"
 # shellcheck source=tests/internal/api_docker.sh
 source "$(dirname "$0")/../internal/api_docker.sh"
-# shellcheck source=tests/internal/api_various.sh
-source "$(dirname "$0")/../internal/api_various.sh"
 
 (
     cd "$(dirname "$0")/../.."
     DOCKERFILE_CRONLOCATION="$(grep -Po '(?<=SUPERCRONIC_CONFIG=")[^"]*' Dockerfile)"
 
-    function handleInterrupt() {
+    
+    function fn_exit() {
         removeContainer "$CONTAINER"
-        exit 1
+        exit "${1:-1}"
     }
-    trap handleInterrupt SIGTERM SIGINT ERR
+    trap fn_exit SIGTERM SIGINT
 
-    # initial run = no cron
+    function log() {
+        if [ -n "${2:-}" ]; then
+            echo "[error][testCron] $1"
+            fn_exit "$2"
+        else
+            echo "[testCron] $1"
+        fi
+    }
+
+       # initial run = no cron
     removeContainer "$CONTAINER"
     ./tests/internal/run.sh --container "$CONTAINER" --detach --volume "$VOLUME" --tag "$GAMESERVER"
     if awaitHealthCheck "$CONTAINER"; then
         if [ "0" != "$(docker exec -it "$CONTAINER" cat "$DOCKERFILE_CRONLOCATION" | wc -l)" ]; then
-            echo "[testCron] successful no cron job found"
+            log "successful no cron job found"
         else
-            echo "[error][testCron] container shouldn't have a cronjob"
-            exit 20
+            log "container shouldn't have a cronjob" 20
         fi 
     else
-        echo "[error][testCron] container is unhealthy"
-        exit 10
+        log "container is unhealthy" 10
     fi
 
     # inject one cron
@@ -45,17 +51,14 @@ source "$(dirname "$0")/../internal/api_various.sh"
     if awaitHealthCheck "$CONTAINER"; then
         crontab="$(docker exec -it "$CONTAINER" cat "$DOCKERFILE_CRONLOCATION")"
         if [ "2" != "$(echo "$crontab" | wc -l)" ]; then
-            echo "[error][testCron] expected two cron lines, found $(echo "$crontab" | wc -l)"
-            exit 21
+            log "expected two cron lines, found $(echo "$crontab" | wc -l)" 21
         elif ! grep -qE "^$CRON_TEST1" <<< "$crontab"; then
-            echo "[error][testCron] provided crontab isn't part of container but should be"
-            exit 22 
+            log "provided crontab isn't part of container but should be" 22 
         else
-            echo "[testCron] successfully tested one cronjob"
+            log "successfully tested one cronjob"
         fi 
     else
-        echo "[error][testCron] container is unhealthy"
-        exit 10
+        log "container is unhealthy" 11
     fi
 
     # inject multiple cron
@@ -65,29 +68,33 @@ source "$(dirname "$0")/../internal/api_various.sh"
     if awaitHealthCheck "$CONTAINER"; then
         crontab="$(docker exec -it "$CONTAINER" cat "$DOCKERFILE_CRONLOCATION")"
         if [ "3" != "$(echo "$crontab" | wc -l)" ]; then
-            echo "[error][testCron] expected 3 cron lines, found $(echo "$crontab" | wc -l)"
-            exit 23
+            log "expected 3 cron lines, found $(echo "$crontab" | wc -l)" 23
         elif ! grep -qE "^$CRON_TEST1" <<< "$crontab"; then
-            echo "[error][testCron] provided first crontab isn't part of container but should be"
-            exit 24
+            log "provided first crontab isn't part of container but should be" 24
         elif ! grep -qE "^$CRON_TEST2" <<< "$crontab"; then
-            echo "[error][testCron] provided second crontab isn't part of container but should be"
-            exit 25
+            log "provided second crontab isn't part of container but should be" 25
         else
-            echo "[testCron] successfully tested two cronjobs"
-            echo "crontab:"
-            echo "$crontab"
+            log "successfully tested two cronjobs"
+            log "$crontab"
         fi 
     else
-        echo "[error][testCron] container is unhealthy"
-        exit 10
+        log "container is unhealthy" 12
     fi
 
     # check supercron is running
     if docker exec -it "$CONTAINER" pidof supercronic > /dev/null; then
-        echo "[testCron] supercronic started!"
+        log "supercronic started!"
     else
-        echo "[error][testCron] supercronic NOT started"
+        log "supercronic NOT started" 13
+    fi
+
+    # fail for illegal cron job
+    removeContainer "$CONTAINER"
+    ./tests/internal/run.sh --container "$CONTAINER" --detach --volume "$VOLUME" --tag "$GAMESERVER" "-e" "CRON_illegal=* * * * echo \"hello illegal\""
+    if ! awaitHealthCheck "$CONTAINER"; then
+        log "successfully tested illegal cronjob"
+    else
+        log "container is healthy for illegal cronjob which should fail early" 14
     fi
 
     removeContainer "$CONTAINER"
