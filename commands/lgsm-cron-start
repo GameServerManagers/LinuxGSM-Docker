@@ -3,4 +3,4 @@
 set -o errexit
 set -o nounset
 
-gosu "$USER_NAME" supercronic "$SUPERCRONIC_CONFIG"
+gosu "$USER_NAME" supercronic -debug "$SUPERCRONIC_CONFIG"

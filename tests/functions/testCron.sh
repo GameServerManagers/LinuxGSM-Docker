@@ -39,7 +39,7 @@ source "$(dirname "$0")/../internal/api_various.sh"
     fi
 
     # inject one cron
-    CRON_TEST1="* * * * echo \"hello world1\""
+    CRON_TEST1="* * * * * echo \"hello world1\""
     removeContainer "$CONTAINER"
     ./tests/internal/run.sh --container "$CONTAINER" --detach --volume "$VOLUME" --tag "$GAMESERVER" "-e" "CRON_test1=$CRON_TEST1"
     if awaitHealthCheck "$CONTAINER"; then
@@ -59,7 +59,7 @@ source "$(dirname "$0")/../internal/api_various.sh"
     fi
 
     # inject multiple cron
-    CRON_TEST2="* * * * echo \"hello world2\""
+    CRON_TEST2="* * * * * echo \"hello world2\""
     removeContainer "$CONTAINER"
     ./tests/internal/run.sh --container "$CONTAINER" --detach --volume "$VOLUME" --tag "$GAMESERVER" "-e" "CRON_test1=$CRON_TEST1" "-e" "CRON_test2=$CRON_TEST2"
     if awaitHealthCheck "$CONTAINER"; then

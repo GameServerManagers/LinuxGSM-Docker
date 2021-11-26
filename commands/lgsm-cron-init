@@ -14,4 +14,4 @@ for cron_var in $(env | grep -Eo '^CRON_[^=]*'); do
 done
 chown "$USER_NAME:$USER_NAME" "$SUPERCRONIC_CONFIG"
 
-gosu "$USER_NAME" supercronic "$SUPERCRONIC_CONFIG" &
+gosu "$USER_NAME" supercronic -test -debug "$SUPERCRONIC_CONFIG"
