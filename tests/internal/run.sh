@@ -54,7 +54,7 @@ while [ $# -ge 1 ]; do
             shift;;
         *)
             if [ -n "$key" ]; then
-                echo "$key is additional argument to docker"
+                echo "[run.sh] additional argument to docker: $key"
                 args+=("$key")
             fi
             ;;

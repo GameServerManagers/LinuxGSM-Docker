@@ -17,6 +17,7 @@ VOLUME=()
 DEBUG=""
 CLEAR=""
 LOGS="false"
+RUN_ARGS=()
 while [ $# -ge 1 ]; do
     key="$1"
     shift
@@ -51,11 +52,13 @@ while [ $# -ge 1 ]; do
         -l|--logs)
             LOGS="true";;
         *)
-            if grep -qE '^-' <<< "$key"; then
-                echo "unknown option $key"
-                exit 1
+            if [ -z "$GAMESERVER" ]; then
+                GAMESERVER="$key"
+            else
+                echo "[quick.sh] additional argument to docker: \"$key\""
+                RUN_ARGS+=("$key")
             fi
-            GAMESERVER="$key";;
+            ;;
     esac
 done
 
@@ -76,7 +79,7 @@ trap handleInterrupt SIGTERM SIGINT
     #shellcheck disable=SC2068
     ./internal/build.sh $CLEAR ${VERSION[@]} --latest "$GAMESERVER"
     #shellcheck disable=SC2068
-    ./internal/run.sh --container "$CONTAINER" --detach ${VOLUME[@]} "$DEBUG" --tag "$GAMESERVER"
+    ./internal/run.sh --container "$CONTAINER" --detach ${VOLUME[@]} "$DEBUG" --tag "$GAMESERVER" ${RUN_ARGS[@]}
 
     successful="false"
     if awaitHealthCheck "$CONTAINER"; then

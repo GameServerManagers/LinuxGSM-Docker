@@ -4,14 +4,14 @@ set -o errexit
 set -o nounset
 
 GROUP_NAME="$USER_NAME"
-if [ "$(id --user "$USER_ID")" != "$USER_ID" ] || [ "$(id --group "$USER_ID")" != "$GROUP_ID" ]; then
+if [ "$(id --user "$USER_ID" 2> /dev/null)" != "$USER_ID" ] || [ "$(id --group "$USER_ID" 2> /dev/null)" != "$GROUP_ID" ]; then
     echo "[setupUser] changing user id"
-    old_user_id="$(id --user "$USER_ID")"
+    old_user_id="$(id --user "$USER_NAME")"
     usermod -u "$USER_ID" "$USER_NAME"
-    find / -uid "$old_user_id" -exec chown "$USER_ID" \;
+    find /home/ -uid "$old_user_id" -exec chown "$USER_ID" "{}" \;
 
     echo "[setupUser] changing group id"
-    old_group_id="$(id --group "$USER_ID")"
+    old_group_id="$(id --group "$USER_NAME")"
     groupmod -g "$GROUP_ID" "$GROUP_NAME"
-    find / -gid "$old_group_id" -exec chown ":$GROUP_ID" \;
+    find /home/ -gid "$old_group_id" -exec chown ":$GROUP_ID" "{}" \;
 fi
