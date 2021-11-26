@@ -61,9 +61,6 @@ RUN set -eux; \
     installGamedig.sh; \
     cleanImage.sh
 
-HEALTHCHECK --start-period=3600s --interval=60s --timeout=900s --retries=3 \
-    CMD [ -f "$LGSM_STARTED" ] && lgsm-monitor || exit 1
-
 VOLUME "$LGSM_PATH"
 WORKDIR "$LGSM_PATH"
 
@@ -75,5 +72,8 @@ RUN set -eux; \
     installDependencies.sh "$LGSM_GAMESERVER"; \
     createAlias.sh "$LGSM_GAMESERVER"; \
     cleanImage.sh
+
+HEALTHCHECK --start-period=3600s --interval=60s --timeout=900s --retries=3 \
+    CMD [ -f "$LGSM_STARTED" ] && lgsm-monitor || exit 1
 
 ENTRYPOINT ["./../linuxgsm-scripts/entrypoint.sh"]

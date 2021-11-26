@@ -83,5 +83,12 @@ source "$(dirname "$0")/../internal/api_various.sh"
         exit 10
     fi
 
+    # check supercron is running
+    if docker exec -it "$CONTAINER" pidof supercronic > /dev/null; then
+        echo "[testCron] supercronic started!"
+    else
+        echo "[error][testCron] supercronic NOT started"
+    fi
+
     removeContainer "$CONTAINER"
 )
