@@ -4,7 +4,7 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-VERSION="$1"
+#VERSION="$1"
 GAMESERVER="$2"
 VOLUME="$3"
 CONTAINER="linuxgsm-$GAMESERVER-testCron"
@@ -16,8 +16,6 @@ source "$(dirname "$0")/../internal/api_various.sh"
 (
     cd "$(dirname "$0")/../.."
     DOCKERFILE_CRONLOCATION="$(grep -Po '(?<=SUPERCRONIC_CONFIG=")[^"]*' Dockerfile)"
-
-    ./tests/internal/build.sh "$VERSION" --latest "$GAMESERVER"
 
     function handleInterrupt() {
         removeContainer "$CONTAINER"

@@ -19,4 +19,7 @@ VOLUME="linuxgsm-$GAMESERVER-testFeatures"
 
     ./tests/functions/testCron.sh "$VERSION" "$GAMESERVER" "$VOLUME"
     ./tests/functions/testDockerLogs.sh "$VERSION" "$GAMESERVER" "$VOLUME"
+    ./tests/functions/testFixPermissions.sh "$VERSION" "$GAMESERVER" "$VOLUME"
+
+    echo "successful"
 )

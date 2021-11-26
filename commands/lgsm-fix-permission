@@ -3,6 +3,10 @@
 set -o errexit
 set -o nounset
 
+# only volume needs to be fixed, everything else can be fixed by recreating the container
+
 GROUP_NAME="$USER_NAME"
 chown -R "$USER_NAME:$GROUP_NAME" "$LGSM_PATH"
-chmod 755 "$LGSM_PATH"
+chmod 750 "$LGSM_PATH"
+chmod 750 "$LGSM_PATH/$LGSM_GAMESERVER"
+chmod -R ug+rw,o= "$LGSM_PATH"

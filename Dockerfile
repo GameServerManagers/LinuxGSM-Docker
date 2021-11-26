@@ -13,8 +13,8 @@ RUN set -eux; \
 # this stage should be usable by existing developers
 FROM ubuntu:21.04 as linuxgsm
 
-ARG LGSM_VERSION="master"
-ENV LGSM_VERSION="$LGSM_VERSION" \
+ARG ARG_LGSM_VERSION="master"
+ENV LGSM_VERSION="${ARG_LGSM_VERSION:?}" \
     LGSM_GAMESERVER="" \
     USER_ID="750" \
     GROUP_ID="750" \
@@ -70,8 +70,8 @@ WORKDIR "$LGSM_PATH"
 # install server specific dependencies
 FROM linuxgsm as specific
 ARG ARG_LGSM_GAMESERVER=""
-ENV LGSM_GAMESERVER="$ARG_LGSM_GAMESERVER"
-RUN set -eux; echo "${LGSM_GAMESERVER:?}"; \
+ENV LGSM_GAMESERVER="${ARG_LGSM_GAMESERVER:?}"
+RUN set -eux; \
     installDependencies.sh "$LGSM_GAMESERVER"; \
     createAlias.sh "$LGSM_GAMESERVER"; \
     cleanImage.sh
