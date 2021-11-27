@@ -23,6 +23,7 @@ VOLUME="$3"
             rm "$log_downgrade" "$log_update" > /dev/null 2>&1 || true
             exit "$2"
         else
+            rm "$log_downgrade" "$log_update" > /dev/null 2>&1 || true
             echo "[info][testLgsmUpdate] $1"
         fi
     }
