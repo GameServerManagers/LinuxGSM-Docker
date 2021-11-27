@@ -36,15 +36,15 @@ function awaitHealthCheck() {
         return 1
     fi
 
-    echo -n "[awaitHealthCheck] waiting for health check of \"$container\" "
+    echo -n "[info][awaitHealthCheck] waiting for health check of \"$container\" "
     seconds=0
     while isContainerHealthStarting "$container"; do
         seconds=$((seconds+1))
         sleep 1s
-        echo -en "\r[awaitHealthCheck] waiting for health check of \"$container\" currently ${seconds} seconds"
+        echo -en "\r[info][awaitHealthCheck] waiting for health check of \"$container\" currently ${seconds} seconds"
     done
     echo ""
-    echo "[awaitHealthCheck] \"$container\" health check startup time $seconds"
+    echo "[info][awaitHealthCheck] \"$container\" health check startup time $seconds"
 
     isContainerHealthHealthy "$container"
 }

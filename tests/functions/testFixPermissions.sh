@@ -27,56 +27,56 @@ source "$(dirname "$0")/../internal/api_various.sh"
     "${dockerRun[@]}" -u root:root alpine chown -R 1234:5678 "lgsm"
     # server executable with false permissions
     "${dockerRun[@]}" alpine chmod ugo= "$GAMESERVER"
+
+    function log() {
+        if [ -n "${2:-}" ]; then
+            echo "[error][testFixPermissions] $1"
+            echo "${3:-}"
+            exit "$2"
+        else
+            echo "[info][testFixPermissions] $1"
+        fi
+    }
     
-    if ./tests/quick.sh --version "$VERSION" --volume "$VOLUME" "$GAMESERVER"; then
+    if ./tests/quick.sh --quick --version "$VERSION" --volume "$VOLUME" "$GAMESERVER"; then
         permission="$("${dockerRun[@]}" alpine ls -l "$newFile")"
         owner="$("${dockerRun[@]}" alpine ls -l "$newFile")"
         if ! grep -qE '^.rw.r..---' <<< "$permission"; then
-            echo "[error][testFixPermissions] new file has wrong permission \"$permission\""
-            exit 20
+            log "new file has wrong permission \"$permission\"" 20
         
         elif ! grep -qE "^[^ ]*\s*[0-9]\s*$uid\s*$gid" <<< "$owner"; then
-            echo "[error][testFixPermissions] new file has wrong owner \"$owner\""
-            exit 21
+            log "new file has wrong owner \"$owner\"" 21
         else 
-            echo "[testFixPermissions] new file has correct permissions / owner"
+            log "new file has correct permissions / owner"
         fi 
 
         permission="$("${dockerRun[@]}" alpine ls -l "lgsm")"
         if ! grep -qE '^.rw.r..---' <<< "$permission"; then
-            echo "[error][testFixPermissions] lgsm folder has wrong permission"
-            exit 22
+            log "lgsm folder has wrong permission" 22
 
         elif [ "0" != "$("${dockerRun[@]}" alpine find "lgsm" ! -user "$uid" | wc -l)" ]; then
-            echo "[error][testFixPermissions] lgsm folder / subfile has false uid"
-            "${dockerRun[@]}" alpine find "lgsm" ! -user "$uid"
-            exit 23
+            log "lgsm folder / subfile has false uid" 23 "$("${dockerRun[@]}" alpine find "lgsm" ! -user "$uid" | tail)"
         
         elif [ "0" != "$("${dockerRun[@]}" alpine find "lgsm" ! -group "$gid" | wc -l)" ]; then
-            echo "[error][testFixPermissions] lgsm folder / subfile has false gid"
-            "${dockerRun[@]}" alpine find "lgsm" ! -group "$gid"
-            exit 24
+            log "lgsm folder / subfile has false gid" 24 "$("${dockerRun[@]}" alpine find "lgsm" ! -group "$gid" | tail)"
             
         else 
-            echo "[testFixPermissions] lgsm folder has correct permissions / owner"
+            log "lgsm folder has correct permissions / owner"
         fi
 
         permission="$("${dockerRun[@]}" alpine ls -l "$GAMESERVER")"
         owner="$("${dockerRun[@]}" alpine ls -l "$GAMESERVER")"
         if ! grep -qE '^.r.x...---' <<< "$permission"; then
-            echo "[error][testFixPermissions] gameserver executable has wrong permission \"$permission\""
-            exit 25
+            log "gameserver executable has wrong permission \"$permission\"" 25
         
         elif ! grep -qE "^[^ ]*\s*[0-9]\s*$uid\s*$gid" <<< "$owner"; then
-            echo "[error][testFixPermissions] gameserver executable wrong owner \"$owner\""
-            exit 26
+            log "gameserver executable wrong owner \"$owner\"" 26
 
         else 
-            echo "[testFixPermissions] gameserver executable has correct permissions / owner"
+            log "gameserver executable has correct permissions / owner"
         fi 
     else
-        echo "[error][testFixPermissions] permissions not fixed and container failed to start"
-        exit 10
+        log "permissions not fixed and container failed to start" 10
     fi
 
     "${dockerRun[@]}" alpine rm "$newFile"

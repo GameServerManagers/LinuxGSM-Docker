@@ -11,54 +11,52 @@ source "$(dirname "$0")/internal/api_docker.sh"
 # shellcheck source=tests/internal/api_various.sh
 source "$(dirname "$0")/internal/api_various.sh"
 
-VERSION=()
+
 GAMESERVER=""
-VOLUME=()
-DEBUG=""
-CLEAR=""
 LOGS="false"
-RUN_ARGS=()
+
+build=(./internal/build.sh)
+run=(./internal/run.sh)
 while [ $# -ge 1 ]; do
     key="$1"
     shift
 
     case "$key" in
         -h|--help)
-            echo "quick testing of provided gameserver"
-            echo "quick.sh [option] server"
-            echo ""
-            echo "options:"
-            echo "--version x    use linuxgsm version x e.g. \"v21.4.1\""
-            echo "--volume  x    use volume x e.g. \"lgsm\""
-            echo "-d             run gameserver and overwrite entrypoint to bash"
-            echo "--debug"
-            echo "-c             run without docker cache"
-            echo "--no-cache"
-            echo "--logs         print last log lines after run"
-            echo "-l"
-            echo ""
-            echo "server         e.g. gmodserver"
+            echo "[help][quick] quick testing of provided gameserver"
+            echo "[help][quick] quick.sh [option] server"
+            echo "[help][quick] "
+            echo "[help][quick] options:"
+            echo "[help][quick] -c  --no-cache   run without docker cache"
+            echo "[help][quick] -d  --debug      run gameserver and overwrite entrypoint to bash"
+            echo "[help][quick] -l  --logs       print last log lines after run"
+            echo "[help][quick]     --quick      enforces a faster health check interval"
+            echo "[help][quick]     --version x  use linuxgsm version x e.g. \"v21.4.1\""
+            echo "[help][quick]     --volume  x  use volume x e.g. \"lgsm\""
+            echo "[help][quick] "
+            echo "[help][quick] server           e.g. gmodserver"
             exit 0;;
-        --version)
-            VERSION=("--version" "$1")
-            shift;;
-        --volume)
-            VOLUME=("--volume" "$1")
-            shift;;
         -c|--no-cache)
-            CLEAR="--no-cache";;
+            build+=(--no-cache);;
         -d|--debug)
-            DEBUG="--debug";;
+            run+=(--debug);;
         -l|--logs)
             LOGS="true";;
+        --quick)
+            run+=(--quick);;
+        --version)
+            build+=(--version "$1")
+            shift;;
+        --volume)
+            run+=(--volume "$1")
+            shift;;
         *)
             if [ -z "$GAMESERVER" ]; then
                 GAMESERVER="$key"
             else
                 echo "[quick.sh] additional argument to docker: \"$key\""
-                RUN_ARGS+=("$key")
-            fi
-            ;;
+                run+=("$key")
+            fi;;
     esac
 done
 
@@ -67,6 +65,8 @@ if [ -z "$GAMESERVER" ]; then
     exit 1
 fi
 CONTAINER="linuxgsm-$GAMESERVER"
+build+=(--latest "$GAMESERVER")
+run+=(--container "$CONTAINER" --detach --tag "$GAMESERVER")
 
 function handleInterrupt() {
     removeContainer "$CONTAINER"
@@ -76,10 +76,11 @@ trap handleInterrupt SIGTERM SIGINT
 (
     cd "$(dirname "$0")"
     removeContainer "$CONTAINER"
-    #shellcheck disable=SC2068
-    ./internal/build.sh $CLEAR ${VERSION[@]} --latest "$GAMESERVER"
-    #shellcheck disable=SC2068
-    ./internal/run.sh --container "$CONTAINER" --detach ${VOLUME[@]} "$DEBUG" --tag "$GAMESERVER" ${RUN_ARGS[@]}
+    
+    echo "${build[@]}"
+    "${build[@]}"
+    echo "${run[@]}"
+    "${run[@]}"
 
     successful="false"
     if awaitHealthCheck "$CONTAINER"; then
@@ -92,10 +93,10 @@ trap handleInterrupt SIGTERM SIGINT
     removeContainer "$CONTAINER"
 
     if "$successful"; then
-        echo "successful"
+        echo "[info][quick] successful"
         exit 0
     else
-        echo "failed"
+        echo "[error][quick] failed"
         exit 1
     fi
 )

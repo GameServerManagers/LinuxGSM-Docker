@@ -2,7 +2,7 @@
 
 set -o errexit
 set -o nounset
-echo "[installMinimalDependencies] installing ..."
+echo "[info][installMinimalDependencies] installing ..."
 
 apt-get update
 # curl / wget needed for lgsm

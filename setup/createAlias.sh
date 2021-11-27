@@ -1,13 +1,13 @@
 #!/bin/bash
 LGSM_GAMESERVER="$1"
 if [ -z "$LGSM_GAMESERVER" ]; then
-	echo "[createAlias] ERROR first argument needs to be target gameserver"
+	echo "[error][createAlias] first argument needs to be target gameserver"
 	exit 1
 fi
 
 set -o errexit
 set -o nounset
-echo "[createAlias] creating linuxgsm alias"
+echo "[info][createAlias] creating linuxgsm alias"
 
 function createAlias() {
 	name="$1"
@@ -15,9 +15,9 @@ function createAlias() {
 	file="$LGSM_SCRIPTS/$name"
 
 	if [ -f "$file" ]; then
-		echo "[createAlias.sh]error file already exists => cant create alias with this method"
+		echo "[error][createAlias.sh]file already exists => cant create alias with this method"
 	else
-		echo "[createAlias.sh] $command $name"
+		echo "[info][createAlias.sh] $command $name"
 		cat > "$file" <<- EOM
 		#!/bin/sh
 		gosu "\$USER_NAME" "$command" "$name" "\$@"

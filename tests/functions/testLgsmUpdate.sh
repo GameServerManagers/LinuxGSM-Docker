@@ -11,7 +11,7 @@ VOLUME="$3"
 
 (
     cd "$(dirname "$0")/../.."
-    ./tests/quick.sh --version "$VERSION" --volume "$VOLUME" "$GAMESERVER"
+    ./tests/quick.sh --quick --version "$VERSION" --volume "$VOLUME" "$GAMESERVER"
 
     log_downgrade="downgrade.log"
     log_update="upgrade.log"
@@ -23,16 +23,16 @@ VOLUME="$3"
             rm "$log_downgrade" "$log_update" > /dev/null 2>&1 || true
             exit "$2"
         else
-            echo "[testLgsmUpdate] $1"
+            echo "[info][testLgsmUpdate] $1"
         fi
     }
 
     # old versions are allowed to fail, as long as log contains the expected entry
-    ./tests/quick.sh --logs --version "$OLD_VERSION" --volume "$VOLUME" "$GAMESERVER" > "$log_downgrade" || true 
+    ./tests/quick.sh --quick --logs --version "$OLD_VERSION" --volume "$VOLUME" "$GAMESERVER" > "$log_downgrade" || true 
     if ! grep -qF '[lgsm-init] force uninstall lgsm' "$log_downgrade"; then
         log "downgrading from \"$VERSION\" to \"$OLD_VERSION\" successful but container didn't forcefully uninstalled lgsm" 21 
 
-    elif ! ./tests/quick.sh --logs --version "$VERSION" --volume "$VOLUME" "$GAMESERVER" > "$log_update"; then
+    elif ! ./tests/quick.sh --quick --logs --version "$VERSION" --volume "$VOLUME" "$GAMESERVER" > "$log_update"; then
         log "upgrading from \"$OLD_VERSION\" to \"$VERSION\" failed" 22
 
     elif ! grep -qF '[lgsm-init] force uninstall lgsm' "$log_update"; then

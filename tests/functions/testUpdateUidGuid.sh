@@ -12,38 +12,40 @@ gid="750"
 
 (
     cd "$(dirname "$0")/../.."
-    ./tests/quick.sh --version "$VERSION" --volume "$VOLUME" "$GAMESERVER"
+    ./tests/quick.sh --quick --version "$VERSION" --volume "$VOLUME" "$GAMESERVER"
+
+    function log() {
+        if [ -n "${2:-}" ]; then
+            echo "[error][testUpdateUidGuid] $1"
+            echo "${3:-}"
+            exit "$2"
+        else
+            echo "[info][testUpdateUidGuid] $1"
+        fi
+    }
 
     dockerRun=(docker run -it --rm -v "$VOLUME:/home" --workdir "/home")
     if [ "0" != "$("${dockerRun[@]}" alpine find . ! -user "$uid" ! -iname "tmux.pipe" | wc -l )" ]; then
-        echo "[testUpdateUidGuid] precondition failed, there are files in \"$VOLUME\" which aren't owned by user \"$uid\""
-        "${dockerRun[@]}" alpine find . ! -user "$uid" ! -iname "tmux.pipe" | tail
-        exit 20
+        log "precondition failed, there are files in \"$VOLUME\" which aren't owned by user \"$uid\"" 20 "$("${dockerRun[@]}" alpine find . ! -user "$uid" ! -iname "tmux.pipe" | tail)"
 
     elif [ "0" != "$("${dockerRun[@]}" alpine find . ! -group "$gid" ! -iname "tmux.pipe" | wc -l )" ]; then
-        echo "[testUpdateUidGuid] precondition failed, there are files in \"$VOLUME\" which aren't owned by group \"$gid\""
-        "${dockerRun[@]}" alpine find . ! -group "$gid" ! -iname "tmux.pipe" | tail
-        exit 21
+        log "precondition failed, there are files in \"$VOLUME\" which aren't owned by group \"$gid\"" 21 "$("${dockerRun[@]}" alpine find . ! -group "$gid" ! -iname "tmux.pipe" | tail)"
         
     else
-       echo "[testUpdateUidGuid] precondition successful"
+       log "precondition successful"
     fi
 
-    ./tests/quick.sh --version "$VERSION" --volume "$VOLUME" "$GAMESERVER" -e "USER_ID=1234" -e "GROUP_ID=5678"
+    ./tests/quick.sh --quick --version "$VERSION" --volume "$VOLUME" "$GAMESERVER" -e "USER_ID=1234" -e "GROUP_ID=5678"
     if [ "0" != "$("${dockerRun[@]}" alpine find . ! -user "1234" ! -iname "tmux.pipe" | wc -l )" ]; then
-        echo "[testUpdateUidGuid] update failed, there are files in \"$VOLUME\" which aren't owned by user \"1234\""
-        "${dockerRun[@]}" alpine find . ! -user "1234" ! -iname "tmux.pipe" | tail
-        exit 22
+        log "update failed, there are files in \"$VOLUME\" which aren't owned by user \"1234\"" 22 "$("${dockerRun[@]}" alpine find . ! -user "1234" ! -iname "tmux.pipe" | tail)"
 
     elif [ "0" != "$("${dockerRun[@]}" alpine find . ! -group "5678" ! -iname "tmux.pipe" | wc -l )" ]; then
-        echo "[testUpdateUidGuid] update failed, there are files in \"$VOLUME\" which aren't owned by group \"5678\""
-        "${dockerRun[@]}" alpine find . ! -group "5678" ! -iname "tmux.pipe" | tail
-        exit 23
+        log "update failed, there are files in \"$VOLUME\" which aren't owned by group \"5678\"" 23 "$("${dockerRun[@]}" alpine find . ! -group "5678" ! -iname "tmux.pipe" | tail)"
         
     else
-       echo "[testUpdateUidGuid] update successful"
+       log "update successful"
     fi
 
-    echo "[testUpdateUidGuid] resetting permissions"
+    log "resetting permissions"
     "${dockerRun[@]}" alpine chown -R "$uid:$gid" .
 )

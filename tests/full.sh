@@ -16,30 +16,29 @@ while [ $# -ge 1 ]; do
 
     case "$key" in
         -h|--help)
-            echo "testing every feature of specified server"
-            echo "full.sh [option] [server]"
-            echo ""
-            echo "options:"
-            echo "-v        x"
-            echo "--version x    use linuxgsm version x e.g. \"v21.4.1\""
-            echo "-c        x    run x servers in parralel, default x = physical cores"
-            echo "--cpus    x"
-            echo "--rerun     check results and runs every gameserver which isn't successful"
-            echo ""
-            echo "server         default empty = all, otherwise e.g. gmodserver"
+            echo "[help][full] testing every feature of specified server"
+            echo "[help][full] full.sh [option] [server]"
+            echo "[help][full] "
+            echo "[help][full] options:"
+            echo "[help][full] -c --cpus    x  run x servers in parralel, default x = physical cores"
+            echo "[help][full]    --rerun      check results and runs every gameserver which wasn't successful"
+            echo "[help][full] -v --version x  use linuxgsm version x e.g. \"v21.4.1\""
+            echo "[help][full] "
+            echo "[help][full] server:"
+            echo "[help][full] *empty*         test every server"
+            echo "[help][full] gmodserver ...  run only given servers"
             exit 0;;
-        -v|--version)
-            VERSION="$1"
-            shift;;
         -c|--cpus)
             PARRALEL="$1"
             shift;;
         --rerun)
-            RERUN="true"
-            ;;
+            RERUN="true";;
+        -v|--version)
+            VERSION="$1"
+            shift;;
         *)
             if grep -qE '^-' <<< "$key"; then
-                echo "unknown option $key"
+                echo "[error][full] unknown option $key"
                 exit 1
             fi
             GAMESERVER+=("$key");;
@@ -67,7 +66,7 @@ fi
 mkdir -p "$RESULTS"
 
 (
-    echo "building linuxgsm base once"
+    echo "[info][full] building linuxgsm base once"
     ./tests/internal/build.sh --version "$VERSION"
 
     subprocesses=()
@@ -100,7 +99,7 @@ mkdir -p "$RESULTS"
         testThisServercode="$( ("$testAllServer" || "$isServercodeInServerlist") && echo true || echo false )"
         rerunIsFine="$( ( ! "$RERUN" || "$serverDidntStartSuccessful" ) && echo true || echo false )"
         if "$testThisServercode" && "$rerunIsFine"; then
-            echo "testing: $server_code"
+            echo "[info][full] testing: $server_code"
             (
                 if ./tests/quick.sh --logs --version "$VERSION" "$server_code" > "$RESULTS/$server_code.log" 2>&1; then
                     mv "$RESULTS/$server_code.log" "$RESULTS/successful.$server_code.log"
@@ -124,6 +123,6 @@ mkdir -p "$RESULTS"
         subprocesses=("${temp[@]}")
     done
 
-    echo "successful: $(find "$RESULTS/" -iname "successful.*" | wc -l)"
-    echo "failed: $(find "$RESULTS/" -iname "failed.*" | wc -l)"
+    echo "[info][full] successful: $(find "$RESULTS/" -iname "successful.*" | wc -l)"
+    echo "[info][full] failed: $(find "$RESULTS/" -iname "failed.*" | wc -l)"
 )

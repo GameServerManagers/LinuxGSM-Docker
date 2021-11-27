@@ -23,5 +23,5 @@ VOLUME="linuxgsm-$GAMESERVER-testFeatures"
     ./tests/functions/testUpdateUidGuid.sh  "$VERSION" "$GAMESERVER" "$VOLUME"
     ./tests/functions/testLgsmUpdate.sh     "$VERSION" "$GAMESERVER" "$VOLUME"
 
-    echo "[features] successful"
+    echo "[info][features] successful"
 )

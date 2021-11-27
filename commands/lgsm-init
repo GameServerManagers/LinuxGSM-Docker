@@ -7,7 +7,7 @@ set -o nounset
 # if linuxgsm.sh is changed = update -> remove lgsm folder
 # if linuxgsm.sh isn't there this will also fail -> forced lgsm download
 if ! echo "$(sha256sum "$LGSM_SCRIPTS/linuxgsm.sh" | grep -Eo '^[^ ]*')  linuxgsm.sh" | sha256sum -c > /dev/null 2>&1; then
-    echo "[lgsm-init] force uninstall lgsm, either linuxgsm changed or file to determine installed version is removed"
+    echo "[info][lgsm-init] force uninstall lgsm, either linuxgsm changed or file to determine installed version is removed"
     rm -rf "lgsm" || true
 fi
 # remove gameserver executable to not install 2nd one 

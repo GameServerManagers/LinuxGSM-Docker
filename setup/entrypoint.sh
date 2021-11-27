@@ -34,5 +34,5 @@ while read -r line; do
     echo "$line"
 done < tmux.pipe
 rm "$LGSM_STARTED" > /dev/null 2>&1 || true
-echo "entrypoint ended"
+echo "[info][entrypoint] entrypoint ended"
 

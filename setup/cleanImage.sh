@@ -2,7 +2,7 @@
 
 set -o errexit
 set -o nounset
-echo "[cleanImage] cleaning image"
+echo "[info][cleanImage] cleaning image"
 
 apt-get autoremove -y
 apt-get clean -y

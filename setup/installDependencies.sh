@@ -4,7 +4,7 @@ server="$1"
 set -o errexit
 set -o pipefail
 set -o nounset
-echo "[installServer] installing $server"
+echo "[info][installDependencies] installing $server"
 cd "$LGSM_PATH"
 gosu "$USER_NAME" cp -f "$LGSM_SCRIPTS/linuxgsm.sh" .
 gosu "$USER_NAME" ./linuxgsm.sh "$server"
@@ -21,7 +21,7 @@ if [ "${#cmds[@]}" -gt "0" ]; then
     echo steam steam/license note '' | debconf-set-selections
 
     # install dependencies
-    echo "installing dependencies:"
+    echo "[info][installDependencies] installing dependencies:"
     for cmd in "${cmds[@]}"; do
         echo "$cmd"
         eval "DEBIAN_FRONTEND=noninteractive $cmd" || (
