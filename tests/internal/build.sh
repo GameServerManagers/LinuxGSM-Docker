@@ -41,7 +41,7 @@ while [ $# -ge 1 ]; do
         -v|--version)
             tag_lgsm="$1"
             lgsm_version=("--build-arg" "ARG_LGSM_VERSION=$1")
-            echo "using lgsm version ${lgsm_version:-default}"
+            echo "using lgsm version $1"
             shift
             ;;
         -i|--image)

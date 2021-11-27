@@ -17,10 +17,11 @@ VOLUME="linuxgsm-$GAMESERVER-testFeatures"
     fi
     ./tests/quick.sh --version "$VERSION" --volume "$VOLUME" "$GAMESERVER"
 
-    ./tests/functions/testCron.sh "$VERSION" "$GAMESERVER" "$VOLUME"
-    ./tests/functions/testDockerLogs.sh "$VERSION" "$GAMESERVER" "$VOLUME"
+    ./tests/functions/testCron.sh           "$VERSION" "$GAMESERVER" "$VOLUME"
+    ./tests/functions/testDockerLogs.sh     "$VERSION" "$GAMESERVER" "$VOLUME"
     ./tests/functions/testFixPermissions.sh "$VERSION" "$GAMESERVER" "$VOLUME"
-    ./tests/functions/testUpdateUidGuid.sh "$VERSION" "$GAMESERVER" "$VOLUME"
+    ./tests/functions/testUpdateUidGuid.sh  "$VERSION" "$GAMESERVER" "$VOLUME"
+    ./tests/functions/testLgsmUpdate.sh     "$VERSION" "$GAMESERVER" "$VOLUME"
 
     echo "[features] successful"
 )

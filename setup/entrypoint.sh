@@ -16,6 +16,7 @@ if [ ! -e "$LGSM_GAMESERVER" ]; then
     lgsm-init
     lgsm-auto-install
 else
+    lgsm-init
     lgsm-update
 fi
 
