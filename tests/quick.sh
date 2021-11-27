@@ -16,7 +16,7 @@ GAMESERVER=""
 LOGS="false"
 
 build=(./internal/build.sh)
-run=(./internal/run.sh)
+run=(./internal/run.sh --quick)
 while [ $# -ge 1 ]; do
     key="$1"
     shift
@@ -30,7 +30,6 @@ while [ $# -ge 1 ]; do
             echo "[help][quick] -c  --no-cache   run without docker cache"
             echo "[help][quick] -d  --debug      run gameserver and overwrite entrypoint to bash"
             echo "[help][quick] -l  --logs       print last log lines after run"
-            echo "[help][quick]     --quick      enforces a faster health check interval"
             echo "[help][quick]     --version x  use linuxgsm version x e.g. \"v21.4.1\""
             echo "[help][quick]     --volume  x  use volume x e.g. \"lgsm\""
             echo "[help][quick] "
@@ -42,8 +41,6 @@ while [ $# -ge 1 ]; do
             run+=(--debug);;
         -l|--logs)
             LOGS="true";;
-        --quick)
-            run+=(--quick);;
         --version)
             build+=(--version "$1")
             shift;;
