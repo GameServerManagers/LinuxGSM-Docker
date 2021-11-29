@@ -96,8 +96,10 @@ trap handleInterrupt SIGTERM SIGINT
     stopContainer "$CONTAINER"
     if "$LOGS"; then
         printf "[info][quick] logs:\n%s\n" "$(docker logs "$CONTAINER" 2>&1 || true)"
+        printf "[info][quick] healthcheck log:\n%s\n" "$(docker inspect -f '{{json .State.Health.Log}}' "$CONTAINER" | jq || true)"
     elif ! "$successful"; then
         printf "[info][quick] logs:\n%s\n" "$(docker logs -n 20 "$CONTAINER" 2>&1 || true)"
+        printf "[info][quick] healthcheck log:\n%s\n" "$(docker inspect -f '{{json .State.Health.Log}}' "$CONTAINER" | jq || true)"
     fi
     removeContainer "$CONTAINER"
 
