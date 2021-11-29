@@ -44,7 +44,7 @@ while [ $# -ge 1 ]; do
             run+=(--debug);;
         -l|--logs)
             LOGS="true";;
-        --quicker)
+        --very-fast)
             run+=(--quick);;
         --version)
             build+=(--version "$1")
