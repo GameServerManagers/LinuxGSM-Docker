@@ -26,7 +26,8 @@ function stopContainer() {
 
 function removeContainer() {
     stopContainer "$1"
-    docker rm "$1" > /dev/null 2>&1 || true
+    # remove anonymous volumes as well
+    docker rm --volumes "$1" > /dev/null 2>&1 || true
 }
 
 function awaitHealthCheck() {
