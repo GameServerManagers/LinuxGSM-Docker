@@ -2,6 +2,9 @@
 
 set -o errexit
 set -o nounset
+if "$LGSM_DEBUG"; then
+    set -o xtrace
+fi
 
 GROUP_NAME="$USER_NAME"
 if [ "$(id --user "$USER_ID" 2> /dev/null)" != "$USER_ID" ] || [ "$(id --group "$USER_ID" 2> /dev/null)" != "$GROUP_ID" ]; then

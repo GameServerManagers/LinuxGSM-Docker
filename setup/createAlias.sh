@@ -7,6 +7,9 @@ fi
 
 set -o errexit
 set -o nounset
+if "$LGSM_DEBUG"; then
+    set -o xtrace
+fi
 echo "[info][createAlias] creating linuxgsm alias"
 
 function createAlias() {

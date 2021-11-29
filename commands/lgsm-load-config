@@ -3,6 +3,9 @@
 set -o errexit
 set -o nounset
 set -o pipefail
+if "$LGSM_DEBUG"; then
+    set -o xtrace
+fi
 
 if [ -z "$LGSM_GAMESERVER" ]; then
     echo "[error][lgsm-load-config] \$LGSM_GAMESERVER is unset but needed for this script, abort"

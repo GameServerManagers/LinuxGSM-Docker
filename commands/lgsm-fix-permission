@@ -2,6 +2,9 @@
 
 set -o errexit
 set -o nounset
+if "$LGSM_DEBUG"; then
+    set -o xtrace
+fi
 
 # only volume needs to be fixed, everything else can be fixed by recreating the container
 

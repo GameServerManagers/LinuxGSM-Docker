@@ -2,6 +2,9 @@
 
 set -o errexit
 set -o nounset
+if "$LGSM_DEBUG"; then
+    set -o xtrace
+fi
 
 LOG="$LGSM_PATH/log/cron.log"
 gosu "$USER_NAME" mkdir -p "$(dirname "$LOG")"

@@ -19,6 +19,7 @@ ENV LGSM_VERSION="${ARG_LGSM_VERSION:?}" \
     LGSM_CONFIG_PATTERN_GAME="" \
     USER_ID="750" \
     GROUP_ID="750" \
+    LGSM_DEBUG="false" \
     \
     USER_NAME="linuxgsm" \
     LGSM_PATH="/home/linuxgsm" \

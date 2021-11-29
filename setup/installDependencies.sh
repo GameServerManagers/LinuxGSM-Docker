@@ -4,6 +4,9 @@ server="$1"
 set -o errexit
 set -o pipefail
 set -o nounset
+if "$LGSM_DEBUG"; then
+    set -o xtrace
+fi
 echo "[info][installDependencies] installing $server"
 cd "$LGSM_PATH"
 gosu "$USER_NAME" cp -f "$LGSM_SCRIPTS/linuxgsm.sh" .

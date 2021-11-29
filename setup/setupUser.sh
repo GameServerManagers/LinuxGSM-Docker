@@ -2,6 +2,9 @@
 
 set -o errexit
 set -o nounset
+if "$LGSM_DEBUG"; then
+    set -o xtrace
+fi
 GROUP_NAME="$USER_NAME"
 
 # create it

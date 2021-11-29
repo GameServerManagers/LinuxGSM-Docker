@@ -2,6 +2,9 @@
 
 set -o errexit
 set -o nounset
+if "$LGSM_DEBUG"; then
+    set -o xtrace
+fi
 echo "[info][cleanImage] cleaning image"
 
 apt-get autoremove -y

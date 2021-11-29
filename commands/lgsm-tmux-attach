@@ -2,6 +2,9 @@
 
 set -o errexit
 set -o nounset
+if "$LGSM_DEBUG"; then
+    set -o xtrace
+fi
 
 gosu "$USER_NAME" tmux set -g status off
 gosu "$USER_NAME" tmux attach 2> /dev/null

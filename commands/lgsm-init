@@ -2,6 +2,9 @@
 
 set -o errexit
 set -o nounset
+if "$LGSM_DEBUG"; then
+    set -o xtrace
+fi
 
 # is gameserver already installed ?
 # if linuxgsm.sh is changed = update -> remove lgsm folder

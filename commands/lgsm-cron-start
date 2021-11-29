@@ -2,5 +2,8 @@
 
 set -o errexit
 set -o nounset
+if "$LGSM_DEBUG"; then
+    set -o xtrace
+fi
 
 gosu "$USER_NAME" supercronic -debug "$SUPERCRONIC_CONFIG"
