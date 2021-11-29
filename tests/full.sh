@@ -44,11 +44,17 @@ while [ $# -ge 1 ]; do
             if grep -qE '^-' <<< "$key"; then
                 echo "[error][full] unknown option $key"
                 exit 1
+            else
+                echo "[info][full] only testing servercode \"$key\""
             fi
             GAMESERVER+=("$key");;
     esac
 done
 testAllServer="$([ "${#GAMESERVER[@]}" = "0" ] && echo true || echo false )"
+if [ "$(whoami)" = "root" ]; then
+    echo "[error][full] please dont execute me as root, iam invoking linuxgsm.sh directly and this will not work as root"
+    exit 1
+fi
 
 # shellcheck source=tests/internal/api_various.sh
 source "$(dirname "$0")/internal/api_various.sh"

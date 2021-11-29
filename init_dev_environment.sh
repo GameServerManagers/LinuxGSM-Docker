@@ -7,6 +7,10 @@ set -o pipefail
 (
     cd "$(dirname "$0")"
 
+    if which sudo > /dev/null 2>&1; then
+        sudo chown -R "$(whoami)" ./*
+    fi
+
     # don't accidentally commit credentials
     git update-index --skip-worktree tests/steam_test_credentials
 
