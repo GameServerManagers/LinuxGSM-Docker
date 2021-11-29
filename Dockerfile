@@ -1,107 +1,79 @@
-#
-# LinuxGSM Dockerfile
-#
-# https://github.com/GameServerManagers/LinuxGSM-Docker
-#
+# download / build / verify dependencies
+# own stage = additional deps needed which are only here used
+FROM ubuntu:21.04 as dependencyStage
 
-FROM ubuntu:18.04
-LABEL maintainer="LinuxGSM <me@danielgibbs.co.uk>"
+COPY setup/installGosu.sh \
+     setup/installSupercronic.sh \
+     /
+RUN set -eux; \
+    ./installGosu.sh 1.14; \
+    ./installSupercronic.sh v0.1.12 8d3a575654a6c93524c410ae06f681a3507ca5913627fa92c7086fd140fa12ce
 
-ENV DEBIAN_FRONTEND noninteractive
+# create linuxgsm image
+# this stage should be usable by existing developers
+FROM ubuntu:21.04 as linuxgsm
 
-RUN apt-get update && apt-get install -y locales && rm -rf /var/lib/apt/lists/* \
-    && localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
-ENV LANG en_US.utf8
+ARG ARG_LGSM_VERSION="master"
+ENV LGSM_VERSION="${ARG_LGSM_VERSION:?}" \
+    LGSM_GAMESERVER="" \
+    LGSM_CONFIG_PATTERN_GAME="" \
+    USER_ID="750" \
+    GROUP_ID="750" \
+    LGSM_DEBUG="false" \
+    \
+    USER_NAME="linuxgsm" \
+    LGSM_PATH="/home/linuxgsm" \
+    LGSM_SCRIPTS="/home/linuxgsm-scripts" \
+    PATH="$PATH:/home/linuxgsm-scripts/" \
+    LANG="en_US.UTF-8" \
+    LANGUAGE="en_US.UTF-8" \
+    LC_ALL="en_US.UTF-8" \
+    TERM="xterm" \
+    SUPERCRONIC_CONFIG="/home/linuxgsm-scripts/cron.config" \
+    LGSM_STARTED="/home/linuxgsm/server.started"
 
-## Base System
-RUN dpkg --add-architecture i386 && \
-	apt update -y && \
-	apt install -y \
-		mailutils \
-		postfix \
-		curl \
-		wget \
-		file \
-		tar \
-		bzip2 \
-		gzip \
-		unzip \
-		bsdmainutils \
-		python \
-		util-linux \
-		binutils \
-		bc \
-		jq \
-		tmux \
-		lib32gcc1 \
-		libstdc++6 \
-		libstdc++6:i386 \
-		apt-transport-https \
-		ca-certificates \
-		telnet \
-		expect \
-		libncurses5:i386 \
-		libcurl4-gnutls-dev:i386 \
-		libstdc++5:i386 \
-		lib32tinfo5 \
-		xz-utils \
-		zlib1g:i386 \
-		libldap-2.4-2:i386 \
-		lib32z1 \
-		default-jre \
-		speex:i386 \
-		libtbb2 \
-		libxrandr2:i386 \
-		libglu1-mesa:i386 \
-		libxtst6:i386 \
-		libusb-1.0-0:i386 \
-		libopenal1:i386 \
-		libpulse0:i386 \
-		libdbus-glib-1-2:i386 \
-		libnm-glib4:i386 \
-		zlib1g \
-		libssl1.0.0:i386 \
-		libtcmalloc-minimal4:i386 \
-		libsdl1.2debian \
-		libnm-glib-dev:i386 \
-		&& apt-get clean \
-	  && rm -rf /var/lib/apt/lists/*
+COPY --from=dependencyStage \
+     /usr/local/bin/gosu \
+     /usr/local/bin/supercronic \
+     /usr/local/bin/
+COPY setup/installMinimalDependencies.sh \
+     setup/setupUser.sh \
+     setup/installLGSM.sh \
+     setup/installGamedig.sh \
+     setup/cleanImage.sh \
+     setup/installDependencies.sh \
+     setup/createAlias.sh \
+     setup/entrypoint.sh \
+     \
+     commands/lgsm-cron-init \
+     commands/lgsm-cron-start \
+     commands/lgsm-init \
+     commands/lgsm-fix-permission \
+     commands/lgsm-load-config \
+     commands/lgsm-tmux-attach \
+     commands/lgsm-update-uid-gid \
+     "$LGSM_SCRIPTS"/
 
-## linuxgsm.sh
-RUN wget https://linuxgsm.com/dl/linuxgsm.sh
+RUN set -eux; \
+    installMinimalDependencies.sh; \
+    setupUser.sh; \
+    installLGSM.sh; \
+    installGamedig.sh; \
+    cleanImage.sh
 
-# Add the linuxgsm user
-RUN adduser \
-      --disabled-login \
-      --disabled-password \
-      --shell /bin/bash \
-      --gecos "" \
-      linuxgsm \
-    && usermod -G tty linuxgsm \
-    && chown -R linuxgsm:linuxgsm /home/linuxgsm
+VOLUME "$LGSM_PATH"
+WORKDIR "$LGSM_PATH"
 
-# Switch to the user linuxgsm
-USER linuxgsm
+# install server specific dependencies
+FROM linuxgsm as specific
+ARG ARG_LGSM_GAMESERVER=""
+ENV LGSM_GAMESERVER="${ARG_LGSM_GAMESERVER:?}"
+RUN set -eux; \
+    installDependencies.sh "$LGSM_GAMESERVER"; \
+    createAlias.sh "$LGSM_GAMESERVER"; \
+    cleanImage.sh
 
-## user config
-RUN groupadd -g 750 -o linuxgsm && \
-	adduser --uid 750 --disabled-password --gecos "" --ingroup linuxgsm linuxgsm && \
-	chown linuxgsm:linuxgsm /linuxgsm.sh && \
-	chmod +x /linuxgsm.sh && \
-	cp /linuxgsm.sh /home/linuxgsm/linuxgsm.sh && \
-	usermod -G tty linuxgsm && \
-	chown -R linuxgsm:linuxgsm /home/linuxgsm/ && \
-	chmod 755 /home/linuxgsm
+HEALTHCHECK --start-period=3600s --interval=60s --timeout=900s --retries=3 \
+    CMD [ -f "$LGSM_STARTED" ] && lgsm-monitor || exit 1
 
-USER linuxgsm
-WORKDIR /home/linuxgsm
-VOLUME [ "/home/linuxgsm" ]
-
-# need use xterm for LinuxGSM
-ENV TERM=xterm
-
-## Docker Details
-ENV PATH=$PATH:/home/linuxgsm
-
-COPY entrypoint.sh /entrypoint.sh
-ENTRYPOINT ["bash","/entrypoint.sh" ]
+ENTRYPOINT ["./../linuxgsm-scripts/entrypoint.sh"]

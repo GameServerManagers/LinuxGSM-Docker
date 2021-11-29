@@ -1,0 +1,138 @@
+#!/bin/bash
+
+set -o errexit
+set -o nounset
+set -o pipefail
+if "$LGSM_DEBUG"; then
+    set -o xtrace
+fi
+
+if [ -z "$LGSM_GAMESERVER" ]; then
+    echo "[error][lgsm-load-config] \$LGSM_GAMESERVER is unset but needed for this script, abort"
+    exit 10
+fi
+configfile_default="$LGSM_PATH/lgsm/config-lgsm/$LGSM_GAMESERVER/_default.cfg"
+configfile_common="$LGSM_PATH/lgsm/config-lgsm/$LGSM_GAMESERVER/common.cfg"
+configfile_game="$( lgsm-details | grep -Eo 'Config file:.*' | grep -o '/.*' || true )"
+
+if [ ! -f "$configfile_default" ]; then
+    echo "[error][lgsm-load-config] expected _default config file doesn't exist at \"$configfile_default\""
+    exit 11
+fi
+
+function fgrep_ignore_leading_whitespaces() {
+    local find="$1"
+    local file="$2"
+    
+    mapfile -d $'\n' -t lines < <(cat "$file")
+    for line in "${lines[@]}"; do
+        trimmed_line="$(grep -E -e '\S.*\S|\S' <<< "$line" || true)"
+        if [ "${trimmed_line:0:${#find}}" = "$find" ]; then
+            echo "$line"
+        fi
+    done
+}
+
+function sed_sanitize() {
+    local sanitized="$1"
+    local sanitized="${sanitized//\\/\\\\}"  # \ need to be escaped e.g. 's/\//'
+    local sanitized="${sanitized//\//\\/}"   # / need to be escaped e.g. 's///'
+    #local sanitized="${sanitized//\{/\\\\{}" # { need to be escaped
+    local sanitized="${sanitized//[/\\[}"    # [ need to be escaped
+    local sanitized="${sanitized//&/\\&}"    # & need to be escaped
+    echo "$sanitized"
+}
+
+# TODO probably there need to be more options for non cfg configs, e.g. json format or so
+function addConfigToFile() {
+    file="$1"
+    # IMPORTANT: currently exactly two %s are allowed!
+    pattern="${2:-}"
+    key="$3"
+    value="$4"
+
+    # determine pattern for given file, if not provided
+    if [ -z "$pattern" ]; then
+        if grep -Eq '^\s*[a-zA-Z0-9_-]*=\s*"' "$file"; then
+            pattern='%s="%s"'
+        elif grep -Eq '^\s*[a-zA-Z0-9_-]*\s\s*"' "$file"; then
+            pattern='%s "%s"'
+        else
+            echo "[error][lgsm-load-config] couldn't determine pattern for \"$file\" please provide it in environment variable \"LGSM_CONFIG_PATTERN_GAME\" or dont provide values for injection"
+            exit 1
+        fi
+        echo "[info][lgsm-load-config] choosing pattern \"$pattern\" "
+    else
+        echo "[info][lgsm-load-config] using provided pattern \"$pattern\" for \"$file\""
+    fi
+
+    # assuming pattern is prefix %s mid %s suffix
+    pattern_prefix="${pattern%%%s*}"  # 1 %s 2 %s 3 -> 1
+    pattern_mid="${pattern#*%s}"      # 1 %s 2 %s 3 -> 2 %s 3
+    pattern_mid="${pattern_mid%%%s*}" #      2 %s 3 -> 2
+    pattern_suffix="${pattern##*%s}"  # 1 %s 2 %s 3 -> 3
+
+    exact_match="$pattern_prefix$key$pattern_mid"
+    mapfile -t lines < <(fgrep_ignore_leading_whitespaces "$exact_match" "$file")
+    if [ "${#lines[@]}" -ge "1" ]; then
+        echo "[info][lgsm-load-config] $key is already part of $file, replacing"
+        find="$(sed_sanitize "${lines[0]}")"
+        replace="$(sed_sanitize "$exact_match$value$pattern_suffix")"
+        sed -i "s/$find/$replace/" "$file"
+
+        for i in $(seq 1 "$((${#lines[@]}-1))"); do
+            echo "[warning][lgsm-load-config] found multiple entries of \"$key\" and removing it now"
+            find="$(sed_sanitize "${lines[$i]}")"
+            sed -i "s/$find//" "$file"
+        done
+    else
+        echo "[info][lgsm-load-config] adding $key to $target_file"
+        printf "\n%s%s%s%s%s\n" "$pattern_prefix" "$key" "$pattern_mid" "$value" "$pattern_suffix" >> "$file"
+    fi
+}
+
+function handleEnvironmentVariablePrefix() {
+    prefix="$1"
+    target_file="$2"
+    pattern="${3:-}"
+    check_file="${4:-}"
+
+    #shellcheck disable=SC1087 #prefix is no array
+    for config in $( env | grep -Eo "^$prefix[^=]*" ); do
+        key="${config:${#prefix}}"
+        value="$( eval echo "\"\$$config\"" )"
+
+        echo "[info][lgsm-load-config] processing $key"
+        if [ -n "$check_file" ]; then
+            if [ -f "$check_file" ]; then
+                if grep -Eq "^$key" "$check_file"; then
+                    echo "[info][lgsm-load-config] $key is part of $check_file"
+                    addConfigToFile "$target_file" "$pattern" "$key" "$value"
+                    
+                else
+                    echo "[error][lgsm-load-config] provided environment variable $config is a non-default variable for current gameserver $LGSM_GAMESERVER, if you are sure you want it added use CONFIGFORCED_ as prefix."
+                    exit 12
+                fi
+            else
+                echo "[error][lgsm-load-config] can't check if $key is part of $check_file because the file doesn't exist"
+                exit 13
+            fi
+        else
+            addConfigToFile "$target_file" "$pattern" "$key" "$value"
+        fi
+    done
+}
+
+
+rm -f "$configfile_common"
+# CONFIG options should be safe to use => fail if not correct because we can verify they are part of _default.cfg
+handleEnvironmentVariablePrefix "CONFIG_" "$configfile_common" "%s=\"%s\"" "$configfile_default"
+# CONFIGFORCED_ -> skip check, e.g. 
+handleEnvironmentVariablePrefix "CONFIGFORCED_" "$configfile_common" "%s=\"%s\""
+
+# GAME_ is added to game specific config file
+if [ -n "$configfile_game" ] && [ -f "$configfile_game" ]; then
+    handleEnvironmentVariablePrefix "GAME_" "$configfile_game" "$LGSM_CONFIG_PATTERN_GAME"
+else
+    echo "[warning][lgsm-load-config] couldn't get config file for $LGSM_GAMESERVER, therefore skipped all environment variables with \$GAME_ "
+fi

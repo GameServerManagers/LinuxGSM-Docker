@@ -1,0 +1,14 @@
+volumes:
+  server:
+
+services:
+    linuxgsm:
+        build:
+          context: .
+          args:
+            LGSM_GAMESERVER: gmodserver
+        volumes:
+          - server:/home/linuxgsm
+          - /etc/localtime:/etc/localtime:ro
+        restart: always
+        tty: true
