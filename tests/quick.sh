@@ -16,7 +16,6 @@ source "$(dirname "$0")/steam_test_credentials"
 
 GAMESERVER=""
 LOGS="false"
-QUICK_MODE="true"
 
 build=(./internal/build.sh)
 run=(./internal/run.sh)
@@ -33,7 +32,7 @@ while [ $# -ge 1 ]; do
             echo "[help][quick] -c  --no-cache    run without docker cache"
             echo "[help][quick] -d  --debug       run gameserver and overwrite entrypoint to bash"
             echo "[help][quick] -l  --logs        print last log lines after run"
-            echo "[help][quick]     --slow        don't overwrite healthcheck"
+            echo "[help][quick]     --very-fast   overwrite healthcheck, only use it with volumes / lancache because container will else fail pretty fast"
             echo "[help][quick]     --version  x  use linuxgsm version x e.g. \"v21.4.1\""
             echo "[help][quick]     --volume   x  use volume x e.g. \"lgsm\""
             echo "[help][quick] "
@@ -45,8 +44,8 @@ while [ $# -ge 1 ]; do
             run+=(--debug);;
         -l|--logs)
             LOGS="true";;
-        --slow)
-            QUICK_MODE="false";;
+        --quicker)
+            run+=(--quick);;
         --version)
             build+=(--version "$1")
             shift;;
@@ -70,9 +69,6 @@ elif [ -n "$steam_test_username" ] && [ -n "$steam_test_password" ]; then
     run+=(-e "CONFIGFORCED_steamuser=\"$steam_test_username\"" -e "CONFIGFORCED_steampass=\"$steam_test_password\"")
 else
     echo "[warning][quick] no steam credentials provided, some servers will fail without it"
-fi
-if "$QUICK_MODE"; then
-    run+=(--quick)
 fi
 
 CONTAINER="linuxgsm-$GAMESERVER"
