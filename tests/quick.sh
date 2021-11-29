@@ -16,9 +16,10 @@ source "$(dirname "$0")/steam_test_credentials"
 
 GAMESERVER=""
 LOGS="false"
+QUICK_MODE="true"
 
 build=(./internal/build.sh)
-run=(./internal/run.sh --quick)
+run=(./internal/run.sh)
 while [ $# -ge 1 ]; do
     key="$1"
     shift
@@ -29,11 +30,12 @@ while [ $# -ge 1 ]; do
             echo "[help][quick] quick.sh [option] server"
             echo "[help][quick] "
             echo "[help][quick] options:"
-            echo "[help][quick] -c  --no-cache   run without docker cache"
-            echo "[help][quick] -d  --debug      run gameserver and overwrite entrypoint to bash"
-            echo "[help][quick] -l  --logs       print last log lines after run"
-            echo "[help][quick]     --version x  use linuxgsm version x e.g. \"v21.4.1\""
-            echo "[help][quick]     --volume  x  use volume x e.g. \"lgsm\""
+            echo "[help][quick] -c  --no-cache    run without docker cache"
+            echo "[help][quick] -d  --debug       run gameserver and overwrite entrypoint to bash"
+            echo "[help][quick] -l  --logs        print last log lines after run"
+            echo "[help][quick]     --slow        don't overwrite healthcheck"
+            echo "[help][quick]     --version  x  use linuxgsm version x e.g. \"v21.4.1\""
+            echo "[help][quick]     --volume   x  use volume x e.g. \"lgsm\""
             echo "[help][quick] "
             echo "[help][quick] server           e.g. gmodserver"
             exit 0;;
@@ -43,6 +45,8 @@ while [ $# -ge 1 ]; do
             run+=(--debug);;
         -l|--logs)
             LOGS="true";;
+        --slow)
+            QUICK_MODE="false";;
         --version)
             build+=(--version "$1")
             shift;;
@@ -67,6 +71,10 @@ elif [ -n "$steam_test_username" ] && [ -n "$steam_test_password" ]; then
 else
     echo "[warning][quick] no steam credentials provided, some servers will fail without it"
 fi
+if "$QUICK_MODE"; then
+    run+=(--quick)
+fi
+
 CONTAINER="linuxgsm-$GAMESERVER"
 build+=(--latest "$GAMESERVER")
 run+=(--container "$CONTAINER" --detach --tag "$GAMESERVER")
@@ -93,7 +101,7 @@ trap handleInterrupt SIGTERM SIGINT
     if "$LOGS"; then
         printf "[info][quick] logs:\n%s\n" "$(docker logs "$CONTAINER" 2>&1 || true)"
     elif ! "$successful"; then
-        printf "[info][quick] logs:\n%s\n" "$(docker logs -n 10 "$CONTAINER" 2>&1 || true)"
+        printf "[info][quick] logs:\n%s\n" "$(docker logs -n 20 "$CONTAINER" 2>&1 || true)"
     fi
     removeContainer "$CONTAINER"
 

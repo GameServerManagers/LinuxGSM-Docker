@@ -105,7 +105,7 @@ mkdir -p "$RESULTS"
         if "$testThisServercode" && "$rerunIsFine"; then
             echo "[info][full] testing: $server_code"
             (   
-                quick=(./tests/quick.sh --logs --version "$VERSION")
+                quick=(./tests/quick.sh --slow --logs --version "$VERSION")
                 if "$VOLUMES"; then
                     quick+=(--volume "linuxgsm-$server_code")
                 fi
