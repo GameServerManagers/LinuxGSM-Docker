@@ -12,6 +12,11 @@ source "$(dirname "$0")/internal/api_various.sh"
 
 (
     cd "$(dirname "$0")"
+    echo "[info][createImages] removing images before recreating"
+    for image in $(docker images -q "$IMAGE"); do
+        docker rmi "$image"
+    done
+
     mapfile -d $'\n' -t servers < <(getServerCodeList "$VERSION")
     ./internal/build.sh --no-cache --image "$IMAGE" --version "$VERSION"
     for server_code in "${servers[@]}"; do
