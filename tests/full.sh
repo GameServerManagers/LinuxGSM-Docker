@@ -142,4 +142,13 @@ mkdir -p "$RESULTS"
 
     echo "[info][full] successful: $(find "$RESULTS/" -iname "successful.*" | wc -l)"
     echo "[info][full] failed: $(find "$RESULTS/" -iname "failed.*" | wc -l)"
+
+    mapfile -t failed_credentials_missing < <(grep --include "*failed*" -rlF 'Change steamuser="username"' "$RESULTS" | sort | uniq || true)
+    echo "[info][full] failed - unset steam credentials: $(grep -Po '(?<=failed.)[^.]*' <<< "${failed_credentials_missing[@]}" || true)"
+    # print filenames + very high line number to jump right at eof
+    printf '%s\n' "${failed_credentials_missing[@]/%/:100000}"
+
+    mapfile -t failed_other < <(grep --include "*failed*" -rLF 'Change steamuser="username"' "$RESULTS" | sort | uniq || true)
+    echo "[info][full] failed - other error: $(grep -Po '(?<=failed.)[^.]*' <<< "${failed_other[@]}")"
+    printf '%s\n' "${failed_other[@]/%/:100000}"
 )
