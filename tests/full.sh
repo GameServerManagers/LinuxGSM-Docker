@@ -10,6 +10,7 @@ PARRALEL=""
 PARRALEL="$(lscpu -p | grep -Ev '^#' | sort -u -t, -k 2,4 | wc -l)"
 ROOT_FOLDER="$(realpath "$(dirname "$0")/..")"
 RERUN="false"
+VOLUMES="false"
 while [ $# -ge 1 ]; do
     key="$1"
     shift
@@ -22,6 +23,7 @@ while [ $# -ge 1 ]; do
             echo "[help][full] options:"
             echo "[help][full] -c --cpus    x  run x servers in parralel, default x = physical cores"
             echo "[help][full]    --rerun      check results and runs every gameserver which wasn't successful"
+            echo "[help][full]    --volumes    use volumes \"linuxgsm-SERVERCODE\""
             echo "[help][full] -v --version x  use linuxgsm version x e.g. \"v21.4.1\""
             echo "[help][full] "
             echo "[help][full] server:"
@@ -33,6 +35,8 @@ while [ $# -ge 1 ]; do
             shift;;
         --rerun)
             RERUN="true";;
+        --volumes)
+            VOLUMES="true";;
         -v|--version)
             VERSION="$1"
             shift;;
@@ -100,8 +104,15 @@ mkdir -p "$RESULTS"
         rerunIsFine="$( ( ! "$RERUN" || "$serverDidntStartSuccessful" ) && echo true || echo false )"
         if "$testThisServercode" && "$rerunIsFine"; then
             echo "[info][full] testing: $server_code"
-            (
-                if ./tests/quick.sh --logs --version "$VERSION" "$server_code" > "$RESULTS/$server_code.log" 2>&1; then
+            (   
+                quick=(./tests/quick.sh --logs --version "$VERSION")
+                if "$VOLUMES"; then
+                    quick+=(--volume "linuxgsm-$server_code")
+                fi
+                quick+=("$server_code")
+
+                echo "${quick[@]}"
+                if "${quick[@]}" > "$RESULTS/$server_code.log" 2>&1; then
                     mv "$RESULTS/$server_code.log" "$RESULTS/successful.$server_code.log"
                 else
                     mv "$RESULTS/$server_code.log" "$RESULTS/failed.$server_code.log"

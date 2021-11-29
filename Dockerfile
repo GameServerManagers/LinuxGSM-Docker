@@ -16,6 +16,7 @@ FROM ubuntu:21.04 as linuxgsm
 ARG ARG_LGSM_VERSION="master"
 ENV LGSM_VERSION="${ARG_LGSM_VERSION:?}" \
     LGSM_GAMESERVER="" \
+    LGSM_CONFIG_PATTERN_GAME="" \
     USER_ID="750" \
     GROUP_ID="750" \
     \
@@ -28,10 +29,7 @@ ENV LGSM_VERSION="${ARG_LGSM_VERSION:?}" \
     LC_ALL="en_US.UTF-8" \
     TERM="xterm" \
     SUPERCRONIC_CONFIG="/home/linuxgsm-scripts/cron.config" \
-    LGSM_STARTED="/home/linuxgsm/server.started" \
-    LGSM_PATTERN_CONFIG='%s="%s"' \
-    LGSM_PATTERN_COMMON='%s="%s"' \
-    LGSM_PATTERN_GAME='%s="%s"'
+    LGSM_STARTED="/home/linuxgsm/server.started"
 
 COPY --from=dependencyStage \
      /usr/local/bin/gosu \
@@ -50,6 +48,7 @@ COPY setup/installMinimalDependencies.sh \
      commands/lgsm-cron-start \
      commands/lgsm-init \
      commands/lgsm-fix-permission \
+     commands/lgsm-load-config \
      commands/lgsm-tmux-attach \
      commands/lgsm-update-uid-gid \
      "$LGSM_SCRIPTS"/

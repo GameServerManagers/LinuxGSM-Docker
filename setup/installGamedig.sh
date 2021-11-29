@@ -1,5 +1,5 @@
 #!/bin/sh
-set -eux
+
 set -o errexit
 set -o nounset
 

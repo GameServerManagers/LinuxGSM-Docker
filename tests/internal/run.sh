@@ -38,7 +38,7 @@ while [ $# -ge 1 ]; do
             tag="$1"
             shift;;
         --quick)
-            run_image+=(--health-interval=10s);;
+            run_image+=(--health-interval=10s --health-start-period=60s);;
         -v|--volume)
             run_image+=(-v "$1:/home/linuxgsm")
             shift;;

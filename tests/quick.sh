@@ -10,6 +10,8 @@ cd "$(dirname "$0")/.."
 source "$(dirname "$0")/internal/api_docker.sh"
 # shellcheck source=tests/internal/api_various.sh
 source "$(dirname "$0")/internal/api_various.sh"
+# shellcheck source=tests/steam_test_credentials
+source "$(dirname "$0")/steam_test_credentials"
 
 
 GAMESERVER=""
@@ -51,15 +53,19 @@ while [ $# -ge 1 ]; do
             if [ -z "$GAMESERVER" ]; then
                 GAMESERVER="$key"
             else
-                echo "[quick.sh] additional argument to docker: \"$key\""
+                echo "[info][quick] additional argument to docker: \"$key\""
                 run+=("$key")
             fi;;
     esac
 done
 
 if [ -z "$GAMESERVER" ]; then
-    echo "ERROR no gameserver provided"
+    echo "[error][quick] no gameserver provided"
     exit 1
+elif [ -n "$steam_test_username" ] && [ -n "$steam_test_password" ]; then
+    run+=(-e "CONFIGFORCED_steamuser=\"$steam_test_username\"" -e "CONFIGFORCED_steampass=\"$steam_test_password\"")
+else
+    echo "[warning][quick] no steam credentials provided, some servers will fail without it"
 fi
 CONTAINER="linuxgsm-$GAMESERVER"
 build+=(--latest "$GAMESERVER")
@@ -85,7 +91,9 @@ trap handleInterrupt SIGTERM SIGINT
     fi
     stopContainer "$CONTAINER"
     if "$LOGS"; then
-        docker logs "$CONTAINER"
+        printf "[info][quick] logs:\n%s\n" "$(docker logs "$CONTAINER" 2>&1 || true)"
+    elif ! "$successful"; then
+        printf "[info][quick] logs:\n%s\n" "$(docker logs -n 10 "$CONTAINER" 2>&1 || true)"
     fi
     removeContainer "$CONTAINER"
 

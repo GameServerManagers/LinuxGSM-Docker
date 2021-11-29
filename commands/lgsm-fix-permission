@@ -8,5 +8,7 @@ set -o nounset
 GROUP_NAME="$USER_NAME"
 chown -R "$USER_NAME:$GROUP_NAME" "$LGSM_PATH"
 chmod 750 "$LGSM_PATH"
-chmod 750 "$LGSM_PATH/$LGSM_GAMESERVER"
+if [ -f "$LGSM_PATH/$LGSM_GAMESERVER" ]; then
+    chmod 750 "$LGSM_PATH/$LGSM_GAMESERVER"
+fi
 chmod -R ug+rw,o= "$LGSM_PATH"

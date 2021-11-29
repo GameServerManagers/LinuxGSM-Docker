@@ -17,9 +17,15 @@ if [ ! -e "$LGSM_GAMESERVER" ]; then
     lgsm-auto-install
 else
     lgsm-init
-    lgsm-update
+    if ! lgsm-update; then
+        echo ""
+        echo "[error][entrypoint] update failed, remove $LGSM_GAMESERVER from volume if you want to reinstall it"
+        echo "[error][entrypoint] docker run --rm -v VOLUME_NAME:/home alpine:3.15 rm -vf /home/$LGSM_GAMESERVER"
+        exit 1
+    fi
 fi
 
+lgsm-load-config
 lgsm-start
 trap lgsm-stop SIGTERM SIGINT
 lgsm-cron-start > /dev/null 2>&1 &

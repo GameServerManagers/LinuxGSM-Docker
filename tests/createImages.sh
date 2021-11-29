@@ -5,7 +5,7 @@ set -o nounset
 set -o pipefail
 
 VERSION="$1"
-IMAGE="jusito/linuxgsm"
+IMAGE="gameservermanagers/linuxgsm-docker"
 
 # shellcheck source=tests/internal/api_various.sh
 source "$(dirname "$0")/internal/api_various.sh"
