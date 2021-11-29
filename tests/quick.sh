@@ -37,7 +37,7 @@ while [ $# -ge 1 ]; do
             echo "[help][quick]     --version  x  use linuxgsm version x e.g. \"v21.4.1\""
             echo "[help][quick]     --volume   x  use volume x e.g. \"lgsm\""
             echo "[help][quick] "
-            echo "[help][quick] server           e.g. gmodserver"
+            echo "[help][quick] server            e.g. gmodserver"
             exit 0;;
         -c|--no-cache)
             build+=(--no-cache);;
