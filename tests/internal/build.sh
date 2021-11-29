@@ -11,9 +11,10 @@ source "$(dirname "$0")/api_various.sh"
 
 server=""
 image="lgsm-test"
-tag_lgsm="dev"
+tag_lgsm="master"
 latest="false"
 push="false"
+suffix=""
 
 build_lgsm=(docker build)
 build_specific=(docker build)
@@ -30,6 +31,7 @@ while [ $# -ge 1 ]; do
             echo "[help][build] -i  --image    x  target image, default=lgsm-test"
             echo "[help][build]     --latest      every created image is also tagged as latest"
             echo "[help][build]     --push        every image is also pushed"
+            echo "[help][build]     --suffix   x  suffix for docker tag, e.g. \"develop\" will create gmodserver-v21.4.1-develop"
             echo "[help][build] -v  --version  x  use provided lgsm version where x is branch / tag / commit e.g. --version v21.4.1"
             echo "[help][build] "
             echo "[help][build] server:"
@@ -44,6 +46,9 @@ while [ $# -ge 1 ]; do
             latest="true";;
         --push)
             push="true";;
+        --suffix)
+            suffix="-$1"
+            shift;;
         -v|--version)
             tag_lgsm="$1"
             build_lgsm+=(--build-arg "ARG_LGSM_VERSION=$1")
@@ -60,8 +65,9 @@ while [ $# -ge 1 ]; do
             fi
     esac
 done
+tag_lgsm="${tag_lgsm}$suffix"
 build_lgsm+=(-t "$image:$tag_lgsm" --target linuxgsm .)
-build_specific+=(-t "$image:${server}_$tag_lgsm" --build-arg "ARG_LGSM_GAMESERVER=$server" .)
+build_specific+=(-t "$image:${server}-$tag_lgsm" --build-arg "ARG_LGSM_GAMESERVER=$server" .)
 
 cd "$(dirname "$0")/../.."
 
@@ -85,12 +91,12 @@ if [ -n "$server" ]; then
     "${build_specific[@]}"
 
     if "$push"; then
-        docker push "$image:${server}_$tag_lgsm"
+        docker push "$image:${server}-$tag_lgsm"
     fi
     if "$latest"; then
-        docker tag "$image:${server}_$tag_lgsm" "$image:${server}"
+        docker tag "$image:${server}-$tag_lgsm" "$image:${server}$suffix"
         if "$push"; then
-            docker push "$image:${server}"
+            docker push "$image:${server}$suffix"
         fi
     fi
 fi
