@@ -14,8 +14,11 @@ source "$(dirname "$0")/internal/api_various.sh"
 source "$(dirname "$0")/steam_test_credentials"
 
 
-GAMESERVER=""
+
 LOGS="false"
+IMAGE="gameservermanagers/linuxgsm-docker"
+RETRY="1"
+GAMESERVER=""
 
 build=(./internal/build.sh)
 run=(./internal/run.sh)
@@ -29,12 +32,15 @@ while [ $# -ge 1 ]; do
             echo "[help][quick] quick.sh [option] server"
             echo "[help][quick] "
             echo "[help][quick] options:"
-            echo "[help][quick] -c  --no-cache    run without docker cache"
-            echo "[help][quick] -d  --debug       run gameserver and overwrite entrypoint to bash"
-            echo "[help][quick] -l  --logs        print last log lines after run"
-            echo "[help][quick]     --very-fast   overwrite healthcheck, only use it with volumes / lancache because container will else fail pretty fast"
-            echo "[help][quick]     --version  x  use linuxgsm version x e.g. \"v21.4.1\""
-            echo "[help][quick]     --volume   x  use volume x e.g. \"lgsm\""
+            echo "[help][quick] -c  --no-cache      run without docker cache"
+            echo "[help][quick] -d  --debug         run gameserver and overwrite entrypoint to bash"
+            echo "[help][quick]     --image      x  target image"
+            echo "[help][quick] -l  --logs          print last log lines after run"
+            echo "[help][quick]     --retry         if run failed, rebuild and rerun up to 3 times"
+            echo "[help][quick]     --skip-lgsm     skip build lgsm"
+            echo "[help][quick]     --very-fast     overwrite healthcheck, only use it with volumes / lancache because container will else fail pretty fast"
+            echo "[help][quick]     --version    x  use linuxgsm version x e.g. \"v21.4.1\""
+            echo "[help][quick]     --volume     x  use volume x e.g. \"lgsm\""
             echo "[help][quick] "
             echo "[help][quick] server            e.g. gmodserver"
             exit 0;;
@@ -42,8 +48,19 @@ while [ $# -ge 1 ]; do
             build+=(--no-cache);;
         -d|--debug)
             run+=(--debug);;
+        --image)
+            IMAGE="$1"
+            shift;;
         -l|--logs)
             LOGS="true";;
+        --retry)
+            RETRY="3";;
+        --skip-lgsm)
+            build+=(--skip-lgsm);;
+        --suffix)
+            build+=(--suffix "$1")
+            run+=(--suffix "$1" )
+            shift;;
         --very-fast)
             run+=(--quick);;
         --version)
@@ -72,8 +89,8 @@ else
 fi
 
 CONTAINER="linuxgsm-$GAMESERVER"
-build+=(--latest "$GAMESERVER")
-run+=(--container "$CONTAINER" --detach --tag "$GAMESERVER")
+build+=(--image "$IMAGE" --latest "$GAMESERVER")
+run+=(--image "$IMAGE" --tag "$GAMESERVER" --container "$CONTAINER" --detach)
 
 function handleInterrupt() {
     removeContainer "$CONTAINER"
@@ -82,25 +99,29 @@ trap handleInterrupt SIGTERM SIGINT
 
 (
     cd "$(dirname "$0")"
-    removeContainer "$CONTAINER"
-    
-    echo "${build[@]}"
-    "${build[@]}"
-    echo "${run[@]}"
-    "${run[@]}"
-
     successful="false"
-    if awaitHealthCheck "$CONTAINER"; then
-        successful="true"
-    fi
-    stopContainer "$CONTAINER"
-    if "$LOGS"; then
-        printf "[info][quick] logs:\n%s\n" "$(docker logs "$CONTAINER" 2>&1 || true)"
-        printf "[info][quick] healthcheck log:\n%s\n" "$(docker inspect -f '{{json .State.Health.Log}}' "$CONTAINER" | jq || true)"
-    elif ! "$successful"; then
-        printf "[info][quick] logs:\n%s\n" "$(docker logs -n 20 "$CONTAINER" 2>&1 || true)"
-        printf "[info][quick] healthcheck log:\n%s\n" "$(docker inspect -f '{{json .State.Health.Log}}' "$CONTAINER" | jq || true)"
-    fi
+    try="1"
+    while [ "$try" -le "$RETRY" ] && ! "$successful"; do
+        echo "[info][quick] try $try"
+        try="$(( try+1 ))"
+        removeContainer "$CONTAINER"
+        echo "${build[@]}"
+        "${build[@]}"
+        echo "${run[@]}"
+        "${run[@]}"
+
+        if awaitHealthCheck "$CONTAINER"; then
+            successful="true"
+        fi
+        stopContainer "$CONTAINER"
+        if "$LOGS"; then
+            printf "[info][quick] logs:\n%s\n" "$(docker logs "$CONTAINER" 2>&1 || true)"
+            printf "[info][quick] healthcheck log:\n%s\n" "$(docker inspect -f '{{json .State.Health.Log}}' "$CONTAINER" | jq || true)"
+        elif ! "$successful"; then
+            printf "[info][quick] logs:\n%s\n" "$(docker logs -n 20 "$CONTAINER" 2>&1 || true)"
+            printf "[info][quick] healthcheck log:\n%s\n" "$(docker inspect -f '{{json .State.Health.Log}}' "$CONTAINER" | jq || true)"
+        fi
+    done
     removeContainer "$CONTAINER"
 
     if "$successful"; then

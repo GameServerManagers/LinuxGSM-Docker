@@ -9,5 +9,11 @@ set -o nounset
     files=()
     mapfile -d $'\0' files < <( find commands setup tests -type f ! -iname "*.log" ! -iname "*.yml" -print0 )
 
-    shellcheck "${files[@]}"
+    echo "[info][shellcheck] testing on ${#files[@]} files"
+    
+    if shellcheck "${files[@]}"; then
+        echo "[info][shellcheck] successful"
+    else
+        echo "[info][shellcheck] failed"
+    fi
 )

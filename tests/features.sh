@@ -5,6 +5,9 @@ set -o nounset
 set -o pipefail
 
 VERSION="$1"
+if [ "${1}" = "--version" ] || [ "${1}" = "-v" ]; then
+    VERSION="$2"
+fi
 CLEAR="$( grep -qE '(-c|--clear)' <<< "$@" && echo true || echo false )"
 GAMESERVER="gmodserver"
 VOLUME="linuxgsm-$GAMESERVER-testFeatures"

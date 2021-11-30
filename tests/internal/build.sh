@@ -10,11 +10,12 @@ source "$(dirname "$0")/api_docker.sh"
 source "$(dirname "$0")/api_various.sh"
 
 server=""
-image="lgsm-test"
-tag_lgsm="master"
+image="gameservermanagers/linuxgsm-docker"
 latest="false"
-push="false"
+skip_lgsm="false"
 suffix=""
+lgsm_version="master"
+lgsm_tags_latest=()
 
 build_lgsm=(docker build)
 build_specific=(docker build)
@@ -27,12 +28,12 @@ while [ $# -ge 1 ]; do
             echo "[help][build] build.sh [option] [server]"
             echo "[help][build] "
             echo "[help][build] options:"
-            echo "[help][build] -c  --no-cache    disable cache using"
-            echo "[help][build] -i  --image    x  target image, default=lgsm-test"
-            echo "[help][build]     --latest      every created image is also tagged as latest"
-            echo "[help][build]     --push        every image is also pushed"
-            echo "[help][build]     --suffix   x  suffix for docker tag, e.g. \"develop\" will create gmodserver-v21.4.1-develop"
-            echo "[help][build] -v  --version  x  use provided lgsm version where x is branch / tag / commit e.g. --version v21.4.1"
+            echo "[help][build] -c  --no-cache     disable cache using"
+            echo "[help][build] -i  --image     x  target image, default=$image"
+            echo "[help][build]     --latest       tag created image also as latest and according to provided version e.g. lgsm:latest :v21.4.1 :v21.4 :v21"
+            echo "[help][build]     --skip-lgsm    dont rebuild lgsm"
+            echo "[help][build]     --suffix    x  suffix for docker tag, e.g. \"develop\" will create gmodserver-v21.4.1-develop"
+            echo "[help][build] -v  --version   x  use provided lgsm version where x is branch / tag / commit e.g. --version v21.4.1"
             echo "[help][build] "
             echo "[help][build] server:"
             echo "[help][build] gmodserver        build linuxgsm image and specific gmodserver"
@@ -44,16 +45,25 @@ while [ $# -ge 1 ]; do
             shift;;
         --latest)
             latest="true";;
-        --push)
-            push="true";;
+        --skip-lgsm)
+            skip_lgsm="true";;
         --suffix)
             suffix="-$1"
             shift;;
         -v|--version)
-            tag_lgsm="$1"
-            build_lgsm+=(--build-arg "ARG_LGSM_VERSION=$1")
-            build_specific+=(--build-arg "ARG_LGSM_VERSION=$1")
-            echo "[info][build] using lgsm version $1"
+            lgsm_version="$1"
+            if grep -q '^v[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*$' <<< "$lgsm_version"; then
+                major="${lgsm_version%%.*}"
+                minor="${lgsm_version#*.}"
+                minor="${minor%%.*}"
+                #patch="${lgsm_version##*.}"
+                # "$major.$minor.$patch" not added because equal to version 
+                lgsm_tags_latest+=("$major.$minor" "$major")
+            fi
+
+            build_lgsm+=(--build-arg "ARG_LGSM_VERSION=$lgsm_version")
+            build_specific+=(--build-arg "ARG_LGSM_VERSION=$lgsm_version")
+            echo "[info][build] using lgsm version $lgsm_version"
             shift;;
         *)
             if [ -z "$server" ]; then
@@ -65,23 +75,32 @@ while [ $# -ge 1 ]; do
             fi
     esac
 done
-tag_lgsm="${tag_lgsm}$suffix"
-build_lgsm+=(-t "$image:$tag_lgsm" --target linuxgsm .)
-build_specific+=(-t "$image:${server}-$tag_lgsm" --build-arg "ARG_LGSM_GAMESERVER=$server" .)
+
+lgsm_main_tag="$lgsm_version$suffix"
+specific_main_tag="$lgsm_version-${server}$suffix"
+# BUILDKIT_INLINE_CACHE needed for --cache-from
+build_lgsm+=(-t "$image:$lgsm_main_tag" --target linuxgsm --build-arg BUILDKIT_INLINE_CACHE=1 .)
+build_specific+=(-t "$image:$specific_main_tag" --target specific --cache-from "$image:$lgsm_main_tag" --build-arg "ARG_LGSM_GAMESERVER=$server" .)
 
 cd "$(dirname "$0")/../.."
 
 # build lgsm image
-echo "${build_lgsm[@]}"
-"${build_lgsm[@]}"
+if ! "$skip_lgsm"; then
+    echo "${build_lgsm[@]}"
+    "${build_lgsm[@]}"
+    echo "[info][build] created tag: $image:$lgsm_main_tag" # used in results as info for push.sh
 
-if "$push"; then
-    docker push "$image:$tag_lgsm"
-fi
-if "$latest"; then
-    docker tag "$image:$tag_lgsm" "$image:latest"
-    if "$push"; then
-        docker push "$image:latest"
+    if "$latest"; then
+        latest_tag="latest"
+        if [ -n "$suffix" ]; then
+            latest_tag="${suffix:1}"
+        fi
+        docker tag "$image:$lgsm_main_tag" "$image:$latest_tag"
+        echo "[info][build] created tag: $image:${server}$suffix"
+        for tag in "${lgsm_tags_latest[@]}"; do
+            docker tag "$image:$lgsm_main_tag" "$image:$tag$suffix"
+            echo "[info][build] created tag: $image:$tag$suffix"
+        done
     fi
 fi
 
@@ -89,14 +108,13 @@ fi
 if [ -n "$server" ]; then
     echo "${build_specific[@]}"
     "${build_specific[@]}"
-
-    if "$push"; then
-        docker push "$image:${server}-$tag_lgsm"
-    fi
+    echo "[info][build] created tag: $image:$specific_main_tag"
     if "$latest"; then
-        docker tag "$image:${server}-$tag_lgsm" "$image:${server}$suffix"
-        if "$push"; then
-            docker push "$image:${server}$suffix"
-        fi
+        docker tag "$image:$specific_main_tag" "$image:${server}$suffix"
+        echo "[info][build] created tag: $image:${server}$suffix"
+        for tag in "${lgsm_tags_latest[@]}"; do
+            docker tag "$image:$specific_main_tag" "$image:$tag-${server}$suffix"
+            echo "[info][build] created tag: $image:$tag-${server}$suffix"
+        done
     fi
 fi

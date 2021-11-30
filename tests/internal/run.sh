@@ -1,7 +1,8 @@
 #!/bin/bash
-tag=""
+TAG=""
+SUFFIX=""
 docker_run_mode="-it"
-IMAGE="lgsm-test"
+IMAGE="gameservermanagers/linuxgsm-docker"
 container="lgsm-test"
 
 run_image=(docker run)
@@ -18,7 +19,8 @@ while [ $# -ge 1 ]; do
             echo "[help][run] -d  --debug        set entrypoint to bash"
             echo "[help][run]     --detach       run in background instead of foreground"
             echo "[help][run] -i  --image     x  target image, default=lgsm-test"
-            echo "[help][run]     --tag       x  \"lgsm\" run lgsm image or \"specific\" run last created $IMAGE:$tag"
+            echo "[help][run]     --suffix       add to tag provided suffix"
+            echo "[help][run]     --tag       x  target tag"
             echo "[help][run]     --quick        enforce quick monitoring"
             echo "[help][run] -v  --volume    x  use volume x"
             echo "[help][run] "
@@ -33,9 +35,13 @@ while [ $# -ge 1 ]; do
         --detach)
             docker_run_mode="-dt";;
         -i|--image)
-            IMAGE="$key";;
+            IMAGE="$1"
+            shift;;
+        --suffix)
+            SUFFIX="-$1"
+            shift;;
         -t|--tag)
-            tag="$1"
+            TAG="$1"
             shift;;
         --quick)
             run_image+=("--health-interval=10s" "--health-start-period=60s");;
@@ -50,12 +56,7 @@ while [ $# -ge 1 ]; do
             ;;
     esac
 done
-run_image+=("$docker_run_mode" --name "$container" "$IMAGE:$tag")
-
-if [ -z "$tag" ]; then
-    echo "please provide the tag to execute as first argument lgsm or specific"
-    exit 1
-fi
+run_image+=("$docker_run_mode" --name "$container" "$IMAGE:$TAG$SUFFIX")
 
 echo "${run_image[@]}"
 "${run_image[@]}"
