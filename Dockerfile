@@ -1,6 +1,6 @@
 # download / build / verify dependencies
 # own stage = additional deps needed which are only here used
-FROM ubuntu:21.04 as dependencyStage
+FROM ubuntu:20.04 as dependencyStage
 
 COPY setup/installGosu.sh \
      setup/installSupercronic.sh \
@@ -11,7 +11,7 @@ RUN set -eux; \
 
 # create linuxgsm image
 # this stage should be usable by existing developers
-FROM ubuntu:21.04 as linuxgsm
+FROM ubuntu:20.04 as linuxgsm
 
 ARG ARG_LGSM_VERSION="master"
 ENV LGSM_VERSION="${ARG_LGSM_VERSION:?}" \
