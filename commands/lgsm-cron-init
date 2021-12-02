@@ -1,0 +1,20 @@
+#!/bin/sh
+
+set -o errexit
+set -o nounset
+if "$LGSM_DEBUG"; then
+    set -o xtrace
+fi
+
+LOG="$LGSM_PATH/log/cron.log"
+gosu "$USER_NAME" mkdir -p "$(dirname "$LOG")"
+gosu "$USER_NAME" touch "$LOG"
+
+echo "0 0 * * * [ \"$(du -s "$LOG" | grep -oE "^[0-9]*")\" -gt 1000 ] && savelog -c 3 '$LOG'" > "$SUPERCRONIC_CONFIG"
+# allow every CRON_ variable as cronjob
+for cron_var in $(env | grep -Eo '^CRON_[^=]*'); do
+    eval echo "\"\$$cron_var >> '$LOG'\"" >> "$SUPERCRONIC_CONFIG"
+done
+chown "$USER_NAME:$USER_NAME" "$SUPERCRONIC_CONFIG"
+
+gosu "$USER_NAME" supercronic -test -debug "$SUPERCRONIC_CONFIG"

@@ -1,102 +1,80 @@
-#
-# LinuxGSM Base Dockerfile
-#
-# https://github.com/GameServerManagers/LinuxGSM-Docker
-#
+# download / build / verify dependencies
+# own stage = additional deps needed which are only here used
+FROM ubuntu:20.04 as dependencyStage
+SHELL ["/bin/bash", "-c"]
+COPY setup/installGosu.sh \
+     setup/installSupercronic.sh \
+     /
+RUN chmod +x installGosu.sh
+RUN set -eux; \
+    ./installGosu.sh 1.14; \
+    ./installSupercronic.sh v0.1.12 8d3a575654a6c93524c410ae06f681a3507ca5913627fa92c7086fd140fa12ce
 
-FROM ubuntu:20.04
+# create linuxgsm image
+# this stage should be usable by existing developers
+FROM ubuntu:20.04 as linuxgsm
 
-LABEL maintainer="LinuxGSM <me@danielgibbs.co.uk>"
+ARG ARG_LGSM_VERSION="master"
+ENV LGSM_VERSION="${ARG_LGSM_VERSION:?}" \
+    LGSM_GAMESERVER="" \
+    LGSM_CONFIG_PATTERN_GAME="" \
+    USER_ID="750" \
+    GROUP_ID="750" \
+    LGSM_DEBUG="false" \
+    \
+    USER_NAME="linuxgsm" \
+    LGSM_PATH="/home/linuxgsm" \
+    LGSM_SCRIPTS="/home/linuxgsm-scripts" \
+    PATH="$PATH:/home/linuxgsm-scripts/" \
+    LANG="en_US.UTF-8" \
+    LANGUAGE="en_US.UTF-8" \
+    LC_ALL="en_US.UTF-8" \
+    TERM="xterm" \
+    SUPERCRONIC_CONFIG="/home/linuxgsm-scripts/cron.config" \
+    LGSM_STARTED="/home/linuxgsm/server.started"
 
-ENV DEBIAN_FRONTEND noninteractive
-SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+COPY --from=dependencyStage \
+     /usr/local/bin/gosu \
+     /usr/local/bin/supercronic \
+     /usr/local/bin/
+COPY setup/installMinimalDependencies.sh \
+     setup/setupUser.sh \
+     setup/installLGSM.sh \
+     setup/installGamedig.sh \
+     setup/cleanImage.sh \
+     setup/installDependencies.sh \
+     setup/createAlias.sh \
+     setup/entrypoint.sh \
+     \
+     commands/lgsm-cron-init \
+     commands/lgsm-cron-start \
+     commands/lgsm-init \
+     commands/lgsm-fix-permission \
+     commands/lgsm-load-config \
+     commands/lgsm-tmux-attach \
+     commands/lgsm-update-uid-gid \
+     "$LGSM_SCRIPTS"/
 
-RUN set -ex; \
-apt-get update; \
-apt-get install -y locales; \
-rm -rf /var/lib/apt/lists/*; \
-localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
+RUN set -eux; \
+    installMinimalDependencies.sh; \
+    setupUser.sh; \
+    installLGSM.sh; \
+    installGamedig.sh; \
+    cleanImage.sh
 
-RUN apt-get update \
-    && apt-get install -y locales apt-utils debconf-utils
-RUN localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
+VOLUME "$LGSM_PATH"
+WORKDIR "$LGSM_PATH"
 
-## Base System
-RUN apt-get update; \
-    apt-get upgrade -y
+# install server specific dependencies
+FROM linuxgsm as specific
+ARG ARG_LGSM_GAMESERVER="gmodserver"
+ENV LGSM_GAMESERVER="${ARG_LGSM_GAMESERVER:?}"
+RUN set -eux; \
+    installDependencies.sh "$LGSM_GAMESERVER"; \
+    createAlias.sh "$LGSM_GAMESERVER"; \
+    cleanImage.sh
 
-RUN apt-get update \
-    && apt-get install -y software-properties-common \
-    && add-apt-repository multiverse \
-    && apt-get update \
-    && apt-get install -y \
-    sudo \
-    curl \
-    wget \
-    file \
-    tar \
-    bzip2 \
-    gzip \
-    unzip \
-    cpio \
-    bsdmainutils \
-    python \
-    util-linux \
-    ca-certificates \
-    binutils \
-    bc \
-    jq \
-    tmux \
-    netcat \
-    lib32gcc1 \
-    lib32stdc++6 \
-    iproute2 \
-    nano \
-    iputils-ping \
+HEALTHCHECK --start-period=3600s --interval=60s --timeout=900s --retries=3 \
+    CMD [ -f "$LGSM_STARTED" ] && lgsm-monitor || exit 1
 
-# Install SteamCMD
-&& echo steam steam/question select "I AGREE" | debconf-set-selections \
-&& echo steam steam/license note '' | debconf-set-selections \
-&& dpkg --add-architecture i386 \
-&& apt-get update -y \
-&& apt-get install -y --no-install-recommends ca-certificates locales steamcmd \
-
-# Install Gamedig https://docs.linuxgsm.com/requirements/gamedig
-&& curl -sL https://deb.nodesource.com/setup_16.x | bash - \
-&& apt-get update && apt-get install -y nodejs \
-&& npm install -g gamedig \
-
-# Cleanup
-&& apt-get -y autoremove \
-&& apt-get -y clean \
-&& rm -rf /var/lib/apt/lists/* \
-&& rm -rf /tmp/* \
-&& rm -rf /var/tmp/*
-
-## user config
-RUN adduser \
---disabled-login \
---disabled-password \
---shell /bin/bash \
---gecos "" \
-linuxgsm \
-&& usermod -G tty linuxgsm \
-&& echo "linuxgsm ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers \
-&& chown -R linuxgsm:linuxgsm /home/linuxgsm \
-
-## linuxgsm.sh
-RUN set -ex; \
-mkdir /opt/linuxgsm; \
-chown linuxgsm:linuxgsm /opt/linuxgsm; \
-wget -O /opt/linuxgsm/linuxgsm.sh https://linuxgsm.sh; \
-chmod +x /opt/linuxgsm/linuxgsm.sh
-
-USER linuxgsm
-
-WORKDIR /home/linuxgsm
-
-# need use xterm for LinuxGSM
-ENV TERM=xterm
-
-## Docker Details
-ENV PATH=$PATH:/home/linuxgsm
+ENTRYPOINT ["./../linuxgsm-scripts/entrypoint.sh"]

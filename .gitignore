@@ -1,1 +1,4 @@
 *~
+tests/results
+**/*.log
+tests/steam_test_credentials

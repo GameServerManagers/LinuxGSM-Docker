@@ -1,0 +1,17 @@
+#!/bin/sh
+
+set -o errexit
+set -o nounset
+if "$LGSM_DEBUG"; then
+    set -o xtrace
+fi
+
+# only volume needs to be fixed, everything else can be fixed by recreating the container
+
+GROUP_NAME="$USER_NAME"
+chown -R "$USER_NAME:$GROUP_NAME" "$LGSM_PATH"
+chmod 750 "$LGSM_PATH"
+if [ -f "$LGSM_PATH/$LGSM_GAMESERVER" ]; then
+    chmod 750 "$LGSM_PATH/$LGSM_GAMESERVER"
+fi
+chmod -R ug+rw,o= "$LGSM_PATH"
