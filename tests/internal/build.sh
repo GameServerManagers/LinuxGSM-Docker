@@ -57,7 +57,7 @@ while [ $# -ge 1 ]; do
                 minor="${lgsm_version#*.}"
                 minor="${minor%%.*}"
                 #patch="${lgsm_version##*.}"
-                # "$major.$minor.$patch" not added because equal to version 
+                # "$major.$minor.$patch" not added because equal to version
                 lgsm_tags_latest+=("$major.$minor" "$major")
             fi
 

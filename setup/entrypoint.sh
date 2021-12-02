@@ -38,7 +38,7 @@ touch "$LGSM_STARTED"
 # alternative solution: lgsm-tmux-attach | tee /dev/tty &
 rm tmux.pipe > /dev/null 2>&1 || true
 mkfifo tmux.pipe
-lgsm-tmux-attach | tee tmux.pipe & 
+lgsm-tmux-attach | tee tmux.pipe &
 while read -r line; do
     echo "$line"
 done < tmux.pipe

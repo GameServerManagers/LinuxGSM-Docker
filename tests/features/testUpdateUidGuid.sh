@@ -30,7 +30,7 @@ gid="750"
 
     elif [ "0" != "$("${dockerRun[@]}" alpine find . ! -group "$gid" ! -iname "tmux.pipe" | wc -l )" ]; then
         log "precondition failed, there are files in \"$VOLUME\" which aren't owned by group \"$gid\"" 21 "$("${dockerRun[@]}" alpine find . ! -group "$gid" ! -iname "tmux.pipe" | tail)"
-        
+
     else
        log "precondition successful"
     fi
@@ -41,7 +41,7 @@ gid="750"
 
     elif [ "0" != "$("${dockerRun[@]}" alpine find . ! -group "5678" ! -iname "tmux.pipe" | wc -l )" ]; then
         log "update failed, there are files in \"$VOLUME\" which aren't owned by group \"5678\"" 23 "$("${dockerRun[@]}" alpine find . ! -group "5678" ! -iname "tmux.pipe" | tail)"
-        
+
     else
        log "update successful"
     fi

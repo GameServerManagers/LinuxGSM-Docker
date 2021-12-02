@@ -23,7 +23,7 @@ fi
 function fgrep_ignore_leading_whitespaces() {
     local find="$1"
     local file="$2"
-    
+
     mapfile -d $'\n' -t lines < <(cat "$file")
     for line in "${lines[@]}"; do
         trimmed_line="$(grep -E -e '\S.*\S|\S' <<< "$line" || true)"
@@ -108,7 +108,7 @@ function handleEnvironmentVariablePrefix() {
                 if grep -Eq "^$key" "$check_file"; then
                     echo "[info][lgsm-load-config] $key is part of $check_file"
                     addConfigToFile "$target_file" "$pattern" "$key" "$value"
-                    
+
                 else
                     echo "[error][lgsm-load-config] provided environment variable $config is a non-default variable for current gameserver $LGSM_GAMESERVER, if you are sure you want it added use CONFIGFORCED_ as prefix."
                     exit 12
@@ -127,7 +127,7 @@ function handleEnvironmentVariablePrefix() {
 rm -f "$configfile_common"
 # CONFIG options should be safe to use => fail if not correct because we can verify they are part of _default.cfg
 handleEnvironmentVariablePrefix "CONFIG_" "$configfile_common" "%s=\"%s\"" "$configfile_default"
-# CONFIGFORCED_ -> skip check, e.g. 
+# CONFIGFORCED_ -> skip check, e.g.
 handleEnvironmentVariablePrefix "CONFIGFORCED_" "$configfile_common" "%s=\"%s\""
 
 # GAME_ is added to game specific config file

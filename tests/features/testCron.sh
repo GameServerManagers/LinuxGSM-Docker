@@ -15,7 +15,7 @@ source "$(dirname "$0")/../internal/api_docker.sh"
     cd "$(dirname "$0")/../.."
     DOCKERFILE_CRONLOCATION="$(grep -Po '(?<=SUPERCRONIC_CONFIG=")[^"]*' Dockerfile)"
 
-    
+
     function fn_exit() {
         removeContainer "$CONTAINER"
         exit "${1:-1}"
@@ -39,7 +39,7 @@ source "$(dirname "$0")/../internal/api_docker.sh"
             log "successful no cron job found"
         else
             log "container shouldn't have a cronjob" 20
-        fi 
+        fi
     else
         log "container is unhealthy" 10
     fi
@@ -53,10 +53,10 @@ source "$(dirname "$0")/../internal/api_docker.sh"
         if [ "2" != "$(echo "$crontab" | wc -l)" ]; then
             log "expected two cron lines, found $(echo "$crontab" | wc -l)" 21
         elif ! grep -qE "^$CRON_TEST1" <<< "$crontab"; then
-            log "provided crontab isn't part of container but should be" 22 
+            log "provided crontab isn't part of container but should be" 22
         else
             log "successfully tested one cronjob"
-        fi 
+        fi
     else
         log "container is unhealthy" 11
     fi
@@ -76,7 +76,7 @@ source "$(dirname "$0")/../internal/api_docker.sh"
         else
             log "successfully tested two cronjobs"
             log "$crontab"
-        fi 
+        fi
     else
         log "container is unhealthy" 12
     fi

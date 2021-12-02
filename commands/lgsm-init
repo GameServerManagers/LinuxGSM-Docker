@@ -13,7 +13,7 @@ if ! echo "$(sha256sum "$LGSM_SCRIPTS/linuxgsm.sh" | grep -Eo '^[^ ]*')  linuxgs
     echo "[info][lgsm-init] force uninstall lgsm, either linuxgsm changed or file to determine installed version is removed"
     rm -rf "lgsm" || true
 fi
-# remove gameserver executable to not install 2nd one 
+# remove gameserver executable to not install 2nd one
 rm "$LGSM_GAMESERVER" > /dev/null 2>&1 || true
 
 gosu "$USER_NAME" cp -f "$LGSM_SCRIPTS/linuxgsm.sh" .

@@ -26,7 +26,7 @@ configfile_common="/home/linuxgsm/lgsm/config-lgsm/$GAMESERVER/common.cfg"
             echo "[info][testLoadConfig] $1"
         fi
     }
-    
+
     inContainer=(docker exec -it "$CONTAINER")
 
     # test valid CONFIG_ -> common.cfg
@@ -42,7 +42,7 @@ configfile_common="/home/linuxgsm/lgsm/config-lgsm/$GAMESERVER/common.cfg"
         else
             log "maxbackups successfully added!"
         fi
-    else 
+    else
         log "container didn't start with steamcredentials" 20 "$(docker logs "$CONTAINER")"
     fi
 
@@ -61,7 +61,7 @@ configfile_common="/home/linuxgsm/lgsm/config-lgsm/$GAMESERVER/common.cfg"
         else
             log "steamuser and steampass successfully added!"
         fi
-    else 
+    else
         log "container didn't start with steamcredentials" 20 "$(docker logs "$CONTAINER")"
     fi
 
@@ -78,7 +78,7 @@ configfile_common="/home/linuxgsm/lgsm/config-lgsm/$GAMESERVER/common.cfg"
         else
             log "common.cfg successfully overwritten on startup!"
         fi
-    else 
+    else
         log "container didn't start, cant check if common.cfg is overwritten " 23 "$(docker logs "$CONTAINER" || true )"
     fi
 
@@ -88,7 +88,7 @@ configfile_common="/home/linuxgsm/lgsm/config-lgsm/$GAMESERVER/common.cfg"
         -e CONFIG_steamuser_illegal="newSteamUser"
     if ! awaitHealthCheck "$CONTAINER"; then
         log "container didn't start with illegal CONFIG value \"steamuser_illegal\""
-    else 
+    else
         log "illegal CONFIG option didn't break the container" 26 "$(docker logs "$CONTAINER" || true)"
     fi
 
@@ -113,7 +113,7 @@ configfile_common="/home/linuxgsm/lgsm/config-lgsm/$GAMESERVER/common.cfg"
         else
             log "couldn't determine game config file" 28
         fi
-    else 
+    else
         log "container didn't start with valid GAME_ env" 27 "$(docker logs "$CONTAINER" || true )"
     fi
 
@@ -140,7 +140,7 @@ configfile_common="/home/linuxgsm/lgsm/config-lgsm/$GAMESERVER/common.cfg"
         else
             log "couldn't determine game config file" 31
         fi
-    else 
+    else
         log "container didn't start with valid GAME_ env, you probably need to fix this manually" 30 "$(docker logs "$CONTAINER" || true )"
     fi
 
@@ -167,7 +167,7 @@ configfile_common="/home/linuxgsm/lgsm/config-lgsm/$GAMESERVER/common.cfg"
         else
             log "couldn't determine game config file" 37
         fi
-    else 
+    else
         log "container didn't start with valid GAME_ env" 33 "$(docker logs "$CONTAINER" || true )"
     fi
 

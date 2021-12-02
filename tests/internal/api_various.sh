@@ -5,7 +5,7 @@ function isEmpty() {
 }
 
 function contains() {
-    echo "$1" | grep -qF "$2" 
+    echo "$1" | grep -qF "$2"
 }
 
 function getServerList() {

@@ -32,7 +32,7 @@ function removeContainer() {
 
 function awaitHealthCheck() {
     container="$1"
-    
+
     if existsContainer "$container" || ! hasContainerHealthCheak "$container"; then
         return 1
     fi
