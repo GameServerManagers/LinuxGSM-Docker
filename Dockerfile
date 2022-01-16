@@ -12,7 +12,7 @@ ENV DEBIAN_FRONTEND noninteractive
 ENV TERM=xterm
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
-# Install UTF-8
+# Install UTF-8 unicode
 RUN echo "**** Install UTF-8 ****" \
     && apt-get update \
     && apt-get install -y locales apt-utils debconf-utils
@@ -66,7 +66,8 @@ RUN echo "**** Install SteamCMD ****" \
     && echo steam steam/license note '' | debconf-set-selections \
     && dpkg --add-architecture i386 \
     && apt-get update -y \
-    && apt-get install -y --no-install-recommends locales libsdl2-2.0-0:i386 steamcmd
+    && apt-get install -y --no-install-recommends libsdl2-2.0-0:i386 steamcmd \
+    && ln -s /usr/games/steamcmd /usr/bin/steamcmd
 
 # Install NodeJS
 RUN echo "**** Install NodeJS ****" \
