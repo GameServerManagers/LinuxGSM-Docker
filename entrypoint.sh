@@ -1,18 +1,31 @@
 #!/bin/bash
-## linuxgsm-docker base image entrypoint script
-## execute LinuxGSM or arbitrary server commands at will
-## by passing command
 
+# Correct permissions in home dir
+echo "update permissions for linuxgsm"
+sudo chown -R linuxgsm:linuxgsm /home/linuxgsm
 
-## Because of a limitation in LinuxGSM script it must be run from the directory
-## It is installed in.
-##
-## If one wants to use a volume for the data directory, which is the home directory
-## then we must keep a backup copy of the script on local drive
+# Copy linuxgsm.sh into homedir
 if [ ! -e ~/linuxgsm.sh ]; then
-    echo "Initializing Linuxgsm User Script in New Volume"
-    cp /linuxgsm.sh ./linuxgsm.sh
+    echo "copying linuxgsm.sh to /home/linuxgsm"
+    cp /linuxgsm.sh ~/linuxgsm.sh
 fi
+
+# Setup game server
+if [ ! -f "${GAMESERVER}" ]; then
+    echo "creating ./${GAMESERVER}"
+   ./linuxgsm.sh ${GAMESERVER}
+fi
+
+# Install game server
+if [ -z "$(ls -A -- "serverfiles")" ]; then
+    echo "Installing ${GAMESERVER}"
+    ./${GAMESERVER} auto-install
+fi
+
+./${GAMESERVER} start
+sleep 5
+./${GAMESERVER} details
+
 
 # with no command, just spawn a running container suitable for exec's
 if [ $# = 0 ]; then

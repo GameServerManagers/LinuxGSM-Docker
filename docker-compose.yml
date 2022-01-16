@@ -1,0 +1,16 @@
+version: '3.4'
+
+services:
+  linuxgsmdocker:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    container_name: lgsm-docker
+    environment:
+      - GAMESERVER=jc3server
+    volumes:
+      - /home/dgibbs/linuxgsm/serverfiles:/home/linuxgsm/serverfiles
+      - /home/dgibbs/linuxgsm/log:/home/linuxgsm/log
+      - /home/dgibbs/linuxgsm/config-lgsm:/home/linuxgsm/lgsm/config-lgsm
+    network_mode: host
+    restart: always
