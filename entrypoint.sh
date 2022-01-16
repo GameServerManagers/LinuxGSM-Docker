@@ -1,5 +1,14 @@
 #!/bin/bash
 
+echo -e "Welcome to the LinuxGSM Docker"
+echo -e "================================================================================"
+echo -e "Gameserver: ${GAMESERVER}"
+echo -e "UID: $UID"
+echo -e ""
+
+
+echo -e "Initalising"
+echo -e "================================================================================"
 # Correct permissions in home dir
 echo "update permissions for linuxgsm"
 sudo chown -R linuxgsm:linuxgsm /home/linuxgsm
@@ -18,10 +27,21 @@ fi
 
 # Install game server
 if [ -z "$(ls -A -- "serverfiles")" ]; then
-    echo "Installing ${GAMESERVER}"
+    echo "installing ${GAMESERVER}"
     ./${GAMESERVER} auto-install
 fi
 
+# Add cron tasks
+echo "adding cron jobs"
+echo "* monitor (5 mins)"
+echo "* update (30 mins)"
+echo "* update-lgsm (1AM Sunday)"
+(crontab -l 2>/dev/null; echo "*/5 * * * * /home/linuxgsm/*server monitor > /dev/null 2>&1") | crontab -
+(crontab -l 2>/dev/null; echo "*/30 * * * * /home/linuxgsm/*server update > /dev/null 2>&1") | crontab -
+(crontab -l 2>/dev/null; echo "0 1 * * 0 /home/linuxgsm/*server update-lgsm > /dev/null 2>&1") | crontab -
+
+echo ""
+echo "start ${GAMESERVER}"
 ./${GAMESERVER} start
 sleep 5
 ./${GAMESERVER} details
