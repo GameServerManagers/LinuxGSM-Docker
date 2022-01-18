@@ -7,10 +7,13 @@ services:
       dockerfile: ./Dockerfile
     container_name: lgsm-docker
     environment:
-      - GAMESERVER=jc3server
+      - GAMESERVER=csgoserver
+      - LGSM_GITHUBUSER=GameServerManagers
+      - LGSM_GITHUBREPO=LinuxGSM
+      - LGSM_GITHUBBRANCH=master
     volumes:
-      - /home/dgibbs/linuxgsm/serverfiles:/home/linuxgsm/serverfiles
-      - /home/dgibbs/linuxgsm/log:/home/linuxgsm/log
-      - /home/dgibbs/linuxgsm/config-lgsm:/home/linuxgsm/lgsm/config-lgsm
+      - /path/to/serverfiles:/home/linuxgsm/serverfiles
+      - /path/to/log:/home/linuxgsm/log
+      - /path/to/config-lgsm:/home/linuxgsm/lgsm/config-lgsm
     network_mode: host
-    restart: always
+    restart: unless-stopped

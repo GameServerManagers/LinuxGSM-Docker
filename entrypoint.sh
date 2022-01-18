@@ -1,12 +1,26 @@
 #!/bin/bash
 
+exit_handler () {
+	# Execute the  shutdown commands
+    echo "recieved SIGTERM stopping ${GAMESERVER}"
+	./${GAMESERVER} stop
+	exit 0
+}
+
+# Exit trap
+echo "loading exit trap"
+trap exit_handler SIGTERM
+
 echo -e "Welcome to the LinuxGSM Docker"
 echo -e "================================================================================"
-echo -e "Gameserver: ${GAMESERVER}"
+echo -e "GAMESERVER: ${GAMESERVER}"
 echo -e "UID: $UID"
 echo -e ""
+echo -e "LGSM_GITHUBUSER: ${LGSM_GITHUBUSER}"
+echo -e "LGSM_GITHUBREPO: ${LGSM_GITHUBREPO}"
+echo -e "LGSM_GITHUBBRANCH: ${LGSM_GITHUBBRANCH}"
 
-
+echo -e ""
 echo -e "Initalising"
 echo -e "================================================================================"
 # Correct permissions in home dir
@@ -39,6 +53,11 @@ echo "* update-lgsm (1AM Sunday)"
 (crontab -l 2>/dev/null; echo "*/5 * * * * /home/linuxgsm/*server monitor > /dev/null 2>&1") | crontab -
 (crontab -l 2>/dev/null; echo "*/30 * * * * /home/linuxgsm/*server update > /dev/null 2>&1") | crontab -
 (crontab -l 2>/dev/null; echo "0 1 * * 0 /home/linuxgsm/*server update-lgsm > /dev/null 2>&1") | crontab -
+
+# Update game server
+echo ""
+echo "update ${GAMESERVER}"
+./${GAMESERVER} update
 
 echo ""
 echo "start ${GAMESERVER}"
