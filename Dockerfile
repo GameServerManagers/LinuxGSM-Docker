@@ -58,7 +58,8 @@ RUN echo "**** Install Base LinuxGSM Requirements ****" \
     iputils-ping \
     nano \
     vim \
-    sudo
+    sudo \
+    tini
 
 # Install SteamCMD
 RUN echo "**** Install SteamCMD ****" \
@@ -122,4 +123,5 @@ USER linuxgsm
 
 COPY entrypoint.sh /home/linuxgsm/entrypoint.sh
 
-ENTRYPOINT ["bash","/home/linuxgsm/entrypoint.sh" ]
+ENTRYPOINT [ "/usr/bin/tini", "--" ]
+CMD [ "bash","./entrypoint.sh" ]
