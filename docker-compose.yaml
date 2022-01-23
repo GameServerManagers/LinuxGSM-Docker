@@ -1,9 +1,0 @@
-services:
-    linuxgsm:
-        image: gameservermanagers/linuxgsm-docker
-        container_name: lgsm-docker
-        hostname: 'LGSM'
-        network_mode: host
-        volumes:
-          - '/path/to/lgsm:/home/linuxgsm'
-        restart: always

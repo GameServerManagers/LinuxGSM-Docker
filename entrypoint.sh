@@ -1,18 +1,71 @@
 #!/bin/bash
-## linuxgsm-docker base image entrypoint script
-## execute LinuxGSM or arbitrary server commands at will
-## by passing command
 
+exit_handler () {
+	# Execute the  shutdown commands
+    echo "recieved SIGTERM stopping ${GAMESERVER}"
+	./${GAMESERVER} stop
+	exit 0
+}
 
-## Because of a limitation in LinuxGSM script it must be run from the directory
-## It is installed in.
-##
-## If one wants to use a volume for the data directory, which is the home directory
-## then we must keep a backup copy of the script on local drive
+# Exit trap
+echo "loading exit trap"
+trap exit_handler SIGTERM
+
+echo -e "Welcome to the LinuxGSM Docker"
+echo -e "================================================================================"
+echo -e "GAMESERVER: ${GAMESERVER}"
+echo -e "UID: $UID"
+echo -e ""
+echo -e "LGSM_GITHUBUSER: ${LGSM_GITHUBUSER}"
+echo -e "LGSM_GITHUBREPO: ${LGSM_GITHUBREPO}"
+echo -e "LGSM_GITHUBBRANCH: ${LGSM_GITHUBBRANCH}"
+
+echo -e ""
+echo -e "Initalising"
+echo -e "================================================================================"
+# Correct permissions in home dir
+echo "update permissions for linuxgsm"
+sudo chown -R linuxgsm:linuxgsm /home/linuxgsm
+
+# Copy linuxgsm.sh into homedir
 if [ ! -e ~/linuxgsm.sh ]; then
-    echo "Initializing Linuxgsm User Script in New Volume"
-    cp /linuxgsm.sh ./linuxgsm.sh
+    echo "copying linuxgsm.sh to /home/linuxgsm"
+    cp /linuxgsm.sh ~/linuxgsm.sh
 fi
+
+# Setup game server
+if [ ! -f "${GAMESERVER}" ]; then
+    echo "creating ./${GAMESERVER}"
+   ./linuxgsm.sh ${GAMESERVER}
+fi
+
+# Install game server
+if [ -z "$(ls -A -- "serverfiles")" ]; then
+    echo "installing ${GAMESERVER}"
+    ./${GAMESERVER} auto-install
+fi
+
+# Add cron tasks
+echo "adding cron jobs"
+echo "* monitor (5 mins)"
+echo "* update (30 mins)"
+echo "* update-lgsm (1AM Sunday)"
+(crontab -l 2>/dev/null; echo "*/5 * * * * /home/linuxgsm/*server monitor > /dev/null 2>&1") | crontab -
+(crontab -l 2>/dev/null; echo "*/30 * * * * /home/linuxgsm/*server update > /dev/null 2>&1") | crontab -
+(crontab -l 2>/dev/null; echo "0 1 * * 0 /home/linuxgsm/*server update-lgsm > /dev/null 2>&1") | crontab -
+
+# Update game server
+echo ""
+echo "update ${GAMESERVER}"
+./${GAMESERVER} update
+
+echo ""
+echo "start ${GAMESERVER}"
+./${GAMESERVER} start
+sleep 5
+./${GAMESERVER} details
+
+tail -f log/script/*
 
 # with no command, just spawn a running container suitable for exec's
 if [ $# = 0 ]; then
