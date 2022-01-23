@@ -2,47 +2,57 @@
   <br>
   <a href="https://linuxgsm.com"><img src="https://i.imgur.com/Eoh1jsi.jpg" alt="LinuxGSM"></a>
   LinuxGSM Docker Container
-  </h1>
+</h1>
 
 [LinuxGSM](https://linuxgsm.com) is the command-line tool for quick, simple deployment and management of Linux dedicated game servers.
 
-  > This docker image is under development and not officialy supported.
+> This docker container is under development is subject to significant change and not considured stable.
 
 A dockerised version of LinuxGSM https://linuxgsm.com
+
 Dockerhub https://hub.docker.com/r/gameservermanagers/linuxgsm-docker/
+# Usage
 
-# How to Use
-
-## Create Persistant Storage
-Game servers require persistant storage to store the server files and configs. The docker reccomended way is to use Persistant storage
-
+## docker-compose
+Below is an example `docker-compose` for csgoserver. Ports will vary depending upon server.
+  ```
+version: '3.4'
+services:
+  linuxgsm:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    container_name: csgoserver
+    environment:
+      - GAMESERVER=csgoserver
+      - LGSM_GITHUBUSER=GameServerManagers
+      - LGSM_GITHUBREPO=LinuxGSM
+      - LGSM_GITHUBBRANCH=master
+    volumes:
+      - /home/linuxgsm/serverfiles:/home/linuxgsm/serverfiles
+      - /home/linuxgsm/serverfiles:/home/linuxgsm/log
+      - /home/linuxgsm/serverfiles:/home/linuxgsm/lgsm/config-lgsm
+    ports:
+      - "27015:27015/tcp"
+      - "27015:27015/udp"
+      - "27020:27020/udp"
+      - "27005:27005/udp"
+    restart: unless-stopped
 ```
-docker volume create csgoserver
-```
-
-# Install and Start Game server
-```
-docker run -d --name csgoserver -v csgoserver --net-host -it -env GAMESERVERNAME=csgoserver gameservermanagers/linuxgsm-docker
-```
+# First Run
+Edit the `docker-compose.yml` file changing `GAMESERVER=` to the game server of choice.
+On first run linuxgsm will install your selected server and will start running. Once completed the game server details will be output.
+## Game Server Ports
+Each game server has its own port requirements. Becuase of this you will need to configure the correct ports in your `docker-compose` after first run. The required ports are output once installation is completed and everytime the docker container is started.
+## Volumes
+volumes are required to save persistant data for your game server. The example above covers a basic csgoserver however some game servers save files in other places. Please check all the correct locations are mounted to remove the risk of loosing save data.
 # Run LinuxGSM commands
+
 Commands can be run just like standard LinuxGSM using the docker exec command.
+
 ```
+
 docker exec -it csgoserver ./csgoserver details
-```
-# Edit LinuxGSM config
-To edit the LinuxGSM config files use the following.
-
-View the default settings
-```
-docker exec -it csgoserver nano _default.cfg
-```
-Edit LinuxGSM config settings
-```
-docker exec -it csgoserver nano common.cfg
-```
-Edit Game Server Config settings
-To edit the game server config settings run the following.
 
 ```
-docker exec -it csgoserver nano server.cfg
-```
+#

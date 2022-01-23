@@ -1,10 +1,10 @@
 version: '3.4'
 services:
-  lgsm-docker:
+  linuxgsm:
     build:
       context: .
       dockerfile: ./Dockerfile
-    container_name: lgsm-csgoserver
+    container_name: csgoserver
     environment:
       - GAMESERVER=csWgoserver
       - LGSM_GITHUBUSER=GameServerManagers
