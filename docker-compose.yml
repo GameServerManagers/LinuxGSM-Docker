@@ -1,19 +1,22 @@
 version: '3.4'
-
 services:
-  linuxgsmdocker:
+  lgsm-docker:
     build:
       context: .
       dockerfile: ./Dockerfile
-    container_name: lgsm-docker
+    container_name: lgsm-csgoserver
     environment:
-      - GAMESERVER=csgoserver
+      - GAMESERVER=csWgoserver
       - LGSM_GITHUBUSER=GameServerManagers
       - LGSM_GITHUBREPO=LinuxGSM
       - LGSM_GITHUBBRANCH=master
     volumes:
-      - /path/to/serverfiles:/home/linuxgsm/serverfiles
-      - /path/to/log:/home/linuxgsm/log
-      - /path/to/config-lgsm:/home/linuxgsm/lgsm/config-lgsm
-    network_mode: host
+      - /home/linuxgsm/serverfiles:/home/linuxgsm/serverfiles
+      - /home/linuxgsm/serverfiles:/home/linuxgsm/log
+      - /home/linuxgsm/serverfiles:/home/linuxgsm/lgsm/config-lgsm
+    ports:
+      - "27015:27015/tcp"
+      - "27015:27015/udp"
+      - "27020:27020/udp"
+      - "27005:27005/udp"
     restart: unless-stopped

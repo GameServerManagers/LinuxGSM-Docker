@@ -65,6 +65,7 @@ echo "start ${GAMESERVER}"
 sleep 5
 ./${GAMESERVER} details
 
+tail -f log/script/*
 
 # with no command, just spawn a running container suitable for exec's
 if [ $# = 0 ]; then
