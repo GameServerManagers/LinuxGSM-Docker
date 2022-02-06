@@ -11,7 +11,7 @@ on:
   push:
     branches: [ master ]
     # Publish semver tags as releases.
-    #tags: [ 'v*.*.*' ]
+    tags: [ 'v*.*.*' ]
   pull_request:
     branches: [ master ]
 
@@ -59,14 +59,14 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-          
+
       - name: Log into registry DockerHub
         if: github.event_name != 'pull_request'
         uses: docker/login-action@v1.12.0
         with:
           registry: docker.io
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}          
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
       # Extract metadata (tags, labels) for Docker
       # https://github.com/docker/metadata-action
