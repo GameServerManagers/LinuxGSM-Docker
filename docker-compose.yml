@@ -6,7 +6,7 @@ services:
       dockerfile: ./Dockerfile
     container_name: csgoserver
     environment:
-      - GAMESERVER=csWgoserver
+      - GAMESERVER=csgoserver
       - LGSM_GITHUBUSER=GameServerManagers
       - LGSM_GITHUBREPO=LinuxGSM
       - LGSM_GITHUBBRANCH=master
