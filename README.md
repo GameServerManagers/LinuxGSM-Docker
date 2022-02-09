@@ -29,9 +29,9 @@ services:
       - LGSM_GITHUBREPO=LinuxGSM
       - LGSM_GITHUBBRANCH=master
     volumes:
-      - /home/linuxgsm/serverfiles:/home/linuxgsm/serverfiles
-      - /home/linuxgsm/serverfiles:/home/linuxgsm/log
-      - /home/linuxgsm/serverfiles:/home/linuxgsm/lgsm/config-lgsm
+      - /path/to/serverfiles:/home/linuxgsm/serverfiles
+      - /path/to/log:/home/linuxgsm/log
+      - /path/to/config-lgsm:/home/linuxgsm/lgsm/config-lgsm
     ports:
       - "27015:27015/tcp"
       - "27015:27015/udp"
@@ -55,3 +55,4 @@ Commands can be run just like standard LinuxGSM using the docker exec command.
 docker exec -it csgoserver ./csgoserver details
 
 ```
+#
