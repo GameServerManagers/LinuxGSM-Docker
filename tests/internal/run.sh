@@ -38,8 +38,12 @@ while [ $# -ge 1 ]; do
             IMAGE="$1"
             shift;;
         --suffix)
-            SUFFIX="-$1"
-            shift;;
+			if [ -n "$1" ]; then
+            	SUFFIX="-$1"
+			else
+				echo "[warning][run] skipping suffix because its empty"
+            fi
+			shift;;
         -t|--tag)
             TAG="$1"
             shift;;
