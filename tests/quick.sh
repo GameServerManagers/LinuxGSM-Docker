@@ -107,7 +107,7 @@ trap handleInterrupt SIGTERM SIGINT
         removeContainer "$CONTAINER"
         echo "${build[@]}"
         "${build[@]}"
-        echo "${run[@]}"
+        echo "${run[@]}" | sed -E 's/(steamuser|steampass)="[^"]*"/\1="xxx"/g'
         "${run[@]}"
 
         if awaitHealthCheck "$CONTAINER"; then

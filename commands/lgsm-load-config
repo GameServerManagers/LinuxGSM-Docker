@@ -49,7 +49,7 @@ function addConfigToFile() {
     # IMPORTANT: currently exactly two %s are allowed!
     pattern="${2:-}"
     key="$3"
-    value="$4"
+    value="$4" # dont print value, could contain secrets
 
     # determine pattern for given file, if not provided
     if [ -z "$pattern" ]; then
