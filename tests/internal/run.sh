@@ -50,7 +50,7 @@ while [ $# -ge 1 ]; do
             shift;;
         *)
             if [ -n "$key" ]; then
-                echo "[info][run] additional argument to docker: $key" | sed -E 's/(steamuser|steampass)="[^"]*"/\1="xxx"/g'
+                echo "[info][run] additional argument to docker: $key" | sed -E 's/(steamuser|steampass)=\S+/\1="xxx"/g'
                 run_image+=("$key")
             fi
             ;;
@@ -58,6 +58,6 @@ while [ $# -ge 1 ]; do
 done
 run_image+=("$docker_run_mode" --name "$container" "$IMAGE:$TAG$SUFFIX")
 
-echo "${run_image[@]}" | sed -E 's/(steamuser|steampass)="[^"]*"/\1="xxx"/g'
+echo "${run_image[@]}" | sed -E 's/(steamuser|steampass)=\S+/\1="xxx"/g'
 "${run_image[@]}"
 

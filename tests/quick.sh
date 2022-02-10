@@ -16,6 +16,7 @@ source "$(dirname "$0")/steam_test_credentials"
 
 
 LOGS="false"
+DEBUG="false"
 IMAGE="gameservermanagers/linuxgsm-docker"
 RETRY="1"
 GAMESERVER=""
@@ -47,7 +48,8 @@ while [ $# -ge 1 ]; do
         -c|--no-cache)
             build+=(--no-cache);;
         -d|--debug)
-            run+=(--debug);;
+            run+=(--debug)
+            DEBUG="true";;
         --image)
             IMAGE="$1"
             shift;;
@@ -83,14 +85,17 @@ if [ -z "$GAMESERVER" ]; then
     echo "[error][quick] no gameserver provided"
     exit 1
 elif [ -n "$steam_test_username" ] && [ -n "$steam_test_password" ]; then
-    run+=(-e "CONFIGFORCED_steamuser=\"$steam_test_username\"" -e "CONFIGFORCED_steampass=\"$steam_test_password\"")
+    run+=(-e CONFIGFORCED_steamuser="$steam_test_username" -e CONFIGFORCED_steampass="$steam_test_password")
 else
     echo "[warning][quick] no steam credentials provided, some servers will fail without it"
 fi
 
 CONTAINER="linuxgsm-$GAMESERVER"
 build+=(--image "$IMAGE" --latest "$GAMESERVER")
-run+=(--image "$IMAGE" --tag "$GAMESERVER" --container "$CONTAINER" --detach)
+run+=(--image "$IMAGE" --tag "$GAMESERVER" --container "$CONTAINER")
+if ! "$DEBUG"; then
+    run+=(--detach)
+fi
 
 function handleInterrupt() {
     removeContainer "$CONTAINER"
@@ -107,10 +112,10 @@ trap handleInterrupt SIGTERM SIGINT
         removeContainer "$CONTAINER"
         echo "${build[@]}"
         "${build[@]}"
-        echo "${run[@]}" | sed -E 's/(steamuser|steampass)="[^"]*"/\1="xxx"/g'
+        echo "${run[@]}" | sed -E 's/(steamuser|steampass)=\S+/\1="xxx"/g'
         "${run[@]}"
 
-        if awaitHealthCheck "$CONTAINER"; then
+        if "$DEBUG" || awaitHealthCheck "$CONTAINER"; then
             successful="true"
         fi
         stopContainer "$CONTAINER"

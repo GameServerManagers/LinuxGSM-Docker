@@ -17,6 +17,7 @@ lgsm-cron-init
 # check if wished server is provided
 if [ ! -e "$LGSM_GAMESERVER" ]; then
     lgsm-init
+    lgsm-load-config
     lgsm-auto-install
 else
     lgsm-init
@@ -26,9 +27,9 @@ else
         echo "[error][entrypoint] docker run --rm -v VOLUME_NAME:/home alpine:3.15 rm -vf /home/$LGSM_GAMESERVER"
         exit 1
     fi
+    lgsm-load-config
 fi
 
-lgsm-load-config
 lgsm-start
 trap lgsm-stop SIGTERM SIGINT
 lgsm-cron-start > /dev/null 2>&1 &
