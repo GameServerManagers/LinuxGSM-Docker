@@ -48,7 +48,11 @@ while [ $# -ge 1 ]; do
         --skip-lgsm)
             skip_lgsm="true";;
         --suffix)
-            suffix="-$1"
+            if [ -n "$1" ]; then
+                suffix="-$1"
+            else
+                echo "[warning][build] you provided an empty suffix, skipping"
+            fi
             shift;;
         -v|--version)
             lgsm_version="$1"
