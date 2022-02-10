@@ -84,8 +84,14 @@ done
 if [ -z "$GAMESERVER" ]; then
     echo "[error][quick] no gameserver provided"
     exit 1
-elif [ -n "$steam_test_username" ] && [ -n "$steam_test_password" ]; then
-    run+=(-e CONFIGFORCED_steamuser="$steam_test_username" -e CONFIGFORCED_steampass="$steam_test_password")
+elif grep -qEe "(^|\s)$GAMESERVER(\s|$)" <<< "${credentials_enabled[@]}"; then
+	echo "[info][quick] $GAMESERVER can only be tested with steam credential"
+	if [ -n "$steam_test_username" ] && [ -n "$steam_test_password" ]; then
+    	run+=(-e CONFIGFORCED_steamuser="$steam_test_username" -e CONFIGFORCED_steampass="$steam_test_password")
+	else
+		echo "[error][quick] $GAMESERVER can only be tested with steam credentials, please fill $(realpath "$(dirname "$0")/steam_test_credentials")"
+		exit 2
+	fi
 else
     echo "[warning][quick] no steam credentials provided, some servers will fail without it"
 fi
