@@ -1,7 +1,7 @@
 # download / build / verify dependencies
 # own stage = additional deps needed which are only here used
 FROM ubuntu:20.04 as dependencyStage
-SHELL ["/bin/bash", "-c"]
+
 COPY setup/installGosu.sh \
      setup/installSupercronic.sh \
      /
@@ -67,7 +67,7 @@ WORKDIR "$LGSM_PATH"
 
 # install server specific dependencies
 FROM linuxgsm as specific
-ARG ARG_LGSM_GAMESERVER="gmodserver"
+ARG ARG_LGSM_GAMESERVER=""
 ENV LGSM_GAMESERVER="${ARG_LGSM_GAMESERVER:?}"
 RUN set -eux; \
     installDependencies.sh "$LGSM_GAMESERVER"; \
