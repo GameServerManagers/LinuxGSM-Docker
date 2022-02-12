@@ -17,6 +17,7 @@ FROM ubuntu:20.04 as linuxgsm
 ARG ARG_LGSM_VERSION="master"
 ENV LGSM_VERSION="${ARG_LGSM_VERSION:?}" \
     LGSM_GAMESERVER="" \
+	LGSM_USE_GAMEDIG="true" \
     LGSM_CONFIG_PATTERN_GAME="" \
     USER_ID="750" \
     GROUP_ID="750" \

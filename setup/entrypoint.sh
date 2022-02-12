@@ -7,6 +7,10 @@ if "$LGSM_DEBUG"; then
     set -o xtrace
 fi
 
+if ! "$LGSM_USE_GAMEDIG"; then
+	npm uninstall -g gamedig
+fi
+
 cd "$LGSM_PATH"
 rm "$LGSM_STARTED" > /dev/null 2>&1 || true
 
