@@ -25,11 +25,25 @@ if [ "${#cmds[@]}" -gt "0" ]; then
 
     # install dependencies
     echo "[info][installDependencies] installing dependencies:"
+	apt-get update
     for cmd in "${cmds[@]}"; do
-        echo "$cmd"
-        eval "DEBIAN_FRONTEND=noninteractive $cmd" || (
-            apt-get update
-            eval "DEBIAN_FRONTEND=noninteractive $cmd"
-        )
+        echo "[info][installDependencies] $cmd"
+		if eval "DEBIAN_FRONTEND=noninteractive $cmd"; then
+			echo "[info][installDependencies] successful!"
+		elif grep -qe ':i386' <<< "$cmd"; then
+			echo "[info][installDependencies] retry"
+			dpkg --add-architecture i386
+			apt-get update
+			eval "DEBIAN_FRONTEND=noninteractive $cmd"
+		else
+			echo "[error][installDependencies] failed"
+			exit 10
+		fi
+		apt-get update
     done
+else
+	echo "[error][installDependencies] Couldn't extract missing dependencies, its very unlikely that everything is already installed. Printing debug information:"
+	echo "${cmds[@]}"
+	cat auto-install.log
+	exit 10
 fi

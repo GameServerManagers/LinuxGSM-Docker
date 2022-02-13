@@ -81,7 +81,7 @@ for run in $(seq 1 "$FLAKY"); do
 	# for multiple runs move previous results folder
 	if [ "$FLAKY" != "1" ] && [ "$run" -gt "1" ]; then
 		rm -rf "$RESULTS.$((run-1))" > /dev/null 2>&1
-		mv -f "$RESULTS" "$RESULTS.$((run-1))"
+		cp -rf "$RESULTS/" "$RESULTS.$((run-1))/"
 	fi
 	if [ "${#GAMESERVER[@]}" = "0" ]; then
 		if "$RERUN"; then
