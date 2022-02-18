@@ -181,7 +181,7 @@ for run in $(seq 1 "$FLAKY"); do
 done
 
 if [ "$FLAKY" != "1" ]; then
-	mapfile -t results_folder < <(find "$ROOT_FOLDER" -type d -iname "results.*")
+	mapfile -t results_folder < <(find "$ROOT_FOLDER" -maxdepth 1 -type d -iname "results.*")
 
 	mapfile -t servercodes < <(find "$RESULTS" -type f -iname "*.log" | grep -Poe '(?<=.)[^./]+(?=.log)' | sort)
 	for servercode in "${servercodes[@]}"; do
