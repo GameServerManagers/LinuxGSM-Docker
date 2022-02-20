@@ -98,11 +98,11 @@ for run in $(seq 1 "$FLAKY"); do
 	mkdir -p "$RESULTS"
 
 	(
-		if "$RERUN"; then
+		if "$RERUN" || [ "$run" -gt "1" ]; then
+			echo "[info][full] skipping building linuxgsm because rerun"
+		else
 			echo "[info][full] building linuxgsm base once"
 			./tests/internal/build.sh --version "$VERSION" --image "$IMAGE" --latest --suffix "$SUFFIX"
-		else
-			echo "[info][full] skipping building linuxgsm because rerun"
 		fi
 
 		subprocesses=()
@@ -177,36 +177,20 @@ for run in $(seq 1 "$FLAKY"); do
 		mapfile -t failed_other < <(grep --include "*failed*" -rLF 'Change steamuser="username"' "$RESULTS" | sort | uniq || true)
 		echo "[info][full] failed - other error: $(grep -Po '(?<=failed.)[^.]*' <<< "${failed_other[@]}" | tr '\n' ' ' || true)"
 		printf '%s\n' "${failed_other[@]/%/:100000}"
+
+		echo ""
+		echo "[info][full] searching in log for command errors \"command not found\" please add this as minimal dependency!"
+		grep -rnF 'command not found' "$RESULTS"
+
+		echo ""
+		echo "[info][full] searching in log for errors where health check got SIGKILL"
+		grep -rnF '"ExitCode": 137' "$RESULTS"
 	)
 done
 
 if [ "$FLAKY" != "1" ]; then
-	mapfile -t results_folder < <(find "$ROOT_FOLDER" -maxdepth 1 -type d -iname "results.*")
-
-	mapfile -t servercodes < <(find "$RESULTS" -type f -iname "*.log" | grep -Poe '(?<=.)[^./]+(?=.log)' | sort)
-	for servercode in "${servercodes[@]}"; do
-		successful=()
-		failed=()
-		if [ -f "$RESULTS/failed.$servercode.log" ]; then
-			failed=("$RESULTS/failed.$servercode.log")
-		elif [ -f "$RESULTS/successful.$servercode.log" ]; then
-			successful+=("$RESULTS/successful.$servercode.log")
-		fi
-
-		for result_folder in "${results_folder[@]}"; do
-			if [ -f "$result_folder/successful.$servercode.log" ]; then
-				successful+=("$result_folder/successful.$servercode.log")
-			elif [ -f "$result_folder/failed.$servercode.log" ]; then
-				failed+=("$result_folder/failed.$servercode.log")
-			fi
-		done
-
-		if [ "${#successful[@]}" -gt "0" ] && [ "${#failed[@]}" -gt "0" ]; then
-			echo ""
-			echo "$servercode flaky result"
-			for result in "${successful[@]}" "${failed[@]}"; do
-				echo "$result:10000"
-			done
-		fi
-	done
+	(
+		cd "$ROOT_FOLDER"
+		./compareMultipleResultFolders.sh
+	)
 fi
