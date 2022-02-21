@@ -195,6 +195,6 @@ done
 if [ "$FLAKY" != "1" ]; then
 	(
 		cd "$ROOT_FOLDER"
-		./compareMultipleResultFolders.sh
+		./tests/compareMultipleResultFolders.sh
 	)
 fi
