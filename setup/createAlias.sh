@@ -13,7 +13,7 @@ fi
 echo "[info][createAlias] creating linuxgsm alias"
 
 function createAlias() {
-	name="$1"
+	name="$(tr '[:upper:]' '[:lower:]' <<< "$1")"
 	command="$LGSM_PATH/$LGSM_GAMESERVER"
 	file="$LGSM_SCRIPTS/$name"
 
@@ -23,7 +23,9 @@ function createAlias() {
 		echo "[info][createAlias.sh] $command $name"
 		cat > "$file" <<- EOM
 		#!/bin/sh
+		echo '$name' >> "\$LGSM_CURRENT_COMMAND"
 		gosu "\$USER_NAME" "$command" "$name" "\$@"
+		sed -i '/^$name$/d' "\$LGSM_CURRENT_COMMAND"
 		EOM
 		chmod a=rx "$file"
 		# create 2nd link for better script readability

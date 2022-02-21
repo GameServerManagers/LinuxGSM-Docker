@@ -39,14 +39,26 @@ trap lgsm-stop SIGTERM SIGINT
 lgsm-cron-start > /dev/null 2>&1 &
 touch "$LGSM_STARTED"
 
-# tmux in background with log usable for docker
-# alternative solution: lgsm-tmux-attach | tee /dev/tty &
-rm tmux.pipe > /dev/null 2>&1 || true
-mkfifo tmux.pipe
-lgsm-tmux-attach | tee tmux.pipe &
-while read -r line; do
-    echo "$line"
-done < tmux.pipe
+is_running="true"
+while "$is_running"; do
+    # tmux in background with log usable for docker
+    # alternative solution: lgsm-tmux-attach | tee /dev/tty &
+    rm tmux.pipe > /dev/null 2>&1 || true
+    mkfifo tmux.pipe
+    lgsm-tmux-attach | tee tmux.pipe &
+    while read -r line; do
+        echo "$line"
+    done < tmux.pipe
+
+    echo "[info][entrypoint] server stopped"
+    is_running="false"
+    current_running_lgsm_alias="$(< "$LGSM_CURRENT_COMMAND")"
+    for lgsm_cmd in monitor update restart force-update validate; do
+        if grep -qe "$lgsm_cmd" <<< "$current_running_lgsm_alias"; then
+            echo "[info][entrypoint] lgsm command \"$lgsm_cmd\" is being executed and is permitted to stop the server, reattaching to tmux"
+            is_running="true"
+        fi
+    done
+done
 rm "$LGSM_STARTED" > /dev/null 2>&1 || true
 echo "[info][entrypoint] entrypoint ended"
-

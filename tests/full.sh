@@ -180,11 +180,15 @@ for run in $(seq 1 "$FLAKY"); do
 
 		echo ""
 		echo "[info][full] searching in log for command errors \"command not found\" please add this as minimal dependency!"
-		grep -rnF 'command not found' "$RESULTS"
+		grep -rnF 'command not found' "$RESULTS" || true
 
 		echo ""
 		echo "[info][full] searching in log for errors where health check got SIGKILL"
-		grep -rnF '"ExitCode": 137' "$RESULTS"
+		grep -rnF '"ExitCode": 137' "$RESULTS" || true
+
+		echo ""
+		echo "[info][full] log contains message \"provide content log to LinuxGSM developers\""
+		grep -rnF 'LinuxGSM developers' "$RESULTS" || true
 	)
 done
 

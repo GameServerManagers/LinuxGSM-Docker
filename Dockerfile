@@ -32,7 +32,8 @@ ENV LGSM_VERSION="${ARG_LGSM_VERSION:?}" \
     LC_ALL="en_US.UTF-8" \
     TERM="xterm" \
     SUPERCRONIC_CONFIG="/home/linuxgsm-scripts/cron.config" \
-    LGSM_STARTED="/home/linuxgsm/server.started"
+    LGSM_STARTED="/home/linuxgsm/server.started" \
+    LGSM_CURRENT_COMMAND="/home/linuxgsm/lgsm-cmd.currently"
 
 COPY --from=dependencyStage \
      /usr/local/bin/gosu \
@@ -75,7 +76,7 @@ RUN set -eux; \
     createAlias.sh "$LGSM_GAMESERVER"; \
     cleanImage.sh
 
-HEALTHCHECK --start-period=3600s --interval=60s --timeout=900s --retries=3 \
+HEALTHCHECK --start-period=3600s --interval=90s --timeout=900s --retries=3 \
     CMD [ -f "$LGSM_STARTED" ] && lgsm-monitor || exit 1
 
 ENTRYPOINT ["./../linuxgsm-scripts/entrypoint.sh"]

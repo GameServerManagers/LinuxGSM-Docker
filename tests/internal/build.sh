@@ -82,9 +82,8 @@ done
 
 lgsm_main_tag="$lgsm_version$suffix"
 specific_main_tag="$lgsm_version-${server}$suffix"
-# BUILDKIT_INLINE_CACHE needed for --cache-from
-build_lgsm+=(-t "$image:$lgsm_main_tag" --target linuxgsm --build-arg BUILDKIT_INLINE_CACHE=1 .)
-build_specific+=(-t "$image:$specific_main_tag" --target specific --cache-from "$image:$lgsm_main_tag" --build-arg "ARG_LGSM_GAMESERVER=$server" .)
+build_lgsm+=(-t "$image:$lgsm_main_tag" --target linuxgsm .)
+build_specific+=(-t "$image:$specific_main_tag" --target specific --build-arg "ARG_LGSM_GAMESERVER=$server" .)
 
 cd "$(dirname "$0")/../.."
 
