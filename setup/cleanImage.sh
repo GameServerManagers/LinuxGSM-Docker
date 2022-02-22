@@ -14,4 +14,5 @@ rm -rf "${LGSM_PATH:?}"/* /tmp/* /var/tmp/* || true
 rm "$LGSM_SCRIPTS/installMinimalDependencies.sh" \
     "$LGSM_SCRIPTS/installLGSM.sh" \
     "$LGSM_SCRIPTS/installGamedig.sh" \
-    "$LGSM_SCRIPTS/setupUser.sh" >> /dev/null 2>&1 || true
+    "$LGSM_SCRIPTS/setupUser.sh" \
+    "$LGSM_PATH"/* >> /dev/null 2>&1 || true
