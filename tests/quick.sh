@@ -98,7 +98,7 @@ fi
 
 CONTAINER="linuxgsm-$GAMESERVER"
 build+=(--image "$IMAGE" --latest "$GAMESERVER")
-run+=(--image "$IMAGE" --tag "$GAMESERVER" --container "$CONTAINER")
+run+=(--image "$IMAGE" --tag "$GAMESERVER" --container "$CONTAINER" -e LGSM_DEBUG="true")
 if ! "$DEBUG"; then
     run+=(--detach)
 fi
@@ -124,14 +124,21 @@ trap handleInterrupt SIGTERM SIGINT
         if "$DEBUG" || awaitHealthCheck "$CONTAINER"; then
             successful="true"
         fi
+        echo ""
+        echo "[info][quick] printing dev-debug-function-order.log"
+        docker exec -it "$CONTAINER" cat "dev-debug-function-order.log" || true
+        echo ""
+        echo "[info][quick] printing dev-debug.log"
+        docker exec -it "$CONTAINER" cat "dev-debug.log" || true
+        echo ""
         stopContainer "$CONTAINER"
         if "$LOGS"; then
             printf "[info][quick] logs:\n%s\n" "$(docker logs "$CONTAINER" 2>&1 || true)"
-            printf "[info][quick] healthcheck log:\n%s\n" "$(docker inspect -f '{{json .State.Health.Log}}' "$CONTAINER" | jq || true)"
         elif ! "$successful"; then
             printf "[info][quick] logs:\n%s\n" "$(docker logs -n 20 "$CONTAINER" 2>&1 || true)"
-            printf "[info][quick] healthcheck log:\n%s\n" "$(docker inspect -f '{{json .State.Health.Log}}' "$CONTAINER" | jq || true)"
         fi
+        printf "[info][quick] healthcheck log:\n%s\n" "$(docker inspect -f '{{json .State.Health.Log}}' "$CONTAINER" | jq | sed 's/\\r/\n/g' | sed 's/\\n/\n/g' || true)"
+        
     done
     removeContainer "$CONTAINER"
 

@@ -23,3 +23,14 @@ function getServerList() {
 function getServerCodeList() {
     getServerList "$1" | grep -oE '^\S*'
 }
+
+function sed_sanitize() {
+    local sanitized="$1"
+    local sanitized="${sanitized//\\/\\\\}"  # \ need to be escaped e.g. 's/\//'
+    local sanitized="${sanitized//\//\\/}"   # / need to be escaped e.g. 's///'
+    #local sanitized="${sanitized//\{/\\\\{}" # { need to be escaped
+    local sanitized="${sanitized//[/\\[}"    # [ need to be escaped
+    local sanitized="${sanitized//&/\\&}"    # & need to be escaped
+    local sanitized="${sanitized//*/\\*}"    # * need to be escaped
+    echo "$sanitized"
+}

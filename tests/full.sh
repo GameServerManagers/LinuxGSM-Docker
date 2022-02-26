@@ -74,6 +74,8 @@ fi
 
 # shellcheck source=tests/internal/api_various.sh
 source "$(dirname "$0")/internal/api_various.sh"
+# shellcheck source=tests/steam_test_credentials
+source "$(dirname "$0")/steam_test_credentials"
 
 for run in $(seq 1 "$FLAKY"); do
 	# prepare results folder
@@ -144,7 +146,20 @@ for run in $(seq 1 "$FLAKY"); do
 					quick+=("$server_code")
 
 					echo "${quick[@]}"
+					is_successful="false"
 					if "${quick[@]}" > "$RESULTS/$server_code.log" 2>&1; then
+						is_successful="true"
+					fi
+					
+					# sanitize secrets in log like used steamuser / steampass
+					if [ -n "$steam_test_username" ]; then
+						sed -i "s/$(sed_sanitize "$steam_test_username")/SECRET_USERNAME/g" "$RESULTS/$server_code.log"
+					fi
+					if [ -n "$steam_test_password" ]; then
+						sed -i "s/$(sed_sanitize "$steam_test_password")/SECRET_PASSWORD/g" "$RESULTS/$server_code.log"
+					fi
+
+					if "$is_successful"; then
 						mv "$RESULTS/$server_code.log" "$RESULTS/successful.$server_code.log"
 					else
 						mv "$RESULTS/$server_code.log" "$RESULTS/failed.$server_code.log"
