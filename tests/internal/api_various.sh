@@ -31,6 +31,6 @@ function sed_sanitize() {
     #local sanitized="${sanitized//\{/\\\\{}" # { need to be escaped
     local sanitized="${sanitized//[/\\[}"    # [ need to be escaped
     local sanitized="${sanitized//&/\\&}"    # & need to be escaped
-    local sanitized="${sanitized//*/\\*}"    # * need to be escaped
+    local sanitized="${sanitized//\*/\\\*}"    # * need to be escaped
     echo "$sanitized"
 }

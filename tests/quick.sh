@@ -16,6 +16,7 @@ source "$(dirname "$0")/steam_test_credentials"
 
 
 LOGS="false"
+LOG_DEBUG="false"
 DEBUG="false"
 IMAGE="gameservermanagers/linuxgsm-docker"
 RETRY="1"
@@ -36,7 +37,8 @@ while [ $# -ge 1 ]; do
             echo "[help][quick] -c  --no-cache      run without docker cache"
             echo "[help][quick] -d  --debug         run gameserver and overwrite entrypoint to bash"
             echo "[help][quick]     --image      x  target image"
-            echo "[help][quick] -l  --logs          print last log lines after run"
+            echo "[help][quick] -l  --logs          print complete docker log afterwards"
+            echo "[help][quick]     --log-debug     enables LGSM_DEBUG, log can contain your steam credentials, dont share it!"
             echo "[help][quick]     --retry         if run failed, rebuild and rerun up to 3 times"
             echo "[help][quick]     --skip-lgsm     skip build lgsm"
             echo "[help][quick]     --very-fast     overwrite healthcheck, only use it with volumes / lancache because container will else fail pretty fast"
@@ -55,6 +57,8 @@ while [ $# -ge 1 ]; do
             shift;;
         -l|--logs)
             LOGS="true";;
+        --log-debug)
+            LOG_DEBUG="true";;
         --retry)
             RETRY="3";;
         --skip-lgsm)
@@ -98,9 +102,12 @@ fi
 
 CONTAINER="linuxgsm-$GAMESERVER"
 build+=(--image "$IMAGE" --latest "$GAMESERVER")
-run+=(--image "$IMAGE" --tag "$GAMESERVER" --container "$CONTAINER" -e LGSM_DEBUG="true")
+run+=(--image "$IMAGE" --tag "$GAMESERVER" --container "$CONTAINER")
 if ! "$DEBUG"; then
     run+=(--detach)
+fi
+if "$LOG_DEBUG"; then
+    run+=(-e LGSM_DEBUG="true")
 fi
 
 function handleInterrupt() {
@@ -124,13 +131,17 @@ trap handleInterrupt SIGTERM SIGINT
         if "$DEBUG" || awaitHealthCheck "$CONTAINER"; then
             successful="true"
         fi
+        
         echo ""
         echo "[info][quick] printing dev-debug-function-order.log"
         docker exec -it "$CONTAINER" cat "dev-debug-function-order.log" || true
+        stty sane
         echo ""
         echo "[info][quick] printing dev-debug.log"
         docker exec -it "$CONTAINER" cat "dev-debug.log" || true
         echo ""
+        stty sane
+        
         stopContainer "$CONTAINER"
         if "$LOGS"; then
             printf "[info][quick] logs:\n%s\n" "$(docker logs "$CONTAINER" 2>&1 || true)"

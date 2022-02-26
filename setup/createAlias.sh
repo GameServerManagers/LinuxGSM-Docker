@@ -25,7 +25,9 @@ function createAlias() {
 		#!/bin/sh
 		echo '$name' >> "\$LGSM_CURRENT_COMMAND"
 		gosu "\$USER_NAME" "$command" "$name" "\$@"
+		exitcode="\$?"
 		sed -i '/^$name$/d' "\$LGSM_CURRENT_COMMAND"
+		exit "\$exitcode"
 		EOM
 		chmod a=rx "$file"
 		# create 2nd link for better script readability

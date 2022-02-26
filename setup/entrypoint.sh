@@ -55,21 +55,29 @@ while "$is_running"; do
         echo "$line"
     done < tmux.pipe
     echo "[info][entrypoint] server stopped"
-
+    errorcode="1"
     is_running="false"
+
+    # check if server is stopped on purpose
     current_running_lgsm_alias="$(< "$LGSM_CURRENT_COMMAND")"
     for lgsm_cmd in monitor update restart force-update validate; do
         if grep -qe "$lgsm_cmd" <<< "$current_running_lgsm_alias"; then
             echo "[info][entrypoint] lgsm command \"$lgsm_cmd\" is being executed and is permitted to stop the server, reattaching to tmux"
+            errorcode="0"
             is_running="true"
+            lgsm-start
         fi
     done
 
-    # e.g. cod4server will fail on first start
+    # retry in first 60s, e.g. cod4server needs a second try
     current_time="$(date +'%s')"
     if ! "$is_running" && [ "$((current_time - first_start))" -lt "60" ]; then
         echo "[warning][entrypoint] server crashed within 60 seconds, restarting"
+        errorcode="0"
+        is_running="true"
+        lgsm-start
     fi
 done
 rm "$LGSM_STARTED" > /dev/null 2>&1 || true
-echo "[info][entrypoint] entrypoint ended"
+echo "[info][entrypoint] entrypoint ended with exitcode=$errorcode"
+exit "$errorcode"

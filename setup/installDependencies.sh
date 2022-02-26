@@ -17,7 +17,7 @@ gosu "$USER_NAME" ./linuxgsm.sh "$server"
 # maybe add a "./linuxgsm.sh installDependencies"
 gosu "$USER_NAME" ./"$server" auto-install 2>&1 | tee auto-install.log || true
 # if not probably dependencies are missing
-mapfile -d ";" cmds < <( grep -Ee 'sudo\s\s*(dpkg|apt)' auto-install.log | sed -E 's/\s*sudo\s*//g' | sed 's/install/install -y /g' )
+mapfile -t cmds < <( grep -Eoe 'sudo\s\s*apt\S*\s\s*install.*' auto-install.log | sed -E 's/\s*sudo\s*//g' | sed 's/install/install -y /g' | tr ';' '\n' )
 if [ "${#cmds[@]}" -gt "0" ]; then
     # preselect answers for steam
     echo steam steam/question select "I AGREE" | debconf-set-selections #"# ide fix
@@ -25,21 +25,19 @@ if [ "${#cmds[@]}" -gt "0" ]; then
 
     # install dependencies
     echo "[info][installDependencies] installing dependencies:"
+	if grep -qe ':i386' <<< "${cmds[@]}"; then
+		dpkg --add-architecture i386
+	fi
 	apt-get update
+	set -x
     for cmd in "${cmds[@]}"; do
-        echo "[info][installDependencies] $cmd"
+        echo "[info][installDependencies] >$cmd<"
 		if eval "DEBIAN_FRONTEND=noninteractive $cmd"; then
 			echo "[info][installDependencies] successful!"
-		elif grep -qe ':i386' <<< "$cmd"; then
-			echo "[info][installDependencies] retry"
-			dpkg --add-architecture i386
-			apt-get update
-			eval "DEBIAN_FRONTEND=noninteractive $cmd"
 		else
 			echo "[error][installDependencies] failed"
 			exit 10
 		fi
-		apt-get update
     done
 else
 	echo "[error][installDependencies] Couldn't extract missing dependencies, its very unlikely that everything is already installed. Printing debug information:"

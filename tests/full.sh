@@ -9,6 +9,7 @@ ROOT_FOLDER="$(realpath "$(dirname "$0")/..")"
 PARRALEL="$(lscpu -p | grep -Ev '^#' | sort -u -t, -k 2,4 | wc -l)"
 IMAGE="gameservermanagers/linuxgsm-docker"
 FLAKY="1"
+LOG_DEBUG="false"
 RERUN="false"
 SUFFIX=""
 VOLUMES="false"
@@ -24,13 +25,14 @@ while [ $# -ge 1 ]; do
             echo "[help][full] full.sh [option] [server]"
             echo "[help][full] "
             echo "[help][full] options:"
-            echo "[help][full] -c --cpus    x  run x servers in parralel, default x = physical cores"
-            echo "[help][full]    --image   x  set target image"
-			echo "[help][full]    --flaky   x  test for flaky results x times, x should be greater as 1"
-            echo "[help][full]    --rerun      check results and runs every gameserver which wasn't successful"
-            echo "[help][full]    --suffix     suffix to add to every image"
-            echo "[help][full]    --volumes    use volumes \"linuxgsm-SERVERCODE\""
-            echo "[help][full] -v --version x  use linuxgsm version x e.g. \"v21.4.1\""
+            echo "[help][full] -c --cpus        x  run x servers in parralel, default x = physical cores"
+			echo "[help][full] -d --log-debug      IMPORTANT: logs will leak your steam credentials!"
+            echo "[help][full]    --image       x  set target image"
+			echo "[help][full]    --flaky       x  test for flaky results x times, x should be greater as 1"
+            echo "[help][full]    --rerun          check results and runs every gameserver which wasn't successful"
+            echo "[help][full]    --suffix         suffix to add to every image"
+            echo "[help][full]    --volumes        use volumes \"linuxgsm-SERVERCODE\""
+            echo "[help][full] -v --version    x   use linuxgsm version x e.g. \"v21.4.1\""
             echo "[help][full] "
             echo "[help][full] "
             echo "[help][full] server:"
@@ -40,6 +42,8 @@ while [ $# -ge 1 ]; do
         -c|--cpus)
             PARRALEL="$1"
             shift;;
+		-d|--log-debug)
+			LOG_DEBUG="true";;
         --image)
             IMAGE="$1"
             shift;;
@@ -143,6 +147,9 @@ for run in $(seq 1 "$FLAKY"); do
 					if "$VOLUMES"; then
 						quick+=(--volume "linuxgsm-$server_code")
 					fi
+					if "$LOG_DEBUG"; then
+						quick+=(--log-debug)
+					fi
 					quick+=("$server_code")
 
 					echo "${quick[@]}"
@@ -152,11 +159,11 @@ for run in $(seq 1 "$FLAKY"); do
 					fi
 					
 					# sanitize secrets in log like used steamuser / steampass
-					if [ -n "$steam_test_username" ]; then
-						sed -i "s/$(sed_sanitize "$steam_test_username")/SECRET_USERNAME/g" "$RESULTS/$server_code.log"
-					fi
 					if [ -n "$steam_test_password" ]; then
-						sed -i "s/$(sed_sanitize "$steam_test_password")/SECRET_PASSWORD/g" "$RESULTS/$server_code.log"
+						sed -i "s/$(sed_sanitize "$steam_test_password")/SECRET_PASSWORD/g" "$RESULTS/$server_code.log" > /dev/null 2>&1 || true
+					fi
+					if [ -n "$steam_test_username" ]; then
+						sed -i "s/$(sed_sanitize "$steam_test_username")/SECRET_USERNAME/g" "$RESULTS/$server_code.log" > /dev/null 2>&1 || true
 					fi
 
 					if "$is_successful"; then
