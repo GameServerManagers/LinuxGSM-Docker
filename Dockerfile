@@ -1,6 +1,6 @@
 # download / build / verify dependencies
 # own stage = additional deps needed which are only here used
-FROM ubuntu:20.04 as dependencyStage
+FROM ubuntu:22.04 as dependencyStage
 
 COPY setup/installGosu.sh \
      setup/installSupercronic.sh \
