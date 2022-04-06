@@ -15,13 +15,11 @@ Dockerhub https://hub.docker.com/r/gameservermanagers/linuxgsm-docker/
 
 ## docker-compose
 Below is an example `docker-compose` for csgoserver. Ports will vary depending upon server.
-  ```
+```
 version: '3.4'
 services:
   linuxgsm:
-    build:
-      context: .
-      dockerfile: ./Dockerfile
+    image: gameservermanagers/linuxgsm-docker
     container_name: csgoserver
     environment:
       - GAMESERVER=csgoserver
