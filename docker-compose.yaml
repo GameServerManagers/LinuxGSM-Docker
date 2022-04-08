@@ -2,13 +2,21 @@ volumes:
   server:
 
 services:
-    linuxgsm:
-        build:
-          context: .
-          args:
-            LGSM_GAMESERVER: gmodserver
-        volumes:
-          - server:/home/linuxgsm
-          - /etc/localtime:/etc/localtime:ro
-        restart: always
-        tty: true
+  linuxgsm:
+    build:
+      context: .
+      args:
+        ARG_LGSM_GAMESERVER: rustserver
+    volumes:
+      - server:/home/linuxgsm
+      - /etc/localtime:/etc/localtime:ro
+    tty: true
+    environment:
+      - USER_ID=${PUID:-1000}
+      - GROUP_ID=${PGID:-1000}
+    ports:
+      - "28010:28010/tcp"
+      - "28010:28010/udp"
+      - "28011:28011/udp"
+      - "28082:28082/udp"
+    restart: unless-stopped

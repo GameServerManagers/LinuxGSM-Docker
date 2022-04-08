@@ -70,7 +70,7 @@ WORKDIR "$LGSM_PATH"
 # install server specific dependencies
 FROM linuxgsm as specific
 ARG ARG_LGSM_GAMESERVER=""
-ENV LGSM_GAMESERVER="${ARG_LGSM_GAMESERVER:?}"
+ENV LGSM_GAMESERVER="${ARG_LGSM_GAMESERVER:? To build the container by hand you need to set build argument ARG_LGSM_GAMESERVER to your desired servercode}"
 RUN set -eux; \
     installDependencies.sh "$LGSM_GAMESERVER"; \
     createAlias.sh "$LGSM_GAMESERVER"; \
