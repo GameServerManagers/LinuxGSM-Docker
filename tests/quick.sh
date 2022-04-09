@@ -56,7 +56,8 @@ while [ $# -ge 1 ]; do
             IMAGE="$1"
             shift;;
         -l|--logs)
-            LOGS="true";;
+            LOGS="true"
+            LOG_DEBUG="true";;
         --log-debug)
             LOG_DEBUG="true";;
         --retry)

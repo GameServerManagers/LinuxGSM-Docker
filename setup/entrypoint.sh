@@ -6,7 +6,7 @@ set -o nounset
 if "$LGSM_DEBUG"; then
     set -o xtrace
     touch ".dev-debug"
-    rm dev-debug*.log || true # remove from last execution
+    rm dev-debug*.log > /dev/null 2>&1 || true # remove from last execution
 else
     rm ".dev-debug" || true
 fi
@@ -38,7 +38,12 @@ else
 fi
 lgsm-load-config
 
-lgsm-start
+lgsm-start || (
+    exitcode="$?"
+    echo "[error][entrypoint] initial start failed, printing console.log"
+    cat "$LGSM_PATH/log/console/$LGSM_GAMESERVER-console.log" || true
+    exit "$exitcode"
+)
 trap lgsm-stop SIGTERM SIGINT
 lgsm-cron-start > /dev/null 2>&1 &
 touch "$LGSM_STARTED"
