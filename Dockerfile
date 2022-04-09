@@ -12,7 +12,7 @@ RUN set -eux; \
 
 # create linuxgsm image
 # this stage should be usable by existing developers
-FROM ubuntu:20.04 as linuxgsm
+FROM ubuntu:22.04 as linuxgsm
 
 ARG ARG_LGSM_VERSION="master"
 ENV LGSM_VERSION="${ARG_LGSM_VERSION:?}" \
