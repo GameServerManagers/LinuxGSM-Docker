@@ -1,6 +1,8 @@
 version: '3.4'
 services:
   linuxgsm:
+  web:
+    image: "ghcr.io/gameservermanagers/linuxgsm-docker:latest"
     build:
       context: .
       dockerfile: ./Dockerfile
