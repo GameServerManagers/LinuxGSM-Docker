@@ -39,5 +39,5 @@ jobs:
           platforms: linux/amd64
           push: true
           tags: |
-            user/app:latest
-            ghcr.io/user/app:latest
+            gameservermanagers/linuxgsm-docker:latest
+            ghcr.io/gameservermanagers/linuxgsm-docker:latest
