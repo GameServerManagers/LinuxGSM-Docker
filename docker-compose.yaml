@@ -1,22 +1,45 @@
-volumes:
-  server:
-
+# usage:
+# docker-compose up -d csgo
+# docker-compose up -d rust
+#
+# VERSION:
+# current pull request: 4b399fa6c5b735eb6b8207f7ba40b476fa667987 # https://github.com/GameServerManagers/LinuxGSM/pull/3836/commits
+# jusito/develop fork for lgsm: 33285c77caad5af04a5f374c078e1040e69518c3
+# official: master
 services:
-  linuxgsm:
+  rust:
     build:
       context: .
       args:
+        ARG_LGSM_VERSION: 33285c77caad5af04a5f374c078e1040e69518c3
         ARG_LGSM_GAMESERVER: rustserver
-    volumes:
-      - server:/home/linuxgsm
-      - /etc/localtime:/etc/localtime:ro
     tty: true
-    environment:
-      - USER_ID=${PUID:-1000}
-      - GROUP_ID=${PGID:-1000}
+    restart: unless-stopped
     ports:
       - "28010:28010/tcp"
       - "28010:28010/udp"
       - "28011:28011/udp"
       - "28082:28082/udp"
+    volumes:
+      - server:/home/linuxgsm
+      - /etc/localtime:/etc/localtime:ro
+  
+  csgo:
+    build:
+      context: .
+      args:
+        ARG_LGSM_VERSION: 33285c77caad5af04a5f374c078e1040e69518c3
+        ARG_LGSM_GAMESERVER: csgoserver
+    tty: true
     restart: unless-stopped
+    ports:
+      - "27015:27015/udp"
+      - "27015:27015/tcp"
+      - "27020:27020/udp"
+      - "27005:27005/udp"
+    volumes:
+      - server:/home/linuxgsm
+      - /etc/localtime:/etc/localtime:ro
+
+volumes:
+  server:
