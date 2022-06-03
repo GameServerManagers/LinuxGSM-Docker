@@ -21,23 +21,23 @@ while [ $# -ge 1 ]; do
 
     case "$key" in
         -h|--help)
-            echo "[help][full] testing every feature of specified server"
-            echo "[help][full] full.sh [option] [server]"
-            echo "[help][full] "
-            echo "[help][full] options:"
-            echo "[help][full] -c --cpus        x  run x servers in parralel, default x = physical cores"
-			echo "[help][full] -d --log-debug      IMPORTANT: logs will leak your steam credentials!"
-            echo "[help][full]    --image       x  set target image"
-			echo "[help][full]    --flaky       x  test for flaky results x times, x should be greater as 1"
-            echo "[help][full]    --rerun          check results and runs every gameserver which wasn't successful"
-            echo "[help][full]    --suffix         suffix to add to every image"
-            echo "[help][full]    --volumes        use volumes \"linuxgsm-SERVERCODE\""
-            echo "[help][full] -v --version    x   use linuxgsm version x e.g. \"v21.4.1\""
-            echo "[help][full] "
-            echo "[help][full] "
-            echo "[help][full] server:"
-            echo "[help][full] *empty*         test every server"
-            echo "[help][full] gmodserver ...  run only given servers"
+            echo "[help][multiple] testing every feature of specified server"
+            echo "[help][multiple] full.sh [option] [server]"
+            echo "[help][multiple] "
+            echo "[help][multiple] options:"
+            echo "[help][multiple] -c --cpus        x  run x servers in parralel, default x = physical cores"
+			echo "[help][multiple] -d --log-debug      IMPORTANT: logs will leak your steam credentials!"
+            echo "[help][multiple]    --image       x  set target image"
+			echo "[help][multiple]    --flaky       x  test for flaky results x times, x should be greater as 1"
+            echo "[help][multiple]    --rerun          check results and runs every gameserver which wasn't successful"
+            echo "[help][multiple]    --suffix         suffix to add to every image"
+            echo "[help][multiple]    --volumes        use volumes \"linuxgsm-SERVERCODE\""
+            echo "[help][multiple] -v --version    x   use linuxgsm version x e.g. \"v21.4.1\""
+            echo "[help][multiple] "
+            echo "[help][multiple] "
+            echo "[help][multiple] server:"
+            echo "[help][multiple] *empty*         test every server"
+            echo "[help][multiple] gmodserver ...  run only given servers"
             exit 0;;
         -c|--cpus)
             PARRALEL="$1"
@@ -62,17 +62,17 @@ while [ $# -ge 1 ]; do
             shift;;
         *)
             if grep -qE '^-' <<< "$key"; then
-                echo "[error][full] unknown option $key"
+                echo "[error][multiple] unknown option $key"
                 exit 1
             else
-                echo "[info][full] only testing servercode \"$key\""
+                echo "[info][multiple] only testing servercode \"$key\""
             fi
             GAMESERVER+=("$key");;
     esac
 done
 testAllServer="$([ "${#GAMESERVER[@]}" = "0" ] && echo true || echo false )"
 if [ "$(whoami)" = "root" ]; then
-    echo "[error][full] please dont execute me as root, iam invoking linuxgsm.sh directly and this will not work as root"
+    echo "[error][multiple] please dont execute me as root, iam invoking linuxgsm.sh directly and this will not work as root"
     exit 1
 fi
 
@@ -105,9 +105,9 @@ for run in $(seq 1 "$FLAKY"); do
 
 	(
 		if "$RERUN" || [ "$run" -gt "1" ]; then
-			echo "[info][full] skipping building linuxgsm because rerun"
+			echo "[info][multiple] skipping building linuxgsm because rerun"
 		else
-			echo "[info][full] building linuxgsm base once"
+			echo "[info][multiple] building linuxgsm base once"
 			./tests/internal/build.sh --version "$VERSION" --image "$IMAGE" --latest --suffix "$SUFFIX"
 		fi
 
@@ -141,7 +141,7 @@ for run in $(seq 1 "$FLAKY"); do
 			testThisServercode="$( ("$testAllServer" || "$isServercodeInServerlist") && echo true || echo false )"
 			rerunIsFine="$( ( ! "$RERUN" || "$serverDidntStartSuccessful" ) && echo true || echo false )"
 			if "$testThisServercode" && "$rerunIsFine"; then
-				echo "[info][full] testing: $server_code"
+				echo "[info][multiple] testing: $server_code"
 				(
 					quick=(./tests/quick.sh --logs --version "$VERSION" --image "$IMAGE" --skip-lgsm --suffix "$SUFFIX")
 					if "$VOLUMES"; then
@@ -188,28 +188,28 @@ for run in $(seq 1 "$FLAKY"); do
 			subprocesses=("${temp[@]}")
 		done
 
-		echo "[info][full] successful: $(find "$RESULTS/" -iname "successful.*" | wc -l)"
-		echo "[info][full] failed: $(find "$RESULTS/" -iname "failed.*" | wc -l)"
+		echo "[info][multiple] successful: $(find "$RESULTS/" -iname "successful.*" | wc -l)"
+		echo "[info][multiple] failed: $(find "$RESULTS/" -iname "failed.*" | wc -l)"
 
 		mapfile -t failed_credentials_missing < <(grep --include "*failed*" -rlF 'Change steamuser="username"' "$RESULTS" | sort | uniq || true)
-		echo "[info][full] failed - unset steam credentials: $(grep -Po '(?<=failed.)[^.]*' <<< "${failed_credentials_missing[@]}" | tr '\n' ' ' || true)"
+		echo "[info][multiple] failed - unset steam credentials: $(grep -Po '(?<=failed.)[^.]*' <<< "${failed_credentials_missing[@]}" | tr '\n' ' ' || true)"
 		# print filenames + very high line number to jump right at eof on click if IDE supports it
 		printf '%s\n' "${failed_credentials_missing[@]/%/:100000}"
 
 		mapfile -t failed_other < <(grep --include "*failed*" -rLF 'Change steamuser="username"' "$RESULTS" | sort | uniq || true)
-		echo "[info][full] failed - other error: $(grep -Po '(?<=failed.)[^.]*' <<< "${failed_other[@]}" | tr '\n' ' ' || true)"
+		echo "[info][multiple] failed - other error: $(grep -Po '(?<=failed.)[^.]*' <<< "${failed_other[@]}" | tr '\n' ' ' || true)"
 		printf '%s\n' "${failed_other[@]/%/:100000}"
 
 		echo ""
-		echo "[info][full] searching in log for command errors \"command not found\" please add this as minimal dependency!"
+		echo "[info][multiple] searching in log for command errors \"command not found\" please add this as minimal dependency!"
 		grep -rnF 'command not found' "$RESULTS" || true
 
 		echo ""
-		echo "[info][full] searching in log for errors where health check got SIGKILL"
+		echo "[info][multiple] searching in log for errors where health check got SIGKILL"
 		grep -rnF '"ExitCode": 137' "$RESULTS" || true
 
 		echo ""
-		echo "[info][full] log contains message \"provide content log to LinuxGSM developers\""
+		echo "[info][multiple] log contains message \"provide content log to LinuxGSM developers\""
 		grep -rnF 'LinuxGSM developers' "$RESULTS" || true
 	)
 done
