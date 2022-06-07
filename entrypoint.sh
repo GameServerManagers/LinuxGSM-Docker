@@ -45,11 +45,6 @@ if [ -z "$(ls -A -- "serverfiles")" ]; then
     ./${GAMESERVER} auto-install
 fi
 
-# Add cron tasks
-echo "adding cron jobs"
-echo "* monitor (5 mins)"
-echo "* update (30 mins)"
-echo "* update-lgsm (1AM Sunday)"
 echo "starting cron"
 sudo cron
 
