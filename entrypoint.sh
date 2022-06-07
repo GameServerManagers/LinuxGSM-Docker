@@ -50,9 +50,8 @@ echo "adding cron jobs"
 echo "* monitor (5 mins)"
 echo "* update (30 mins)"
 echo "* update-lgsm (1AM Sunday)"
-(crontab -l 2>/dev/null; echo "*/5 * * * * /home/linuxgsm/*server monitor > /dev/null 2>&1") | crontab -
-(crontab -l 2>/dev/null; echo "*/30 * * * * /home/linuxgsm/*server update > /dev/null 2>&1") | crontab -
-(crontab -l 2>/dev/null; echo "0 1 * * 0 /home/linuxgsm/*server update-lgsm > /dev/null 2>&1") | crontab -
+echo "starting cron"
+sudo cron
 
 # Update game server
 echo ""
