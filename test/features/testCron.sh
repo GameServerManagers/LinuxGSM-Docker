@@ -8,7 +8,7 @@ set -o pipefail
 GAMESERVER="$2"
 VOLUME="$3"
 CONTAINER="linuxgsm-$GAMESERVER-testCron"
-# shellcheck source=tests/internal/api_docker.sh
+# shellcheck source=test/internal/api_docker.sh
 source "$(dirname "$0")/../internal/api_docker.sh"
 
 (
@@ -33,7 +33,7 @@ source "$(dirname "$0")/../internal/api_docker.sh"
 
        # initial run = no cron
     removeContainer "$CONTAINER"
-    ./tests/internal/run.sh --container "$CONTAINER" --detach --quick --volume "$VOLUME" --tag "$GAMESERVER"
+    ./test/internal/run.sh --container "$CONTAINER" --detach --quick --volume "$VOLUME" --tag "$GAMESERVER"
     if awaitHealthCheck "$CONTAINER"; then
         if [ "0" != "$(docker exec -it "$CONTAINER" cat "$DOCKERFILE_CRONLOCATION" | wc -l)" ]; then
             log "successful no cron job found"
@@ -47,7 +47,7 @@ source "$(dirname "$0")/../internal/api_docker.sh"
     # inject one cron
     CRON_TEST1="* * * * * echo \"hello world1\""
     removeContainer "$CONTAINER"
-    ./tests/internal/run.sh --container "$CONTAINER" --detach --quick --volume "$VOLUME" --tag "$GAMESERVER" "-e" "CRON_test1=$CRON_TEST1"
+    ./test/internal/run.sh --container "$CONTAINER" --detach --quick --volume "$VOLUME" --tag "$GAMESERVER" "-e" "CRON_test1=$CRON_TEST1"
     if awaitHealthCheck "$CONTAINER"; then
         crontab="$(docker exec -it "$CONTAINER" cat "$DOCKERFILE_CRONLOCATION")"
         if [ "2" != "$(echo "$crontab" | wc -l)" ]; then
@@ -64,7 +64,7 @@ source "$(dirname "$0")/../internal/api_docker.sh"
     # inject multiple cron
     CRON_TEST2="* * * * * echo \"hello world2\""
     removeContainer "$CONTAINER"
-    ./tests/internal/run.sh --container "$CONTAINER" --detach --quick --volume "$VOLUME" --tag "$GAMESERVER" "-e" "CRON_test1=$CRON_TEST1" "-e" "CRON_test2=$CRON_TEST2"
+    ./test/internal/run.sh --container "$CONTAINER" --detach --quick --volume "$VOLUME" --tag "$GAMESERVER" "-e" "CRON_test1=$CRON_TEST1" "-e" "CRON_test2=$CRON_TEST2"
     if awaitHealthCheck "$CONTAINER"; then
         crontab="$(docker exec -it "$CONTAINER" cat "$DOCKERFILE_CRONLOCATION")"
         if [ "3" != "$(echo "$crontab" | wc -l)" ]; then
@@ -90,7 +90,7 @@ source "$(dirname "$0")/../internal/api_docker.sh"
 
     # fail for illegal cron job
     removeContainer "$CONTAINER"
-    ./tests/internal/run.sh --container "$CONTAINER" --detach --quick --volume "$VOLUME" --tag "$GAMESERVER" "-e" "CRON_illegal=* * * * echo \"hello illegal\""
+    ./test/internal/run.sh --container "$CONTAINER" --detach --quick --volume "$VOLUME" --tag "$GAMESERVER" "-e" "CRON_illegal=* * * * echo \"hello illegal\""
     if ! awaitHealthCheck "$CONTAINER"; then
         log "successfully tested illegal cronjob"
     else

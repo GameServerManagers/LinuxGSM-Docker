@@ -10,9 +10,9 @@ GAMESERVER="$2"
 VOLUME="$3"
 uid="750"
 gid="750"
-# shellcheck source=tests/internal/api_docker.sh
+# shellcheck source=test/internal/api_docker.sh
 source "$(dirname "$0")/../internal/api_docker.sh"
-# shellcheck source=tests/internal/api_various.sh
+# shellcheck source=test/internal/api_various.sh
 source "$(dirname "$0")/../internal/api_various.sh"
 
 (
@@ -38,7 +38,7 @@ source "$(dirname "$0")/../internal/api_various.sh"
         fi
     }
     
-    if ./tests/quick.sh --very-fast --version "$VERSION" --volume "$VOLUME" "$GAMESERVER"; then
+    if ./test/quick.sh --very-fast --version "$VERSION" --volume "$VOLUME" "$GAMESERVER"; then
         permission="$("${dockerRun[@]}" alpine ls -l "$newFile")"
         owner="$("${dockerRun[@]}" alpine ls -l "$newFile")"
         if ! grep -qE '^.rw.r..---' <<< "$permission"; then

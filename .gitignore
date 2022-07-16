@@ -1,4 +1,5 @@
 *~
-tests/*results*
+test/*results*
 **/*.log
-tests/steam_test_credentials
+test/steam_test_credentials
+*.patch

@@ -4,7 +4,7 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-# shellcheck source=tests/internal/api_docker.sh
+# shellcheck source=test/internal/api_docker.sh
 source "$(dirname "$0")/../internal/api_docker.sh"
 
 #VERSION="$1"
@@ -32,7 +32,7 @@ configfile_common="/home/linuxgsm/lgsm/config-lgsm/$GAMESERVER/common.cfg"
     # test valid CONFIG_ -> common.cfg
     maxbackups="$RANDOM"
     removeContainer "$CONTAINER"
-    ./tests/internal/run.sh --container "$CONTAINER" --detach --quick --volume "$VOLUME" --tag "$GAMESERVER" \
+    ./test/internal/run.sh --container "$CONTAINER" --detach --quick --volume "$VOLUME" --tag "$GAMESERVER" \
         -e CONFIG_maxbackups="$maxbackups"
     if awaitHealthCheck "$CONTAINER"; then
         log "container started with maxbackups injected"
@@ -49,7 +49,7 @@ configfile_common="/home/linuxgsm/lgsm/config-lgsm/$GAMESERVER/common.cfg"
     # test steam credentials with CONFIGFORCED_ -> common.cfg (two different usages)
     # using slightly different keys because illegal credentials will break the container
     removeContainer "$CONTAINER"
-    ./tests/internal/run.sh --container "$CONTAINER" --detach --quick --volume "$VOLUME" --tag "$GAMESERVER" \
+    ./test/internal/run.sh --container "$CONTAINER" --detach --quick --volume "$VOLUME" --tag "$GAMESERVER" \
         -e CONFIGFORCED_steamuser_test="new Steam User" -e "CONFIGFORCED_steampass_test=new Steam Password"
     if awaitHealthCheck "$CONTAINER"; then
         log "container started with steam credentials injected"
@@ -67,7 +67,7 @@ configfile_common="/home/linuxgsm/lgsm/config-lgsm/$GAMESERVER/common.cfg"
 
     # test overwriting lgsm common.cfg on every start
     removeContainer "$CONTAINER"
-    ./tests/internal/run.sh --container "$CONTAINER" --detach --quick --volume "$VOLUME" --tag "$GAMESERVER"
+    ./test/internal/run.sh --container "$CONTAINER" --detach --quick --volume "$VOLUME" --tag "$GAMESERVER"
     if awaitHealthCheck "$CONTAINER"; then
         log "container started, checking if common.cfg is overwritten"
         common_cfg="$("${inContainer[@]}" cat "$configfile_common" || true)"
@@ -84,7 +84,7 @@ configfile_common="/home/linuxgsm/lgsm/config-lgsm/$GAMESERVER/common.cfg"
 
     # test illegal CONFIG_ value which isn't part of _default.cfg -> expecting crash
     removeContainer "$CONTAINER"
-    ./tests/internal/run.sh --container "$CONTAINER" --detach --quick --volume "$VOLUME" --tag "$GAMESERVER" \
+    ./test/internal/run.sh --container "$CONTAINER" --detach --quick --volume "$VOLUME" --tag "$GAMESERVER" \
         -e CONFIG_steamuser_illegal="newSteamUser"
     if ! awaitHealthCheck "$CONTAINER"; then
         log "container didn't start with illegal CONFIG value \"steamuser_illegal\""

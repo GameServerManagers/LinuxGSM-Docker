@@ -4,9 +4,9 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
-# shellcheck source=tests/internal/api_docker.sh
+# shellcheck source=test/internal/api_docker.sh
 source "$(dirname "$0")/api_docker.sh"
-# shellcheck source=tests/internal/api_various.sh
+# shellcheck source=test/internal/api_various.sh
 source "$(dirname "$0")/api_various.sh"
 
 server=""
@@ -17,8 +17,8 @@ suffix=""
 lgsm_version="master"
 lgsm_tags_latest=()
 
-build_lgsm=(docker build)
-build_specific=(docker build)
+build_lgsm=(docker build -f build/Dockerfile)
+build_specific=("${build_lgsm[@]}")
 while [ $# -ge 1 ]; do
     key="$1"
     shift

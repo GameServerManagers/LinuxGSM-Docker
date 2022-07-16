@@ -22,13 +22,13 @@
 			echo ""
 			echo "$servercode flaky result"
 			for result in "${successful[@]}" "${failed[@]}"; do
-				echo "./tests/${result//.\//}:10000"
+				echo "./test/${result//.\//}:10000"
 			done
 		elif [ "${#successful[@]}" -eq "0" ]; then
 			echo ""
 			echo "$servercode always failing"
 			for result in "${successful[@]}" "${failed[@]}"; do
-				echo "./tests/${result//.\//}:10000"
+				echo "./test/${result//.\//}:10000"
 			done
 		fi
 	done

@@ -1,7 +1,8 @@
-tests/
+test/
 .gitignore
-docker-compose.yml
+.editorconfig
+examples/
 LICENSE
 linuxgsm-docker.sh
-README.md
+*.md
 

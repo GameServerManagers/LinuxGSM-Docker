@@ -76,14 +76,14 @@ if [ "$(whoami)" = "root" ]; then
     exit 1
 fi
 
-# shellcheck source=tests/internal/api_various.sh
+# shellcheck source=test/internal/api_various.sh
 source "$(dirname "$0")/internal/api_various.sh"
-# shellcheck source=tests/steam_test_credentials
+# shellcheck source=test/steam_test_credentials
 source "$(dirname "$0")/steam_test_credentials"
 
 for run in $(seq 1 "$FLAKY"); do
 	# prepare results folder
-	RESULTS="$ROOT_FOLDER/tests/results"
+	RESULTS="$ROOT_FOLDER/test/results"
 	# for multiple runs move previous results folder
 	if [ "$FLAKY" != "1" ] && [ "$run" -gt "1" ]; then
 		rm -rf "$RESULTS.$((run-1))" > /dev/null 2>&1
@@ -108,7 +108,7 @@ for run in $(seq 1 "$FLAKY"); do
 			echo "[info][multiple] skipping building linuxgsm because rerun"
 		else
 			echo "[info][multiple] building linuxgsm base once"
-			./tests/internal/build.sh --version "$VERSION" --image "$IMAGE" --latest --suffix "$SUFFIX"
+			./test/internal/build.sh --version "$VERSION" --image "$IMAGE" --latest --suffix "$SUFFIX"
 		fi
 
 		subprocesses=()
@@ -143,7 +143,7 @@ for run in $(seq 1 "$FLAKY"); do
 			if "$testThisServercode" && "$rerunIsFine"; then
 				echo "[info][multiple] testing: $server_code"
 				(
-					quick=(./tests/quick.sh --logs --version "$VERSION" --image "$IMAGE" --skip-lgsm --suffix "$SUFFIX")
+					quick=(./test/quick.sh --logs --version "$VERSION" --image "$IMAGE" --skip-lgsm --suffix "$SUFFIX")
 					if "$VOLUMES"; then
 						quick+=(--volume "linuxgsm-$server_code")
 					fi
@@ -217,6 +217,6 @@ done
 if [ "$FLAKY" != "1" ]; then
 	(
 		cd "$ROOT_FOLDER"
-		./tests/compareMultipleResultFolders.sh
+		./test/compareMultipleResultFolders.sh
 	)
 fi

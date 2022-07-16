@@ -21,8 +21,8 @@ tools=(jq)
     done
 
     # don't accidentally commit credentials
-    git update-index --skip-worktree tests/steam_test_credentials
+    git update-index --skip-worktree test/steam_test_credentials
 
     # fix permissions
-    find tests/ commands/ setup/ -type f -exec chmod u+x "{}" \;
+    find test/ runtime/ build/ -type f -exec chmod u+x "{}" \;
 )

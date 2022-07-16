@@ -12,7 +12,7 @@ VOLUME="$3"
     log="$(realpath "$(dirname "$0")")/testDockerLogs.log"
     cd "$(dirname "$0")/../.."
 
-    ./tests/quick.sh --very-fast --logs --version "$VERSION" --volume "$VOLUME" "$GAMESERVER" > "$log"
+    ./test/quick.sh --very-fast --logs --version "$VERSION" --volume "$VOLUME" "$GAMESERVER" > "$log"
     if grep -qE 'VAC\s*secure\s*mode\s*is\s*activated.' "$log"; then
         rm "$log"
         echo "[info][testDockerLogs] successful"

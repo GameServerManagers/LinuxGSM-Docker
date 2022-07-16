@@ -2,9 +2,9 @@
 # own stage = additional deps needed which are only here used
 FROM ubuntu:22.04 as dependencyStage
 
-COPY setup/installGosu.sh \
-     setup/installOpenSSL_1.1n.sh \
-     setup/installSupercronic.sh \
+COPY build/installGosu.sh \
+     build/installOpenSSL_1.1n.sh \
+     build/installSupercronic.sh \
      /
 RUN chmod +x installGosu.sh
 RUN set -eux; \
@@ -44,22 +44,22 @@ COPY --from=dependencyStage \
 COPY --from=dependencyStage \
      /usr/local/lib \
      /usr/local/lib/
-COPY setup/installMinimalDependencies.sh \
-     setup/setupUser.sh \
-     setup/installLGSM.sh \
-     setup/installGamedig.sh \
-     setup/cleanImage.sh \
-     setup/installDependencies.sh \
-     setup/createAlias.sh \
-     setup/entrypoint.sh \
+COPY build/installMinimalDependencies.sh \
+     build/setupUser.sh \
+     build/installLGSM.sh \
+     build/installGamedig.sh \
+     build/cleanImage.sh \
+     build/installDependencies.sh \
+     build/createAlias.sh \
+     build/entrypoint.sh \
      \
-     commands/lgsm-cron-init \
-     commands/lgsm-cron-start \
-     commands/lgsm-init \
-     commands/lgsm-fix-permission \
-     commands/lgsm-load-config \
-     commands/lgsm-tmux-attach \
-     commands/lgsm-update-uid-gid \
+     runtime/lgsm-cron-init \
+     runtime/lgsm-cron-start \
+     runtime/lgsm-init \
+     runtime/lgsm-fix-permission \
+     runtime/lgsm-load-config \
+     runtime/lgsm-tmux-attach \
+     runtime/lgsm-update-uid-gid \
      "$LGSM_SCRIPTS"/
 
 RUN set -eux; \
