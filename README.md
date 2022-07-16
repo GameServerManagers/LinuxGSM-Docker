@@ -11,8 +11,24 @@
 A dockerised version of LinuxGSM https://linuxgsm.com
 Dockerhub https://hub.docker.com/r/gameservermanagers/linuxgsm-docker/
 
-# How to Use
+## How to use:
 
+1. There are prebuild images, if you think you need to build it yourself have a look at [testing readme](./test/testing.md)
+
+
+
+  
+- `/tests`
+  - `steam_test_credentials` some servers need credentials here, currently steam guard is not supported
+  - `single.sh` test a single servercode
+  - `multiple.sh` test multiple servercodes at once
+
+
+
+
+
+1. Pick your servercode e.g. `rustserver`
+2. Pick ports needed
 ## Create Persistant Storage
 Game servers require persistant storage to store the server files and configs. The docker reccomended way is to use Persistant storage
 
