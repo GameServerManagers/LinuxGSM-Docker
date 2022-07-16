@@ -143,7 +143,7 @@ for run in $(seq 1 "$FLAKY"); do
 			if "$testThisServercode" && "$rerunIsFine"; then
 				echo "[info][multiple] testing: $server_code"
 				(
-					quick=(./test/quick.sh --logs --version "$VERSION" --image "$IMAGE" --skip-lgsm --suffix "$SUFFIX")
+					quick=(./test/single.sh --logs --version "$VERSION" --image "$IMAGE" --skip-lgsm --suffix "$SUFFIX")
 					if "$VOLUMES"; then
 						quick+=(--volume "linuxgsm-$server_code")
 					fi

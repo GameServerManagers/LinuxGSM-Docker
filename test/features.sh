@@ -18,7 +18,7 @@ VOLUME="linuxgsm-$GAMESERVER-testFeatures"
     if "$CLEAR"; then
         docker volume rm "$VOLUME" || true
     fi
-    ./tests/quick.sh --version "$VERSION" --volume "$VOLUME" "$GAMESERVER"
+    ./tests/single.sh --version "$VERSION" --volume "$VOLUME" "$GAMESERVER"
 
     ./tests/features/testCron.sh           "$VERSION" "$GAMESERVER" "$VOLUME"
     ./tests/features/testDockerLogs.sh     "$VERSION" "$GAMESERVER" "$VOLUME"

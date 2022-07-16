@@ -31,8 +31,8 @@ while [ $# -ge 1 ]; do
 
     case "$key" in
         -h|--help)
-            echo "[help][single] quick testing of provided gameserver"
-            echo "[help][single] quick.sh [option] server"
+            echo "[help][single] single testing of provided gameserver"
+            echo "[help][single] single.sh [option] server"
             echo "[help][single] "
             echo "[help][single] options:"
             echo "[help][single] -c  --no-cache      run without docker cache"

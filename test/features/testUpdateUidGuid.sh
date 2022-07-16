@@ -12,7 +12,7 @@ gid="750"
 
 (
     cd "$(dirname "$0")/../.."
-    ./test/quick.sh --very-fast --version "$VERSION" --volume "$VOLUME" "$GAMESERVER"
+    ./test/single.sh --very-fast --version "$VERSION" --volume "$VOLUME" "$GAMESERVER"
 
     function log() {
         if [ -n "${2:-}" ]; then
@@ -35,7 +35,7 @@ gid="750"
        log "precondition successful"
     fi
 
-    ./test/quick.sh --very-fast --version "$VERSION" --volume "$VOLUME" "$GAMESERVER" -e "USER_ID=1234" -e "GROUP_ID=5678"
+    ./test/single.sh --very-fast --version "$VERSION" --volume "$VOLUME" "$GAMESERVER" -e "USER_ID=1234" -e "GROUP_ID=5678"
     if [ "0" != "$("${dockerRun[@]}" alpine find . ! -user "1234" ! -iname "tmux.pipe" | wc -l )" ]; then
         log "update failed, there are files in \"$VOLUME\" which aren't owned by user \"1234\"" 22 "$("${dockerRun[@]}" alpine find . ! -user "1234" ! -iname "tmux.pipe" | tail)"
 

@@ -11,7 +11,7 @@ VOLUME="$3"
 
 (
     cd "$(dirname "$0")/../.."
-    ./test/quick.sh --very-fast --version "$VERSION" --volume "$VOLUME" "$GAMESERVER"
+    ./test/single.sh --very-fast --version "$VERSION" --volume "$VOLUME" "$GAMESERVER"
 
     log_downgrade="downgrade.log"
     log_update="upgrade.log"
@@ -29,11 +29,11 @@ VOLUME="$3"
     }
 
     # old versions are allowed to fail, as long as log contains the expected entry
-    ./test/quick.sh --very-fast --logs --version "$OLD_VERSION" --volume "$VOLUME" "$GAMESERVER" > "$log_downgrade" || true 
+    ./test/single.sh --very-fast --logs --version "$OLD_VERSION" --volume "$VOLUME" "$GAMESERVER" > "$log_downgrade" || true 
     if ! grep -qF '[lgsm-init] force uninstall lgsm' "$log_downgrade"; then
         log "downgrading from \"$VERSION\" to \"$OLD_VERSION\" successful but container didn't forcefully uninstalled lgsm" 21 
 
-    elif ! ./test/quick.sh --very-fast --logs --version "$VERSION" --volume "$VOLUME" "$GAMESERVER" > "$log_update"; then
+    elif ! ./test/single.sh --very-fast --logs --version "$VERSION" --volume "$VOLUME" "$GAMESERVER" > "$log_update"; then
         log "upgrading from \"$OLD_VERSION\" to \"$VERSION\" failed" 22
 
     elif ! grep -qF '[lgsm-init] force uninstall lgsm' "$log_update"; then

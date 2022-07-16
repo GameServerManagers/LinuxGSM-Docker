@@ -38,7 +38,7 @@ source "$(dirname "$0")/../internal/api_various.sh"
         fi
     }
     
-    if ./test/quick.sh --very-fast --version "$VERSION" --volume "$VOLUME" "$GAMESERVER"; then
+    if ./test/single.sh --very-fast --version "$VERSION" --volume "$VOLUME" "$GAMESERVER"; then
         permission="$("${dockerRun[@]}" alpine ls -l "$newFile")"
         owner="$("${dockerRun[@]}" alpine ls -l "$newFile")"
         if ! grep -qE '^.rw.r..---' <<< "$permission"; then
