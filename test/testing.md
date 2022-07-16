@@ -1,6 +1,7 @@
 # Overview of testing
 
 - all scripts supporting `-h or --help` for all options, here are only most important explained
+- some servers need [steam credentials](steam_test_credentials) don't commit them and don't share your logs if they are used!
 - Wherever available `--version commit/tag/branch` can be:
     - empty to take recent lgsm master branch
     - a lgsm tag like `v22.1.0`
@@ -26,7 +27,7 @@
 
 ### I just want to build this image, how?
 
-`./single.sh servercode`
+`./single.sh --build-only --latest servercode`
 
 ### I created a lgsm fork and want to test it
 

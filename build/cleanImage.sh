@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# clean/shrink dockerimage and removes unnecessary files
+# e.g. remove apt cache and build scripts
+
 set -o errexit
 set -o nounset
 if "$LGSM_DEBUG"; then

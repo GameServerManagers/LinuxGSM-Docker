@@ -1,8 +1,12 @@
 #!/bin/bash
+
+# shellcheck source=test/internal/api_various.sh
+source "$(dirname "$0")/api_various.sh"
+
 TAG=""
 SUFFIX=""
 docker_run_mode="-it"
-IMAGE="gameservermanagers/linuxgsm-docker"
+IMAGE="$DEFAULT_DOCKER_REPOSITORY"
 container="lgsm-test"
 
 run_image=(docker run)

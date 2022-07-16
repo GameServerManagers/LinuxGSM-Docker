@@ -1,4 +1,7 @@
 #!/bin/bash
+
+# creates all alias for `lgsm-COMMAND` and `COMMAND` in /home/linuxgsm-scripts($LGSM_SCRIPTS) which are available in PATH
+
 LGSM_GAMESERVER="$1"
 if [ -z "$LGSM_GAMESERVER" ]; then
 	echo "[error][createAlias] first argument needs to be target gameserver"

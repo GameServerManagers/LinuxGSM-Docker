@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# install minimal dependencies needed for build / runtime scripts
+
 set -o errexit
 set -o nounset
 if "$LGSM_DEBUG"; then

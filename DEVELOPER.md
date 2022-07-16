@@ -1,34 +1,26 @@
 # Overview for developers and consumers of the image
 
+If you want to work on this files at all, check/use: `init_dev_environment.sh`. E.g. it will check for tools you need or prevent your steam credentials to be committed
+
 Repository contains:
-- docker build scripts `/build`
-- runtime scripts `/runtime`
+- docker build scripts `/build`, sometimes usable by extending dockerimages
+- runtime scripts `/runtime`, intended to be used by extending dockerimages and available in PATH
 - test scripts `/test`
 
-## repository folder structure
+Please check and use  its telling you if you need to install tools and prevents commiting your steam credentials by accident.
 
-- `/runtime` runtime functionality intended to be used by extending dockerimages and available in PATH
-  - refered as `commands` of the dockerimage
-  - `lgsm-update-uid-gid` update uid / gid of lgsm user and all owned files
+## features
+
+- lgsm commands are available in PATH so you can directly use them e.g. `lgsm-update` which is the same as `update`
+- We are using [Gosu](https://github.com/tianon/gosu) so entrypoint is executed as root but every command is executed with lower user privilege.
+  - Because the commands take care of gosu, you can use `lgsm-update` in your custom scripts as root and the command will take care of correct user
+  - Also works if you are using: `docker exec -it CONTAINER update`
+- `/runtime` contains scripts(refered to as commands of the image) which provide standard functions, also available in PATH so you can directly invoke them
   - `lgsm-fix-permission` resets all file permissions in volume
-  - `lgsm-init` resets linuxgsm.sh in volume and install _servercode_.sh
-  - `lgsm-cron-init`
-  - `lgsm-cron-start`
-  - `lgsm-tmux-attach`
-  - `lgsm-COMMAND` and `COMMAND` where command is an available lgsm command, e.g. details, monitor, install, aso.
-  - `lgsm-load-config` _alpha state_ updates gameconfig according to environment variables
-  
-- `/build` build functionionality sometimes usable by extending dockerimages
-  - `installMinimalDependencies.sh` install minimal dependencies needed for build / runtime scripts
-  - `cleanImage.sh` clean and shrink dockerimage, e.g. remove apt cache and build scripts
-  - `entrypoint.sh` entrypoint for linuxgsm images, also example how the commands can be used. Expected to be executed as root with access to gosu.
-  - `setupUser.sh` create linuxgsm user
-  - `createAlias.sh` creates all alias for `lgsm-COMMAND` and `COMMAND`
-  - `installDependencies.sh` use linuxgsm to install needed dependencies
-  - `installGamedig.sh` install nodejs and recent gamedig
-  - `installGosu.sh` install Gosu to `/usr/local/bin/gosu`
-  - `installOpenSSL_1.1n.sh`
-  - `installLGSM.sh`
+  - `lgsm-update-uid-gid` update uid / gid of lgsm user and all owned files 
+  - `lgsm-init` resets linuxgsm.sh in volume and installs _servercode_.sh
+  - Cron job handling via Supercronic `lgsm-cron-init` `lgsm-cron-start`
+- _alpha state_ `lgsm-load-config` updates gameconfig according to environment variables
 
 ## dockerimage folder structure
 
@@ -39,3 +31,4 @@ Repository contains:
     - contains all scripts and links and is part of PATH variable, so all scripts are directly accessible from everywhere
         - initial linuxgsm.sh
         - links to lgsm commands like `lgsm-monitor` which is identical to `monitor`
+

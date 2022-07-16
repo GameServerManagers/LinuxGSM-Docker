@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# create linuxgsm user
+
 set -o errexit
 set -o nounset
 if "$LGSM_DEBUG"; then

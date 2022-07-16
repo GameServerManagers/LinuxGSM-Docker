@@ -4,10 +4,15 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
+# shellcheck source=test/internal/api_various.sh
+source "$(dirname "$0")/internal/api_various.sh"
+# shellcheck source=test/steam_test_credentials
+source "$(dirname "$0")/steam_test_credentials"
+
 ROOT_FOLDER="$(realpath "$(dirname "$0")/..")"
 
 PARRALEL="$(lscpu -p | grep -Ev '^#' | sort -u -t, -k 2,4 | wc -l)"
-IMAGE="gameservermanagers/linuxgsm-docker"
+IMAGE="$DEFAULT_DOCKER_REPOSITORY"
 FLAKY="1"
 LOG_DEBUG="false"
 RERUN="false"
@@ -75,11 +80,6 @@ if [ "$(whoami)" = "root" ]; then
     echo "[error][multiple] please dont execute me as root, iam invoking linuxgsm.sh directly and this will not work as root"
     exit 1
 fi
-
-# shellcheck source=test/internal/api_various.sh
-source "$(dirname "$0")/internal/api_various.sh"
-# shellcheck source=test/steam_test_credentials
-source "$(dirname "$0")/steam_test_credentials"
 
 for run in $(seq 1 "$FLAKY"); do
 	# prepare results folder

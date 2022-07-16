@@ -10,7 +10,7 @@ source "$(dirname "$0")/api_docker.sh"
 source "$(dirname "$0")/api_various.sh"
 
 server=""
-image="gameservermanagers/linuxgsm-docker"
+image="$DEFAULT_DOCKER_REPOSITORY"
 latest="false"
 skip_lgsm="false"
 suffix=""

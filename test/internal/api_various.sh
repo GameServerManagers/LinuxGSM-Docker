@@ -1,5 +1,7 @@
 #!/bin/bash
 
+DEFAULT_DOCKER_REPOSITORY="gameservermanagers/linuxgsm-docker"
+
 function isEmpty() {
     [ -z "$1" ]
 }

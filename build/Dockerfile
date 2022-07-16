@@ -49,7 +49,7 @@ COPY build/installMinimalDependencies.sh \
      build/installLGSM.sh \
      build/installGamedig.sh \
      build/cleanImage.sh \
-     build/installDependencies.sh \
+     build/installServerDependencies.sh \
      build/createAlias.sh \
      \
      runtime/entrypoint.sh \
@@ -77,7 +77,7 @@ FROM linuxgsm as specific
 ARG ARG_LGSM_GAMESERVER=""
 ENV LGSM_GAMESERVER="${ARG_LGSM_GAMESERVER:? To build the container by hand you need to set build argument ARG_LGSM_GAMESERVER to your desired servercode}"
 RUN set -eux; \
-    installDependencies.sh "$LGSM_GAMESERVER"; \
+    installServerDependencies.sh "$LGSM_GAMESERVER"; \
     createAlias.sh "$LGSM_GAMESERVER"; \
     cleanImage.sh
 

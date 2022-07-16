@@ -18,9 +18,10 @@ source "$(dirname "$0")/steam_test_credentials"
 LOGS="false"
 LOG_DEBUG="false"
 DEBUG="false"
-IMAGE="gameservermanagers/linuxgsm-docker"
+IMAGE="$DEFAULT_DOCKER_REPOSITORY"
 RETRY="1"
 GAMESERVER=""
+BUILD_ONLY="false"
 
 build=(./internal/build.sh)
 run=(./internal/run.sh)
@@ -35,6 +36,7 @@ while [ $# -ge 1 ]; do
             echo "[help][single] "
             echo "[help][single] options:"
             echo "[help][single] -c  --no-cache      run without docker cache"
+            echo "[help][single] -b  --build-only    just build it"
             echo "[help][single] -d  --debug         run gameserver and overwrite entrypoint to bash"
             echo "[help][single]     --image      x  target image"
             echo "[help][single] -l  --logs          print complete docker log afterwards"
@@ -49,6 +51,8 @@ while [ $# -ge 1 ]; do
             exit 0;;
         -c|--no-cache)
             build+=(--no-cache);;
+        -b|--build-only)
+            BUILD_ONLY="true";;
         -d|--debug)
             run+=(--debug)
             DEBUG="true";;
@@ -126,31 +130,35 @@ trap handleInterrupt SIGTERM SIGINT
         removeContainer "$CONTAINER"
         echo "${build[@]}"
         "${build[@]}"
-        echo "${run[@]}" | sed -E 's/(steamuser|steampass)=\S+/\1="xxx"/g'
-        "${run[@]}"
 
-        if "$DEBUG" || awaitHealthCheck "$CONTAINER"; then
+        if "$BUILD_ONLY"; then
             successful="true"
+        else
+            echo "${run[@]}" | sed -E 's/(steamuser|steampass)=\S+/\1="xxx"/g'
+            "${run[@]}"
+
+            if "$DEBUG" || awaitHealthCheck "$CONTAINER"; then
+                successful="true"
+            fi
+            
+            echo ""
+            echo "[info][single] printing dev-debug-function-order.log"
+            docker exec -it "$CONTAINER" cat "dev-debug-function-order.log" || true
+            stty sane
+            echo ""
+            echo "[info][single] printing dev-debug.log"
+            docker exec -it "$CONTAINER" cat "dev-debug.log" || true
+            echo ""
+            stty sane
+            
+            stopContainer "$CONTAINER"
+            if "$LOGS"; then
+                printf "[info][single] logs:\n%s\n" "$(docker logs "$CONTAINER" 2>&1 || true)"
+            elif ! "$successful"; then
+                printf "[info][single] logs:\n%s\n" "$(docker logs -n 20 "$CONTAINER" 2>&1 || true)"
+            fi
+            printf "[info][single] healthcheck log:\n%s\n" "$(docker inspect -f '{{json .State.Health.Log}}' "$CONTAINER" | jq | sed 's/\\r/\n/g' | sed 's/\\n/\n/g' || true)"
         fi
-        
-        echo ""
-        echo "[info][single] printing dev-debug-function-order.log"
-        docker exec -it "$CONTAINER" cat "dev-debug-function-order.log" || true
-        stty sane
-        echo ""
-        echo "[info][single] printing dev-debug.log"
-        docker exec -it "$CONTAINER" cat "dev-debug.log" || true
-        echo ""
-        stty sane
-        
-        stopContainer "$CONTAINER"
-        if "$LOGS"; then
-            printf "[info][single] logs:\n%s\n" "$(docker logs "$CONTAINER" 2>&1 || true)"
-        elif ! "$successful"; then
-            printf "[info][single] logs:\n%s\n" "$(docker logs -n 20 "$CONTAINER" 2>&1 || true)"
-        fi
-        printf "[info][single] healthcheck log:\n%s\n" "$(docker inspect -f '{{json .State.Health.Log}}' "$CONTAINER" | jq | sed 's/\\r/\n/g' | sed 's/\\n/\n/g' || true)"
-        
     done
     removeContainer "$CONTAINER"
 
