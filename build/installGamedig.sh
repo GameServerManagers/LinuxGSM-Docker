@@ -12,7 +12,7 @@ echo 'tzdata tzdata/Zones/Europe select Berlin' | debconf-set-selections
 apt-get update
 DEBIAN_FRONTEND="noninteractive" apt-get install -y --no-install-recommends xz-utils jq
 
-NODE_VERSION="v16.14.0"
+NODE_VERSION="v16.16.0"
 wget "https://nodejs.org/dist/$NODE_VERSION/node-$NODE_VERSION-linux-x64.tar.xz"
 mkdir -p "/usr/local/lib/nodejs"
 tar -xJvf "node-$NODE_VERSION-linux-x64.tar.xz" -C "/usr/local/lib/nodejs"
