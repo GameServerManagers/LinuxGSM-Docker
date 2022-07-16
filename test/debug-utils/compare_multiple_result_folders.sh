@@ -1,7 +1,7 @@
 #!/bin/bash
 
 (
-	cd "$(dirname "$0")"
+	cd "$(dirname "$0")/.."
 
 	mapfile -t results_folder < <(find "." -maxdepth 1 -type d -iname "results*")
 
