@@ -51,8 +51,8 @@ COPY build/installMinimalDependencies.sh \
      build/cleanImage.sh \
      build/installDependencies.sh \
      build/createAlias.sh \
-     build/entrypoint.sh \
      \
+     runtime/entrypoint.sh \
      runtime/lgsm-cron-init \
      runtime/lgsm-cron-start \
      runtime/lgsm-init \
