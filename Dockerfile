@@ -9,7 +9,7 @@ COPY setup/installGosu.sh \
 RUN chmod +x installGosu.sh
 RUN set -eux; \
     ./installGosu.sh 1.14; \
-    ./installSupercronic.sh v0.1.12 8d3a575654a6c93524c410ae06f681a3507ca5913627fa92c7086fd140fa12ce; \
+    ./installSupercronic.sh v0.2.1 5eb5e2533fe75acffa63e437c0d8c4cb1f0c96891b84ae10ef4e53d602505f60; \
     ./installOpenSSL_1.1n.sh
 
 # create linuxgsm image
