@@ -3,14 +3,14 @@
 FROM ubuntu:22.04 as dependencyStage
 
 COPY build/installGosu.sh \
-     build/installOpenSSL_1.1n.sh \
+     build/installOpenSSL_1.1.sh \
      build/installSupercronic.sh \
      /
 RUN chmod +x installGosu.sh
 RUN set -eux; \
     ./installGosu.sh 1.14; \
     ./installSupercronic.sh v0.2.1 5eb5e2533fe75acffa63e437c0d8c4cb1f0c96891b84ae10ef4e53d602505f60; \
-    ./installOpenSSL_1.1n.sh
+    ./installOpenSSL_1.1.sh
 
 # create linuxgsm image
 # this stage should be usable by existing developers
