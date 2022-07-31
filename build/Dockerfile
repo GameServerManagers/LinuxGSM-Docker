@@ -10,7 +10,7 @@ RUN chmod +x installGosu.sh
 RUN set -eux; \
     ./installGosu.sh 1.14; \
     ./installSupercronic.sh v0.2.1 5eb5e2533fe75acffa63e437c0d8c4cb1f0c96891b84ae10ef4e53d602505f60; \
-    ./installOpenSSL_1.1.sh
+    ./installOpenSSL_1.1.sh 1.1.1q
 
 # create linuxgsm image
 # this stage should be usable by existing developers
