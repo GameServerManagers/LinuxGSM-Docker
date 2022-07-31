@@ -38,6 +38,8 @@ else
 fi
 lgsm-load-config
 
+# workaround libssl
+sed -i -E 's/,libssl1.1[^,]*//' ./lgsm/data/ubuntu-22.04.csv
 lgsm-start || (
     exitcode="$?"
     echo "[error][entrypoint] initial start failed, printing console.log"

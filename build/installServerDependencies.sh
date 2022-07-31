@@ -29,8 +29,19 @@ if [ "${#cmds[@]}" -gt "0" ]; then
 		dpkg --add-architecture i386
 	fi
 	apt-get update
-	set -x
+	
     for cmd in "${cmds[@]}"; do
+		# workaround libssl1.1
+		if grep -qF 'libssl1.1:i386' <<< "$cmd"; then
+			cp "/usr/local/lib/openssl_x86"/*.so* "/usr/local/lib/"
+			ldconfig "/usr/local/lib"
+			cmd="${cmd//libssl1.1:i386/}"
+		elif grep -qF 'libssl1.1' <<< "$cmd"; then
+			cp "/usr/local/lib/openssl_x64"/*.so* "/usr/local/lib/"
+			ldconfig "/usr/local/lib"
+			cmd="${cmd//libssl1.1/}"
+		fi
+
         echo "[info][installDependencies] >$cmd<"
 		if eval "DEBIAN_FRONTEND=noninteractive $cmd"; then
 			echo "[info][installDependencies] successful!"
