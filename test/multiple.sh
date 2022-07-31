@@ -19,6 +19,10 @@ RERUN="false"
 SUFFIX=""
 VOLUMES="false"
 VERSION="master"
+LGSM_GITHUBUSER=""
+LGSM_GITHUBREPO=""
+LGSM_GITHUBBRANCH=""
+
 GAMESERVER=()
 while [ $# -ge 1 ]; do
     key="$1"
@@ -35,6 +39,9 @@ while [ $# -ge 1 ]; do
             echo "[help][multiple]    --image       x  set target image"
 			echo "[help][multiple]    --flaky       x  test for flaky results x times, x should be greater as 1"
             echo "[help][multiple]    --rerun          check results and runs every gameserver which wasn't successful"
+            echo "[help][multiple]    --git-branch  x  sets LGSM_GITHUBBRANCH"
+            echo "[help][multiple]    --git-repo    x  sets LGSM_GITHUBREPO"
+            echo "[help][multiple]    --git-user    x  sets LGSM_GITHUBUSER"
             echo "[help][multiple]    --suffix         suffix to add to every image"
             echo "[help][multiple]    --volumes        use volumes \"linuxgsm-SERVERCODE\""
             echo "[help][multiple] -v --version    x   use linuxgsm version x e.g. \"v21.4.1\""
@@ -57,6 +64,15 @@ while [ $# -ge 1 ]; do
 			shift;;
         --rerun)
             RERUN="true";;
+        --git-branch)
+            LGSM_GITHUBBRANCH="$1"
+			shift;;
+        --git-repo)
+            LGSM_GITHUBREPO="$1"
+			shift;;
+        --git-user)
+            LGSM_GITHUBUSER="$1"
+			shift;;
         --suffix)
             SUFFIX="$1"
             shift;;
@@ -143,18 +159,18 @@ for run in $(seq 1 "$FLAKY"); do
 			if "$testThisServercode" && "$rerunIsFine"; then
 				echo "[info][multiple] testing: $server_code"
 				(
-					quick=(./test/single.sh --logs --version "$VERSION" --image "$IMAGE" --skip-lgsm --suffix "$SUFFIX")
+					single=(./test/single.sh --logs --version "$VERSION" --image "$IMAGE" --skip-lgsm --suffix "$SUFFIX" --git-branch "$LGSM_GITHUBBRANCH" --git-repo "$LGSM_GITHUBREPO" --git-user "$LGSM_GITHUBUSER")
 					if "$VOLUMES"; then
-						quick+=(--volume "linuxgsm-$server_code")
+						single+=(--volume "linuxgsm-$server_code")
 					fi
 					if "$LOG_DEBUG"; then
-						quick+=(--log-debug)
+						single+=(--log-debug)
 					fi
-					quick+=("$server_code")
+					single+=("$server_code")
 
-					echo "${quick[@]}"
+					echo "${single[@]}"
 					is_successful="false"
-					if "${quick[@]}" > "$RESULTS/$server_code.log" 2>&1; then
+					if "${single[@]}" > "$RESULTS/$server_code.log" 2>&1; then
 						is_successful="true"
 					fi
 					

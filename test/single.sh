@@ -22,6 +22,9 @@ IMAGE="$DEFAULT_DOCKER_REPOSITORY"
 RETRY="1"
 GAMESERVER=""
 BUILD_ONLY="false"
+LGSM_GITHUBUSER=""
+LGSM_GITHUBREPO=""
+LGSM_GITHUBBRANCH=""
 
 build=(./internal/build.sh)
 run=(./internal/run.sh)
@@ -42,6 +45,9 @@ while [ $# -ge 1 ]; do
             echo "[help][single] -l  --logs          print complete docker log afterwards"
             echo "[help][single]     --log-debug     enables LGSM_DEBUG, log can contain your steam credentials, dont share it!"
             echo "[help][single]     --retry         if run failed, rebuild and rerun up to 3 times"
+            echo "[help][single]     --git-branch x  sets LGSM_GITHUBBRANCH"
+            echo "[help][single]     --git-repo   x  sets LGSM_GITHUBREPO"
+            echo "[help][single]     --git-user   x  sets LGSM_GITHUBUSER"
             echo "[help][single]     --skip-lgsm     skip build lgsm"
             echo "[help][single]     --very-fast     overwrite healthcheck, only use it with volumes / lancache because container will else fail pretty fast"
             echo "[help][single]     --version    x  use linuxgsm version x e.g. \"v21.4.1\""
@@ -66,6 +72,15 @@ while [ $# -ge 1 ]; do
             LOG_DEBUG="true";;
         --retry)
             RETRY="3";;
+        --git-branch)
+            LGSM_GITHUBBRANCH="$1"
+            shift;;
+        --git-repo)
+            LGSM_GITHUBREPO="$1"
+            shift;;
+        --git-user)
+            LGSM_GITHUBUSER="$1"
+            shift;;
         --skip-lgsm)
             build+=(--skip-lgsm);;
         --suffix)
@@ -103,6 +118,16 @@ elif grep -qEe "(^|\s)$GAMESERVER(\s|$)" <<< "${credentials_enabled[@]}"; then
 	fi
 else
     echo "[warning][single] no steam credentials provided, some servers will fail without it"
+fi
+
+if [ -n "$LGSM_GITHUBUSER" ]; then
+    run+=(-e "LGSM_GITHUBUSER=$LGSM_GITHUBUSER")
+fi
+if [ -n "$LGSM_GITHUBREPO" ]; then
+    run+=(-e "LGSM_GITHUBREPO=$LGSM_GITHUBREPO")
+fi
+if [ -n "$LGSM_GITHUBBRANCH" ]; then
+    run+=(-e "LGSM_GITHUBBRANCH=$LGSM_GITHUBBRANCH")
 fi
 
 CONTAINER="linuxgsm-$GAMESERVER"
