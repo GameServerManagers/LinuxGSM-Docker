@@ -1,0 +1,26 @@
+
+# usage:
+#  docker-compose -f ./examples/ns2server.yml up -d
+volumes:
+  serverfiles:
+
+name: lgsm
+
+services:
+  ns2server:
+    image: "gameservermanagers/linuxgsm-docker:ns2server"
+    tty: true
+    restart: unless-stopped
+    environment:
+      - "CRON_update_daily=0 7 * * * update"
+      # please fill your credentials below
+      - "CONFIGFORCED_steamuser="
+      - "CONFIGFORCED_steampass="
+    volumes:
+      - serverfiles:/home/linuxgsm
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      # Game
+      - "27015:27015/udp"
+      # Query
+      - "27016:27016/udp"

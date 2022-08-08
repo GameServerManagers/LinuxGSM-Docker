@@ -1,0 +1,25 @@
+
+# usage:
+#  docker-compose -f ./examples/arkserver.yml up -d
+volumes:
+  serverfiles:
+
+name: lgsm
+
+services:
+  arkserver:
+    image: "gameservermanagers/linuxgsm-docker:arkserver"
+    tty: true
+    restart: unless-stopped
+    environment:
+      - "CRON_update_daily=0 7 * * * update"
+    volumes:
+      - serverfiles:/home/linuxgsm
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      # Game
+      - "7777:7777/udp"
+      # Query
+      - "27015:27015/udp"
+      # RCON
+      - "27020:27020/tcp"

@@ -1,0 +1,27 @@
+
+# usage:
+#  docker-compose -f ./examples/ccserver.yml up -d
+volumes:
+  serverfiles:
+
+name: lgsm
+
+services:
+  ccserver:
+    image: "gameservermanagers/linuxgsm-docker:ccserver"
+    tty: true
+    restart: unless-stopped
+    environment:
+      - "CRON_update_daily=0 7 * * * update"
+    volumes:
+      - serverfiles:/home/linuxgsm
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      # Game
+      - "27015:27015/udp"
+      # Query / RCON
+      - "27015:27015/tcp"
+      # SourceTV
+      - "27020:27020/udp"
+      # Client
+      - "27005:27005/udp"

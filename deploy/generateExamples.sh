@@ -1,16 +1,17 @@
 #!/bin/bash
 
-set -o errexit
 set -o nounset
 set -o pipefail
 
 version="$1"
+rebuild="false"
 
 (
     cd "$(dirname "$0")/.."
 
     source "test/internal/api_various.sh"
     source "test/internal/api_docker.sh"
+    source "test/steam_test_credentials"
     image="$DEFAULT_DOCKER_REPOSITORY"
 
     mapfile -d $'\n' -t servers < <(getServerCodeList "$version")
@@ -23,10 +24,10 @@ version="$1"
         # run it once
         run=(./test/internal/run.sh --container "$container" --image "$image" --tag "$server" --detach)
         # assuming already build before? Else takes way more time.
-        #if ! ./test/single.sh --build-only --version "$version" --image "$image" "$server"; then
-        #  echo "build failed, skipping"
-        #  continue
-        #fi
+        if "$rebuild" && ! ./test/single.sh --build-only --version "$version" --image "$image" "$server"; then
+          echo "build failed, skipping"
+          continue
+        fi
         echo "${run[@]}"
         if ! "${run[@]}" > /dev/null; then
             echo "run failed, skipping"
@@ -41,12 +42,23 @@ version="$1"
           echo -en "\r[info][awaitContainerStarted] waiting for $seconds"
         done
         echo -e "\r[info][awaitContainerStarted] waited for $seconds "
+        if ! docker exec "$container" ls > /dev/null 2>&1; then
+          echo "[error] $container crashed"
+          cmd=(docker logs "$container")
+          echo "${cmd[@]}"
+          "${cmd[@]}"
+        fi
 
         # get all ports
         details="$(docker exec -it "$container" details 2>&1)"
 
         docker stop "$container" > /dev/null 2>&1 || true
         docker rm "$container" > /dev/null 2>&1 || true
+
+        steam_credentials_needed=""
+        if grep -qEe "(^|\s)$server(\s|$)" <<< "${credentials_enabled[@]}"; then
+          steam_credentials_needed="$(printf '\n      # please fill your credentials below\n      - "CONFIGFORCED_steamuser="\n      - "CONFIGFORCED_steampass="\n')"
+        fi
 
         # write docker-compose.yml
         compose_file="
@@ -55,15 +67,15 @@ version="$1"
 volumes:
   serverfiles:
 
-name: lgsm-$server
+name: lgsm
 
 services:
-  service:
+  $server:
     image: \"$image:$server\"
     tty: true
     restart: unless-stopped
     environment:
-      - \"CRON_update_daily=0 7 * * *\" 
+      - \"CRON_update_daily=0 7 * * * update\"$steam_credentials_needed
     volumes:
       - serverfiles:/home/linuxgsm
       - /etc/localtime:/etc/localtime:ro"
@@ -106,9 +118,6 @@ services:
             echo "#      - \"27015:27015/udp\"" >> "examples/$server.yml"
             echo "#      - \"27015:27015/tcp\"" >> "examples/$server.yml"
             
-        fi
-        if grep -q "b" <<< "$server"; then
-          exit 0
         fi
     done
 )

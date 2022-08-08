@@ -1,0 +1,22 @@
+
+# usage:
+#  docker-compose -f ./examples/scpslserver.yml up -d
+volumes:
+  serverfiles:
+
+name: lgsm
+
+services:
+  scpslserver:
+    image: "gameservermanagers/linuxgsm-docker:scpslserver"
+    tty: true
+    restart: unless-stopped
+    environment:
+      - "CRON_update_daily=0 7 * * * update"
+    volumes:
+      - serverfiles:/home/linuxgsm
+      - /etc/localtime:/etc/localtime:ro
+# couldn't extract ports, can only provide example how to configure it
+#    ports:
+#      - "27015:27015/udp"
+#      - "27015:27015/tcp"

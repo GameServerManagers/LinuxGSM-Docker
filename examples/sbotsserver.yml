@@ -1,0 +1,23 @@
+
+# usage:
+#  docker-compose -f ./examples/sbotsserver.yml up -d
+volumes:
+  serverfiles:
+
+name: lgsm
+
+services:
+  sbotsserver:
+    image: "gameservermanagers/linuxgsm-docker:sbotsserver"
+    tty: true
+    restart: unless-stopped
+    environment:
+      - "CRON_update_daily=0 7 * * * update"
+    volumes:
+      - serverfiles:/home/linuxgsm
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      # Game
+      - "7777:7777/udp"
+      # Query
+      - "27015:27015/udp"

@@ -1,0 +1,25 @@
+
+# usage:
+#  docker-compose -f ./examples/kfserver.yml up -d
+volumes:
+  serverfiles:
+
+name: lgsm
+
+services:
+  kfserver:
+    image: "gameservermanagers/linuxgsm-docker:kfserver"
+    tty: true
+    restart: unless-stopped
+    environment:
+      - "CRON_update_daily=0 7 * * * update"
+      # please fill your credentials below
+      - "CONFIGFORCED_steamuser="
+      - "CONFIGFORCED_steampass="
+    volumes:
+      - serverfiles:/home/linuxgsm
+      - /etc/localtime:/etc/localtime:ro
+# couldn't extract ports, can only provide example how to configure it
+#    ports:
+#      - "27015:27015/udp"
+#      - "27015:27015/tcp"

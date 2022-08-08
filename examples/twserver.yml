@@ -1,0 +1,24 @@
+
+# usage:
+#  docker-compose -f ./examples/twserver.yml up -d
+volumes:
+  serverfiles:
+
+name: lgsm
+
+services:
+  twserver:
+    image: "gameservermanagers/linuxgsm-docker:twserver"
+    tty: true
+    restart: unless-stopped
+    environment:
+      - "CRON_update_daily=0 7 * * * update"
+      # please fill your credentials below
+      - "CONFIGFORCED_steamuser="
+      - "CONFIGFORCED_steampass="
+    volumes:
+      - serverfiles:/home/linuxgsm
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      # Game / Query
+      - "8303:8303/udp"

@@ -1,0 +1,23 @@
+
+# usage:
+#  docker-compose -f ./examples/mumbleserver.yml up -d
+volumes:
+  serverfiles:
+
+name: lgsm
+
+services:
+  mumbleserver:
+    image: "gameservermanagers/linuxgsm-docker:mumbleserver"
+    tty: true
+    restart: unless-stopped
+    environment:
+      - "CRON_update_daily=0 7 * * * update"
+    volumes:
+      - serverfiles:/home/linuxgsm
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      # Voice
+      - "64738:64738/udp"
+      # Query
+      - "64738:64738/tcp"

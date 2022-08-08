@@ -1,0 +1,28 @@
+
+# usage:
+#  docker-compose -f ./examples/sbserver.yml up -d
+volumes:
+  serverfiles:
+
+name: lgsm
+
+services:
+  sbserver:
+    image: "gameservermanagers/linuxgsm-docker:sbserver"
+    tty: true
+    restart: unless-stopped
+    environment:
+      - "CRON_update_daily=0 7 * * * update"
+      # please fill your credentials below
+      - "CONFIGFORCED_steamuser="
+      - "CONFIGFORCED_steampass="
+    volumes:
+      - serverfiles:/home/linuxgsm
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      # Game
+      - "21025:21025/udp"
+      # Query
+      - "21025:21025/tcp"
+      # RCON
+      - "21026:21026/tcp"

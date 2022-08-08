@@ -1,0 +1,23 @@
+
+# usage:
+#  docker-compose -f ./examples/vhserver.yml up -d
+volumes:
+  serverfiles:
+
+name: lgsm
+
+services:
+  vhserver:
+    image: "gameservermanagers/linuxgsm-docker:vhserver"
+    tty: true
+    restart: unless-stopped
+    environment:
+      - "CRON_update_daily=0 7 * * * update"
+    volumes:
+      - serverfiles:/home/linuxgsm
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      # Game
+      - "2456:2456/udp"
+      # Query
+      - "2457:2457/udp"

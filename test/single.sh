@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo "single.sh $@"
+
 set -o errexit
 set -o nounset
 set -o pipefail
@@ -108,7 +110,7 @@ done
 if [ -z "$GAMESERVER" ]; then
     echo "[error][single] no gameserver provided"
     exit 1
-elif grep -qEe "(^|\s)$GAMESERVER(\s|$)" <<< "${credentials_enabled[@]}"; then
+elif grep -qEe "(^|\s)$GAMESERVER(\s|$)" <<< "${credentials_enabled[@]}" && ! "$BUILD_ONLY"; then
 	echo "[info][single] $GAMESERVER can only be tested with steam credential"
 	if [ -n "$steam_test_username" ] && [ -n "$steam_test_password" ]; then
     	run+=(-e CONFIGFORCED_steamuser="$steam_test_username" -e CONFIGFORCED_steampass="$steam_test_password")

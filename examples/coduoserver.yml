@@ -1,0 +1,21 @@
+
+# usage:
+#  docker-compose -f ./examples/coduoserver.yml up -d
+volumes:
+  serverfiles:
+
+name: lgsm
+
+services:
+  coduoserver:
+    image: "gameservermanagers/linuxgsm-docker:coduoserver"
+    tty: true
+    restart: unless-stopped
+    environment:
+      - "CRON_update_daily=0 7 * * * update"
+    volumes:
+      - serverfiles:/home/linuxgsm
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      # Game
+      - "28960:28960/udp"

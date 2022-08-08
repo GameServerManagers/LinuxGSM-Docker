@@ -1,0 +1,21 @@
+
+# usage:
+#  docker-compose -f ./examples/codwawserver.yml up -d
+volumes:
+  serverfiles:
+
+name: lgsm
+
+services:
+  codwawserver:
+    image: "gameservermanagers/linuxgsm-docker:codwawserver"
+    tty: true
+    restart: unless-stopped
+    environment:
+      - "CRON_update_daily=0 7 * * * update"
+    volumes:
+      - serverfiles:/home/linuxgsm
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      # Game / Query
+      - "28960:28960/udp"
