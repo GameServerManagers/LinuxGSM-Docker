@@ -19,4 +19,7 @@ Dockerhub https://hub.docker.com/r/gameservermanagers/linuxgsm-docker/
 4. copy your own config into: `docker cp my_local_config.txt lgsm-SERVER-1:/config_location_from_step_3`
 5. print config content `docker exec lgsm-SERVER-1 cat /config_location_from_step_3`
 
+## Details
 
+- [Repository / Container / Dev structure documentation](DEVELOPER.md)
+- [How to build this / How to use it for lgsm testing](test/testing.md)
