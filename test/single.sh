@@ -52,7 +52,7 @@ while [ $# -ge 1 ]; do
             echo "[help][single]     --git-user   x  sets LGSM_GITHUBUSER"
             echo "[help][single]     --skip-lgsm     skip build lgsm"
             echo "[help][single]     --very-fast     overwrite healthcheck, only use it with volumes / lancache because container will else fail pretty fast"
-            echo "[help][single]     --version    x  use linuxgsm version x e.g. \"v21.4.1\""
+            echo "[help][single]     --version    x  use linuxgsm version x e.g. \"v21.4.1\" can be a commit id(even fork) / branch"
             echo "[help][single]     --volume     x  use volume x e.g. \"lgsm\""
             echo "[help][single] "
             echo "[help][single] server            e.g. gmodserver"

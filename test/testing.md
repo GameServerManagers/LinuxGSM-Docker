@@ -27,7 +27,8 @@
 
 ### I just want to build this image, how?
 
-`./single.sh --build-only --latest servercode`
+- `./single.sh --build-only servercode`
+- `./single.sh --build-only --version commit-id-from-fork servercode`
 
 ### I created a lgsm fork and want to test it
 
