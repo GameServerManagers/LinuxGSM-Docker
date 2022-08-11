@@ -2,7 +2,7 @@
 # usage:
 #  docker-compose -f ./examples/armarserver.yml up -d
 volumes:
-  serverfiles:
+  armarserver-files:
 
 name: lgsm
 
@@ -14,9 +14,8 @@ services:
     environment:
       - "CRON_update_daily=0 7 * * * update"
     volumes:
-      - serverfiles:/home/linuxgsm
+      - armarserver-files:/home/linuxgsm
       - /etc/localtime:/etc/localtime:ro
-# couldn't extract ports, can only provide example how to configure it
-#    ports:
-#      - "27015:27015/udp"
-#      - "27015:27015/tcp"
+    ports:
+      # Game
+      - "0:0/udp"

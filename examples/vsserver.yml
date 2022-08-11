@@ -2,7 +2,7 @@
 # usage:
 #  docker-compose -f ./examples/vsserver.yml up -d
 volumes:
-  serverfiles:
+  vsserver-files:
 
 name: lgsm
 
@@ -14,7 +14,7 @@ services:
     environment:
       - "CRON_update_daily=0 7 * * * update"
     volumes:
-      - serverfiles:/home/linuxgsm
+      - vsserver-files:/home/linuxgsm
       - /etc/localtime:/etc/localtime:ro
     ports:
       # Game

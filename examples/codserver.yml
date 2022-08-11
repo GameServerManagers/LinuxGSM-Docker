@@ -2,7 +2,7 @@
 # usage:
 #  docker-compose -f ./examples/codserver.yml up -d
 volumes:
-  serverfiles:
+  codserver-files:
 
 name: lgsm
 
@@ -14,8 +14,9 @@ services:
     environment:
       - "CRON_update_daily=0 7 * * * update"
     volumes:
-      - serverfiles:/home/linuxgsm
+      - codserver-files:/home/linuxgsm
       - /etc/localtime:/etc/localtime:ro
-    ports:
-      # Game
-      - "28960:28960/udp"
+# couldn't extract ports, can only provide example how to configure it
+#    ports:
+#      - "27015:27015/udp"
+#      - "27015:27015/tcp"

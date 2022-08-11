@@ -2,7 +2,7 @@
 # usage:
 #  docker-compose -f ./examples/arma3server.yml up -d
 volumes:
-  serverfiles:
+  arma3server-files:
 
 name: lgsm
 
@@ -17,9 +17,12 @@ services:
       - "CONFIGFORCED_steamuser="
       - "CONFIGFORCED_steampass="
     volumes:
-      - serverfiles:/home/linuxgsm
+      - arma3server-files:/home/linuxgsm
       - /etc/localtime:/etc/localtime:ro
-# couldn't extract ports, can only provide example how to configure it
-#    ports:
-#      - "27015:27015/udp"
-#      - "27015:27015/tcp"
+    ports:
+      # Game / Voice
+      - "2302:2302/udp"
+      # Query
+      - "2303:2303/udp"
+      # BattleEye
+      - "2306:2306/udp"

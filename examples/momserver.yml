@@ -2,7 +2,7 @@
 # usage:
 #  docker-compose -f ./examples/momserver.yml up -d
 volumes:
-  serverfiles:
+  momserver-files:
 
 name: lgsm
 
@@ -14,10 +14,9 @@ services:
     environment:
       - "CRON_update_daily=0 7 * * * update"
     volumes:
-      - serverfiles:/home/linuxgsm
+      - momserver-files:/home/linuxgsm
       - /etc/localtime:/etc/localtime:ro
-    ports:
-      # Game
-      - "7777:7777/udp"
-      # Beacon
-      - "15000:15000/udp"
+# couldn't extract ports, can only provide example how to configure it
+#    ports:
+#      - "27015:27015/udp"
+#      - "27015:27015/tcp"

@@ -2,7 +2,7 @@
 # usage:
 #  docker-compose -f ./examples/bsserver.yml up -d
 volumes:
-  serverfiles:
+  bsserver-files:
 
 name: lgsm
 
@@ -17,7 +17,7 @@ services:
       - "CONFIGFORCED_steamuser="
       - "CONFIGFORCED_steampass="
     volumes:
-      - serverfiles:/home/linuxgsm
+      - bsserver-files:/home/linuxgsm
       - /etc/localtime:/etc/localtime:ro
 # couldn't extract ports, can only provide example how to configure it
 #    ports:

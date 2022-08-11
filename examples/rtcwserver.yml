@@ -2,7 +2,7 @@
 # usage:
 #  docker-compose -f ./examples/rtcwserver.yml up -d
 volumes:
-  serverfiles:
+  rtcwserver-files:
 
 name: lgsm
 
@@ -14,7 +14,7 @@ services:
     environment:
       - "CRON_update_daily=0 7 * * * update"
     volumes:
-      - serverfiles:/home/linuxgsm
+      - rtcwserver-files:/home/linuxgsm
       - /etc/localtime:/etc/localtime:ro
     ports:
       # Game

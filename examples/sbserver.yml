@@ -2,7 +2,7 @@
 # usage:
 #  docker-compose -f ./examples/sbserver.yml up -d
 volumes:
-  serverfiles:
+  sbserver-files:
 
 name: lgsm
 
@@ -17,7 +17,7 @@ services:
       - "CONFIGFORCED_steamuser="
       - "CONFIGFORCED_steampass="
     volumes:
-      - serverfiles:/home/linuxgsm
+      - sbserver-files:/home/linuxgsm
       - /etc/localtime:/etc/localtime:ro
     ports:
       # Game

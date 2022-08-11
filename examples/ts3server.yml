@@ -2,7 +2,7 @@
 # usage:
 #  docker-compose -f ./examples/ts3server.yml up -d
 volumes:
-  serverfiles:
+  ts3server-files:
 
 name: lgsm
 
@@ -14,10 +14,9 @@ services:
     environment:
       - "CRON_update_daily=0 7 * * * update"
     volumes:
-      - serverfiles:/home/linuxgsm
+      - ts3server-files:/home/linuxgsm
       - /etc/localtime:/etc/localtime:ro
-    ports:
-      # Voice
-      - "9987:9987/udp"
-      # Query / Telnet
-      - "10011:10011/tcp"
+# couldn't extract ports, can only provide example how to configure it
+#    ports:
+#      - "27015:27015/udp"
+#      - "27015:27015/tcp"

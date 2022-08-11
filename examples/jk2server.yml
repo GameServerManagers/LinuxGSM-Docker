@@ -2,7 +2,7 @@
 # usage:
 #  docker-compose -f ./examples/jk2server.yml up -d
 volumes:
-  serverfiles:
+  jk2server-files:
 
 name: lgsm
 
@@ -17,7 +17,7 @@ services:
       - "CONFIGFORCED_steamuser="
       - "CONFIGFORCED_steampass="
     volumes:
-      - serverfiles:/home/linuxgsm
+      - jk2server-files:/home/linuxgsm
       - /etc/localtime:/etc/localtime:ro
     ports:
       # Game

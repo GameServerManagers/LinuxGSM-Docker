@@ -2,7 +2,7 @@
 # usage:
 #  docker-compose -f ./examples/iosserver.yml up -d
 volumes:
-  serverfiles:
+  iosserver-files:
 
 name: lgsm
 
@@ -14,14 +14,9 @@ services:
     environment:
       - "CRON_update_daily=0 7 * * * update"
     volumes:
-      - serverfiles:/home/linuxgsm
+      - iosserver-files:/home/linuxgsm
       - /etc/localtime:/etc/localtime:ro
-    ports:
-      # Game
-      - "27015:27015/udp"
-      # Query / RCON
-      - "27015:27015/tcp"
-      # SourceTV
-      - "27020:27020/udp"
-      # Client
-      - "27005:27005/udp"
+# couldn't extract ports, can only provide example how to configure it
+#    ports:
+#      - "27015:27015/udp"
+#      - "27015:27015/tcp"

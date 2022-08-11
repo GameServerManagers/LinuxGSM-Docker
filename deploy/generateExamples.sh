@@ -65,7 +65,7 @@ rebuild="false"
 # usage:
 #  docker-compose -f ./examples/$server.yml up -d
 volumes:
-  serverfiles:
+  $server-files:
 
 name: lgsm
 
@@ -77,7 +77,7 @@ services:
     environment:
       - \"CRON_update_daily=0 7 * * * update\"$steam_credentials_needed
     volumes:
-      - serverfiles:/home/linuxgsm
+      - $server-files:/home/linuxgsm
       - /etc/localtime:/etc/localtime:ro"
         echo "$compose_file" > "examples/$server.yml"
 

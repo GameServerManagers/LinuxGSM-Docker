@@ -2,7 +2,7 @@
 # usage:
 #  docker-compose -f ./examples/twserver.yml up -d
 volumes:
-  serverfiles:
+  twserver-files:
 
 name: lgsm
 
@@ -17,8 +17,9 @@ services:
       - "CONFIGFORCED_steamuser="
       - "CONFIGFORCED_steampass="
     volumes:
-      - serverfiles:/home/linuxgsm
+      - twserver-files:/home/linuxgsm
       - /etc/localtime:/etc/localtime:ro
-    ports:
-      # Game / Query
-      - "8303:8303/udp"
+# couldn't extract ports, can only provide example how to configure it
+#    ports:
+#      - "27015:27015/udp"
+#      - "27015:27015/tcp"
