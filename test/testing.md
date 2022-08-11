@@ -10,7 +10,6 @@
 - `LGSM_GITHUBBRANCH / LGSM_GITHUBREPO / LGSM_GITHUBUSER` can be set with `--git-[branch,repo,user] "value"`
 - Do you want to test a single servercode? E.g. to test a patch affecting just one server.
     - `./single.sh [--volume v] [--version commit/tag/branch] servercode`
-        - testing a single servercode, e.g. if current is working or for testing your lgsm fork
 - Do you want to test multiple or all servercodes? E.g. you refactoring code affecting multiple or all
     - `./multiple.sh [--version commit/tag/branch] [servercode1 servercode2 ...]`
         - if no servercode is provided every servercode is tested!
@@ -20,7 +19,7 @@
             #!/bin/bash
             ./test/multiple.sh --version v22.1.0 --log-debug
             ```
-            2. invoke it `tmux new -d -s lgsm-testing bash tmux.sh // TODO: should work without extra script, maybe add option to scripts?
+            2. invoke it `tmux new -d -s lgsm-testing bash tmux.sh
             
 
 ## Examples:

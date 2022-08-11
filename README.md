@@ -22,11 +22,55 @@ Dockerhub https://hub.docker.com/r/gameservermanagers/linuxgsm-docker/
     - Stopping container and keep files `docker-compose -f examples/SERVER.yml down` or `docker stop lgsm-SERVER-1`
     - Stopping container and remove files `docker-compose -f examples/SERVER.yml down --volumes`
 
-## Details
+## Overview
 
-- build with:
-  - `./test/single.sh --build-only servercode`
-  - `./test/single.sh --help`
-
+- build with `./test/single.sh --build-only servercode`
+- test with `./test/single.sh servercode`
+- get help `./test/single.sh --help`
+- LinuxGSM monitor executed every few seconds as health check
+- `docker stop CONTAINER` is redirected to lgsm-stop
+- `docker logs CONTAINER` show the game server log
+- `docker exec -it CONTAINER update` every linuxgsm command is available as long e.g. `lgsm-update` and short e.g. `update` variant. Like `details`, `backup`, `force-update`, ...
 - [Repository / Container / Dev structure documentation](DEVELOPER.md)
 - [How to build this / How to use it for lgsm testing](test/testing.md)
+
+### How to configure LinuxGSM in docker?
+
+You can configure LinuxGSM and some gameservers(alpha state) with environment variables directly.
+E.g. you want to set steamuser / steampass which is a LinuxGSM option:
+- `CONFIG_steamuser=...` its checked if this variable exists before its set, container will exit very early if the configuration option isn't already part of _default.cfg
+- `CONFIGFORCED_steamuser=...` The variable will be set always, no check done.
+- These options will be written to the instance.cfg, thereforce you can use it to set options like `CONFIG_startparameters`, `CONFIG_discordalert` and so on.
+
+### How to use cronjobs?
+You can create cron jobs with environment variables. `CRON_update_daily=0 7 * * * update` will create a cronjob which will check for updates once a day. 
+
+### Example ahl2server yml:
+```yml
+volumes:
+  ahl2server-files:
+
+name: lgsm
+
+services:
+  ahl2server:
+    image: "gameservermanagers/linuxgsm-docker:ahl2server"
+    tty: true
+    restart: unless-stopped
+    environment:
+      - "CRON_update_daily=0 7 * * * update"
+      - "CONFIGFORCED_steamuser=MySteamName"
+      - "CONFIGFORCED_steampass=my steam password"
+    volumes:
+      - ahl2server-files:/home/linuxgsm
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      # Game
+      - "27015:27015/udp"
+      # Query / RCON
+      - "27015:27015/tcp"
+      # SourceTV
+      - "27020:27020/udp"
+      # Client
+      - "27005:27005/udp"
+```
