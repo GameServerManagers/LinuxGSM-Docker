@@ -25,10 +25,12 @@ gid="750"
     }
 
     dockerRun=(docker run -it --rm -v "$VOLUME:/home" --workdir "/home")
-    if [ "0" != "$("${dockerRun[@]}" alpine find . ! -user "$uid" ! -iname "tmux.pipe" | wc -l )" ]; then
+    "${dockerRun[@]}" alpine chown -R "$uid:$gid" .
+
+    if [ "0" != "$("${dockerRun[@]}" alpine find . ! -user "$uid" ! -iname "tmux.pipe" ! -iname "server.started" | wc -l )" ]; then
         log "precondition failed, there are files in \"$VOLUME\" which aren't owned by user \"$uid\"" 20 "$("${dockerRun[@]}" alpine find . ! -user "$uid" ! -iname "tmux.pipe" | tail)"
 
-    elif [ "0" != "$("${dockerRun[@]}" alpine find . ! -group "$gid" ! -iname "tmux.pipe" | wc -l )" ]; then
+    elif [ "0" != "$("${dockerRun[@]}" alpine find . ! -group "$gid" ! -iname "tmux.pipe" ! -iname "server.started" | wc -l )" ]; then
         log "precondition failed, there are files in \"$VOLUME\" which aren't owned by group \"$gid\"" 21 "$("${dockerRun[@]}" alpine find . ! -group "$gid" ! -iname "tmux.pipe" | tail)"
 
     else
@@ -36,10 +38,12 @@ gid="750"
     fi
 
     ./test/single.sh --very-fast --version "$VERSION" --volume "$VOLUME" "$GAMESERVER" -e "USER_ID=1234" -e "GROUP_ID=5678"
-    if [ "0" != "$("${dockerRun[@]}" alpine find . ! -user "1234" ! -iname "tmux.pipe" | wc -l )" ]; then
+    if [ "0" != "$("${dockerRun[@]}" alpine find . ! -user "1234" ! -iname "tmux.pipe" ! -iname "server.started" | wc -l )" ]; then
+        "${dockerRun[@]}" alpine find . ! -user "1234" ! -iname "tmux.pipe" ! -iname "server.started"
         log "update failed, there are files in \"$VOLUME\" which aren't owned by user \"1234\"" 22 "$("${dockerRun[@]}" alpine find . ! -user "1234" ! -iname "tmux.pipe" | tail)"
 
-    elif [ "0" != "$("${dockerRun[@]}" alpine find . ! -group "5678" ! -iname "tmux.pipe" | wc -l )" ]; then
+    elif [ "0" != "$("${dockerRun[@]}" alpine find . ! -group "5678" ! -iname "tmux.pipe" ! -iname "server.started" | wc -l )" ]; then
+        "${dockerRun[@]}" alpine find . ! -group "5678" ! -iname "tmux.pipe" ! -iname "server.started"
         log "update failed, there are files in \"$VOLUME\" which aren't owned by group \"5678\"" 23 "$("${dockerRun[@]}" alpine find . ! -group "5678" ! -iname "tmux.pipe" | tail)"
 
     else

@@ -13,7 +13,7 @@ source "$(dirname "$0")/../internal/api_docker.sh"
 
 (
     cd "$(dirname "$0")/../.."
-    DOCKERFILE_CRONLOCATION="$(grep -Po '(?<=SUPERCRONIC_CONFIG=")[^"]*' Dockerfile)"
+    DOCKERFILE_CRONLOCATION="$(grep -Po '(?<=SUPERCRONIC_CONFIG=")[^"]*' build/Dockerfile)"
 
 
     function fn_exit() {
