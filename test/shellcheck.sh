@@ -7,7 +7,7 @@ set -o nounset
     cd "$(dirname "$0")/.."
 
     files=()
-    mapfile -d $'\0' files < <( find runtime build test -type f ! -iname "*.log" ! -iname "*.yml" -print0 )
+    mapfile -d $'\0' files < <( find runtime build test -type f ! -iname "*.log" ! -iname "*.yml" ! -iname "Dockerfile" ! -iname "*.md" -print0 )
 
     echo "[info][shellcheck] testing on ${#files[@]} files"
     

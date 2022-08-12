@@ -1,5 +1,6 @@
 #!/bin/bash
 
+#shellcheck disable=SC2034 # external used
 DEFAULT_DOCKER_REPOSITORY="gameservermanagers/linuxgsm-docker"
 
 function isEmpty() {

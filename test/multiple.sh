@@ -4,10 +4,10 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
-# shellcheck source=test/internal/api_various.sh
-source "$(dirname "$0")/internal/api_various.sh"
-# shellcheck source=test/steam_test_credentials
-source "$(dirname "$0")/steam_test_credentials"
+cd "$(dirname "$0")/.."
+
+source "test/internal/api_various.sh"
+source "test/steam_test_credentials"
 
 ROOT_FOLDER="$(realpath "$(dirname "$0")/..")"
 

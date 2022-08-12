@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "single.sh $@"
+echo "single.sh $*"
 
 set -o errexit
 set -o nounset
@@ -8,13 +8,9 @@ set -o pipefail
 
 cd "$(dirname "$0")/.."
 
-# shellcheck source=test/internal/api_docker.sh
-source "$(dirname "$0")/internal/api_docker.sh"
-# shellcheck source=test/internal/api_various.sh
-source "$(dirname "$0")/internal/api_various.sh"
-# shellcheck source=test/steam_test_credentials
-source "$(dirname "$0")/steam_test_credentials"
-
+source "test/internal/api_docker.sh"
+source "test/internal/api_various.sh"
+source "test/steam_test_credentials"
 
 
 LOGS="false"

@@ -1,11 +1,13 @@
 #!/bin/bash
 
+set -euo pipefail
+
 (
 	cd "$(dirname "$0")/.."
 
 	mapfile -t results_folder < <(find "." -maxdepth 1 -type d -iname "results*")
 
-	mapfile -t servercodes < <(find ./${results_folder[0]}/ -type f -iname "*.log" | grep -Poe '(?<=.)[^./]+(?=.log)' | sort)
+	mapfile -t servercodes < <(find ./"${results_folder[0]}"/ -type f -iname "*.log" | grep -Poe '(?<=.)[^./]+(?=.log)' | sort)
 	for servercode in "${servercodes[@]}"; do
 		successful=()
 		failed=()
