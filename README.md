@@ -30,7 +30,7 @@ Dockerhub https://hub.docker.com/r/gameservermanagers/linuxgsm-docker/
 - LinuxGSM monitor executed every few seconds as health check
 - `docker stop CONTAINER` is redirected to lgsm-stop
 - `docker logs CONTAINER` show the game server log
-- `docker exec -it CONTAINER update` every linuxgsm command is available as long e.g. `lgsm-update` and short e.g. `update` variant. Like `details`, `backup`, `force-update`, ...
+- `docker exec -it CONTAINER --help` every linuxgsm command is available in two forms e.g. `lgsm-update` and `update`. Available commands differ for different servercodes.
 - [Repository / Container / Dev structure documentation](DEVELOPER.md)
 - [How to build this / How to use it for lgsm testing](test/testing.md)
 

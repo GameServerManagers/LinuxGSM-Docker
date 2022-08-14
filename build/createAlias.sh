@@ -38,8 +38,22 @@ function createAlias() {
 	fi
 }
 
-#TODO if linuxgsm supports -h / --help to list commands this can be generated
-for cmd in install auto-install start stop restart details postdetails backup update-lgsm monitor test-alert update check-update force-update validate console debug \
-	change-password map-compressor developer detect-deps detect-glibc detect-ldd query-raw clear-functions; do
-	createAlias "$cmd"
-done
+lgsm-init
+(
+	cd "$LGSM_PATH"
+
+	help_command="$LGSM_SCRIPTS/lgsm-help"
+	printf '%s\n%s' '#!/bin/bash' > "$help_command"
+	chmod +x "$help_command"
+	ln -s "$help_command" "$LGSM_SCRIPTS/--help"
+	ln -s "$help_command" "$LGSM_SCRIPTS/-h"
+
+	# IMPORTANT: assuming ./server will provide commands in format "[ddmlong\s+short\s+| description" # TODO lgsm supporting --help, best unformated
+	mapfile -t commands < <(gosu "$USER_NAME" ./"$LGSM_GAMESERVER" | grep -Eo '\[[0-9]+m[a-zA-Z_]+[^|]+\|.*' | sed -E 's/\[[0-9]+m//')
+	for command in "${commands[@]}"; do
+		name="$(echo "$command" | grep -o '^[^ ]*')"
+		description="$(echo "$command" | grep -o '[^|]*$')"
+		createAlias "${name}"
+		printf "echo '%-40s| %s'\n" "$name lgsm-$name" "$description" >> "$help_command"
+	done
+)
