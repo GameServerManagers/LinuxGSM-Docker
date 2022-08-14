@@ -24,8 +24,8 @@ LGSM_GITHUBUSER=""
 LGSM_GITHUBREPO=""
 LGSM_GITHUBBRANCH=""
 
-build=(./internal/build.sh)
-run=(./internal/run.sh)
+build=(./test/internal/build.sh)
+run=(./test/internal/run.sh)
 while [ $# -ge 1 ]; do
     key="$1"
     shift
