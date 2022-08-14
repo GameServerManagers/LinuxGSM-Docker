@@ -25,9 +25,9 @@ while [ $# -ge 1 ]; do
 done
 
 (
-    cd "$(dirname "$0")"
-    mapfile -t results < <(find "results" -type f)
-    echo "[info][push] found ${#results[@]} from full.sh"
+    cd "$(dirname "$0")/.."
+    mapfile -t results < <(find ./test/results -type f)
+    echo "[info][push] found ${#results[@]} result logs"
     push=()
     for result in "${results[@]}"; do
         if ! "$ONLY_SUCCESFUL" || grep -q 'successful' <<< "$result"; then
