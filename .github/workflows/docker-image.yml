@@ -32,4 +32,4 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/${{ github.repository }}:latest
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/linuxgsm-docker:latest
