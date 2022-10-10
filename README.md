@@ -23,6 +23,7 @@ services:
     container_name: csgoserver
     environment:
       - GAMESERVER=csgoserver
+      - GAMESERVER_INSTANCE=1
       - LGSM_GITHUBUSER=GameServerManagers
       - LGSM_GITHUBREPO=LinuxGSM
       - LGSM_GITHUBBRANCH=master
@@ -38,7 +39,7 @@ services:
     restart: unless-stopped
 ```
 # First Run
-Edit the `docker-compose.yml` file changing `GAMESERVER=` to the game server of choice.
+Edit the `docker-compose.yml` file changing `GAMESERVER=` to the game server of choice. If you are running multiple instances, make sure to change `GAMESERVER_INSTANCE=` to an int of your choosing.
 On first run linuxgsm will install your selected server and will start running. Once completed the game server details will be output.
 ## Game Server Ports
 Each game server has its own port requirements. Becuase of this you will need to configure the correct ports in your `docker-compose` after first run. The required ports are output once installation is completed and everytime the docker container is started.
