@@ -2,8 +2,8 @@
 
 exit_handler () {
 	# Execute the  shutdown commands
-    echo "recieved SIGTERM stopping ${GAMESERVER}"
-	./${GAMESERVER} stop
+    [ -z "${GAMESERVER_INSTANCE}" ] && echo "recieved SIGTERM stopping ${GAMESERVER}" || echo "recieved SIGTERM stopping ${GAMESERVER}${GAMESERVER_INSTANCE}"
+	[ -z "${GAMESERVER_INSTANCE}" ] && ./${GAMESERVER} stop || ./${GAMESERVER}${GAMESERVER_INSTANCE} stop
 	exit 0
 }
 
@@ -42,7 +42,7 @@ fi
 
 # Create game server instance
 
-if [ ! -f "${GAMESERVER_INSTANCE}" ]; then
+if [ ! -z "${GAMESERVER_INSTANCE}" ]; then
     echo "renaming ${GAMESERVER} to ${GAMESERVER}${GAMESERVER_INSTANCE}"
     mv ${GAMESERVER} ${GAMESERVER}${GAMESERVER_INSTANCE}
 
