@@ -64,7 +64,7 @@ echo ""
 [ -z "${GAMESERVER_INSTANCE}" ] && echo "start ${GAMESERVER}" || echo "start ${GAMESERVER}${GAMESERVER_INSTANCE}"
 [ -z "${GAMESERVER_INSTANCE}" ] && ./${GAMESERVER} start || ./${GAMESERVER}${GAMESERVER_INSTANCE} start
 sleep 5
-[ -z "${GAMESERVER_INSTANCE}" ] && ./${GAMESERVER} details || || ./${GAMESERVER}${GAMESERVER_INSTANCE} details
+[ -z "${GAMESERVER_INSTANCE}" ] && ./${GAMESERVER} details || ./${GAMESERVER}${GAMESERVER_INSTANCE} details
 
 tail -f log/script/*
 

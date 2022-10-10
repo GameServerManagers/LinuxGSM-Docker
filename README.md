@@ -19,7 +19,7 @@ Below is an example `docker-compose` for csgoserver. Ports will vary depending u
 version: '3.4'
 services:
   linuxgsm:
-    image: "ghcr.io/gameservermanagers/linuxgsm-docker:latest"
+    image: "raks321/linuxgsm-docker:latest"
     container_name: csgoserver
     environment:
       - GAMESERVER=csgoserver
