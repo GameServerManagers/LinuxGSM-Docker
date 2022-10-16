@@ -1,12 +1,9 @@
 #!/bin/bash
 
-#[ -z "${GAMESERVER_INSTANCE}" ] && echo "recieved SIGTERM stopping ${GAMESERVER}" || echo "recieved SIGTERM stopping ${GAMESERVER}${GAMESERVER_INSTANCE}"
-
-
 exit_handler () {
 	# Execute the  shutdown commands
-    echo "recieved SIGTERM stopping ${GAMESERVER}"
-	./${GAMESERVER} stop
+    [ -z "${GAMESERVER_INSTANCE}" ] && echo "recieved SIGTERM stopping ${GAMESERVER}" || echo "recieved SIGTERM stopping ${GAMESERVER}${GAMESERVER_INSTANCE}"
+	[ -z "${GAMESERVER_INSTANCE}" ] && ./${GAMESERVER} stop || ./${GAMESERVER}${GAMESERVER_INSTANCE} stop
 	exit 0
 }
 
@@ -17,7 +14,7 @@ trap exit_handler SIGTERM
 echo -e "Welcome to the LinuxGSM Docker"
 echo -e "================================================================================"
 echo -e "GAMESERVER: ${GAMESERVER}"
-echo -e "GAMESERVER_INSTANCE: ${GAMESERVER_INSTANCE}"
+[ ! -z ${GAMESERVER_INSTANCE} ] && echo -e "GAMESERVER INSTANCE: ${GAMESERVER_INSTANCE}"
 echo -e "UID: $UID"
 echo -e ""
 echo -e "LGSM_GITHUBUSER: ${LGSM_GITHUBUSER}"
@@ -43,10 +40,16 @@ if [ ! -f "${GAMESERVER}" ]; then
    ./linuxgsm.sh ${GAMESERVER}
 fi
 
+# Create game server instance
+
+if [ ! -z "${GAMESERVER_INSTANCE}" ]; then
+    echo "renaming ${GAMESERVER} to ${GAMESERVER}${GAMESERVER_INSTANCE}"
+    mv ${GAMESERVER} ${GAMESERVER}${GAMESERVER_INSTANCE}
+
 # Install game server
 if [ -z "$(ls -A -- "serverfiles")" ]; then
-    echo "installing ${GAMESERVER}"
-    ./${GAMESERVER} auto-install
+    [ -z "${GAMESERVER_INSTANCE}" ] && echo "installing ${GAMESERVER}" || echo "installing ${GAMESERVER}${GAMESERVER_INSTANCE}"
+    [ -z "${GAMESERVER_INSTANCE}" ] && ./${GAMESERVER} auto-install || ./${GAMESERVER}${GAMESERVER_INSTANCE} auto-install
 fi
 
 echo "starting cron"
@@ -54,14 +57,14 @@ sudo cron
 
 # Update game server
 echo ""
-echo "update ${GAMESERVER}"
-./${GAMESERVER} update
+[ -z "${GAMESERVER_INSTANCE}" ] && echo "update ${GAMESERVER}" || echo "update ${GAMESERVER}${GAMESERVER_INSTANCE}"
+[ -z "${GAMESERVER_INSTANCE}" ] && ./${GAMESERVER} update || ./${GAMESERVER}${GAMESERVER_INSTANCE} update
 
 echo ""
-echo "start ${GAMESERVER}"
-./${GAMESERVER} start
+[ -z "${GAMESERVER_INSTANCE}" ] && echo "start ${GAMESERVER}" || echo "start ${GAMESERVER}${GAMESERVER_INSTANCE}"
+[ -z "${GAMESERVER_INSTANCE}" ] && ./${GAMESERVER} start || ./${GAMESERVER}${GAMESERVER_INSTANCE} start
 sleep 5
-./${GAMESERVER} details
+[ -z "${GAMESERVER_INSTANCE}" ] && ./${GAMESERVER} details || ./${GAMESERVER}${GAMESERVER_INSTANCE} details
 
 tail -f log/script/*
 
