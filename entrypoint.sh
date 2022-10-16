@@ -1,10 +1,10 @@
 #!/bin/bash
 
 exit_handler () {
-	# Execute the  shutdown commands
+    # Execute the  shutdown commands
     [ -z "${GAMESERVER_INSTANCE}" ] && echo "recieved SIGTERM stopping ${GAMESERVER}" || echo "recieved SIGTERM stopping ${GAMESERVER}${GAMESERVER_INSTANCE}"
-	[ -z "${GAMESERVER_INSTANCE}" ] && ./${GAMESERVER} stop || ./${GAMESERVER}${GAMESERVER_INSTANCE} stop
-	exit 0
+    [ -z "${GAMESERVER_INSTANCE}" ] && ./${GAMESERVER} stop || ./${GAMESERVER}${GAMESERVER_INSTANCE} stop
+    exit 0
 }
 
 # Exit trap
@@ -14,7 +14,7 @@ trap exit_handler SIGTERM
 echo -e "Welcome to the LinuxGSM Docker"
 echo -e "================================================================================"
 echo -e "GAMESERVER: ${GAMESERVER}"
-[ ! -z ${GAMESERVER_INSTANCE} ] && echo -e "GAMESERVER INSTANCE: ${GAMESERVER_INSTANCE}"
+[ -n "${GAMESERVER_INSTANCE}" ] && echo -e "GAMESERVER INSTANCE: ${GAMESERVER_INSTANCE}"
 echo -e "UID: $UID"
 echo -e ""
 echo -e "LGSM_GITHUBUSER: ${LGSM_GITHUBUSER}"
@@ -37,14 +37,15 @@ fi
 # Setup game server
 if [ ! -f "${GAMESERVER}" ]; then
     echo "creating ./${GAMESERVER}"
-   ./linuxgsm.sh ${GAMESERVER}
+    ./linuxgsm.sh ${GAMESERVER}
 fi
 
 # Create game server instance
 
-if [ ! -z "${GAMESERVER_INSTANCE}" ]; then
+if [  -n  "${GAMESERVER_INSTANCE}" ]; then
     echo "renaming ${GAMESERVER} to ${GAMESERVER}${GAMESERVER_INSTANCE}"
     mv ${GAMESERVER} ${GAMESERVER}${GAMESERVER_INSTANCE}
+fi
 
 # Install game server
 if [ -z "$(ls -A -- "serverfiles")" ]; then
@@ -74,7 +75,7 @@ if [ $# = 0 ]; then
 else
     # execute the command passed through docker
     "$@"
-
+    
     # if this command was a server start cmd
     # to get around LinuxGSM running everything in
     # tmux;
