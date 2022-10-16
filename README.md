@@ -23,7 +23,7 @@ services:
     container_name: csgoserver
     environment:
       - GAMESERVER=csgoserver
-      - GAMESERVER_INSTANCE=1
+      - GAMESERVER_INSTANCE=01
       - LGSM_GITHUBUSER=GameServerManagers
       - LGSM_GITHUBREPO=LinuxGSM
       - LGSM_GITHUBBRANCH=master
