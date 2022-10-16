@@ -1,8 +1,5 @@
 #!/bin/bash
 
-#[ -z "${GAMESERVER_INSTANCE}" ] && echo "recieved SIGTERM stopping ${GAMESERVER}" || echo "recieved SIGTERM stopping ${GAMESERVER}${GAMESERVER_INSTANCE}"
-
-
 exit_handler () {
 	# Execute the  shutdown commands
     echo "recieved SIGTERM stopping ${GAMESERVER}"
@@ -17,7 +14,6 @@ trap exit_handler SIGTERM
 echo -e "Welcome to the LinuxGSM Docker"
 echo -e "================================================================================"
 echo -e "GAMESERVER: ${GAMESERVER}"
-echo -e "GAMESERVER_INSTANCE: ${GAMESERVER_INSTANCE}"
 echo -e "UID: $UID"
 echo -e ""
 echo -e "LGSM_GITHUBUSER: ${LGSM_GITHUBUSER}"
