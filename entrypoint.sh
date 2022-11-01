@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash 
 
 exit_handler () {
     # Execute the  shutdown commands
