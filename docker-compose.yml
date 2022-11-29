@@ -1,10 +1,11 @@
 version: '3.4'
 services:
   linuxgsm:
-    image: "ghcr.io/gameservermanagers/linuxgsm-docker:latest"
+    image: raks321/linuxgsm-docker:latest
     container_name: csgoserver
     environment:
       - GAMESERVER=csgoserver
+      - GAMESERVER_INSTANCE=01
       - LGSM_GITHUBUSER=GameServerManagers
       - LGSM_GITHUBREPO=LinuxGSM
       - LGSM_GITHUBBRANCH=master
