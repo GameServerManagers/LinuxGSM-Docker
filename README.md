@@ -1,5 +1,4 @@
-> note: This Repo is due to be retired and replaced with a new Docker container
-
+# note: This Repo is now retired and replaced with a new Docker container  https://github.com/GameServerManagers/docker-gameserver
 <h1 align="center">
   <br>
   <a href="https://linuxgsm.com"><img src="https://i.imgur.com/Eoh1jsi.jpg" alt="LinuxGSM"></a>
