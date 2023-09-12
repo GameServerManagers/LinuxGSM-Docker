@@ -36,7 +36,10 @@ fi
 # Setup game server
 if [ ! -f "${GAMESERVER}" ]; then
     echo "creating ./${GAMESERVER}"
-   ./linuxgsm.sh ${GAMESERVER}
+    exec_name=$(./linuxgsm.sh ${GAMESERVER} | grep -o ${GAMESERVER}-. | head -1)
+    if [ ! -z "$exec_name" ]; then
+        export GAMESERVER=$exec_name
+    fi
 fi
 
 # Install game server
