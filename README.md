@@ -14,15 +14,15 @@ Dockerhub https://hub.docker.com/r/gameservermanagers/linuxgsm-docker/
 # Usage
 
 ## docker-compose
-Below is an example `docker-compose` for csgoserver. Ports will vary depending upon server.
+Below is an example `docker-compose` for cs2. Ports will vary depending upon server.
   ```
 version: '3.4'
 services:
   linuxgsm:
     image: "raks321/linuxgsm-docker:latest"
-    container_name: csgoserver
+    container_name: cs2
     environment:
-      - GAMESERVER=csgoserver
+      - GAMESERVER=cs2
       - GAMESERVER_INSTANCE=01
       - LGSM_GITHUBUSER=GameServerManagers
       - LGSM_GITHUBREPO=LinuxGSM
@@ -44,14 +44,14 @@ On first run linuxgsm will install your selected server and will start running. 
 ## Game Server Ports
 Each game server has its own port requirements. Becuase of this you will need to configure the correct ports in your `docker-compose` after first run. The required ports are output once installation is completed and everytime the docker container is started.
 ## Volumes
-volumes are required to save persistant data for your game server. The example above covers a basic csgoserver however some game servers save files in other places. Please check all the correct locations are mounted to remove the risk of loosing save data.
+volumes are required to save persistant data for your game server. The example above covers a basic cs2 however some game servers save files in other places. Please check all the correct locations are mounted to remove the risk of loosing save data.
 # Run LinuxGSM commands
 
 Commands can be run just like standard LinuxGSM using the docker exec command.
 
 ```
 
-docker exec -it csgoserver ./csgoserver details
+docker exec -it cs2 ./cs2 details
 
 ```
 #
